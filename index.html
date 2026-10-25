@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Van Dash">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<script>
+(function () {
+  try {
+    var S = 180, c = document.createElement('canvas');
+    c.width = c.height = S;
+    var g = c.getContext('2d'), cx = S / 2, cy = S / 2;
+    g.fillStyle = '#000'; g.fillRect(0, 0, S, S);
+    // faint topo contour lines
+    g.strokeStyle = 'rgba(255,255,255,0.14)'; g.lineWidth = 1;
+    for (var i = 0; i < 9; i++) {
+      g.beginPath();
+      for (var a = 0; a <= 6.2832; a += 0.05) {
+        var r = 28 + i * 11 + 5 * Math.sin(a * 3 + i) + 4 * Math.sin(a * 5 - i * 2);
+        var x = cx + 12 + r * 1.15 * Math.cos(a), y = cy - 8 + r * 0.95 * Math.sin(a);
+        if (a === 0) g.moveTo(x, y); else g.lineTo(x, y);
+      }
+      g.closePath(); g.stroke();
+    }
+    // dark disc behind the compass
+    g.fillStyle = '#05080c'; g.beginPath(); g.arc(cx, cy, 66, 0, 6.2832); g.fill();
+    // white ring
+    g.strokeStyle = '#fff'; g.lineWidth = 5; g.beginPath(); g.arc(cx, cy, 62, 0, 6.2832); g.stroke();
+    // tick marks
+    g.lineWidth = 2;
+    for (var t = 0; t < 36; t++) {
+      var ang = t * Math.PI / 18, len = (t % 9 === 0) ? 12 : 6;
+      g.beginPath();
+      g.moveTo(cx + 54 * Math.cos(ang), cy + 54 * Math.sin(ang));
+      g.lineTo(cx + (54 - len) * Math.cos(ang), cy + (54 - len) * Math.sin(ang));
+      g.stroke();
+    }
+    // needle rotated 40 degrees: orange tip, gray tail
+    g.save(); g.translate(cx, cy); g.rotate(40 * Math.PI / 180);
+    g.fillStyle = '#ff8a2b';
+    g.beginPath(); g.moveTo(0, -46); g.lineTo(11, 0); g.lineTo(-11, 0); g.closePath(); g.fill();
+    g.fillStyle = '#8a96a6';
+    g.beginPath(); g.moveTo(0, 46); g.lineTo(11, 0); g.lineTo(-11, 0); g.closePath(); g.fill();
+    g.restore();
+    // center hub
+    g.fillStyle = '#05080c'; g.strokeStyle = '#ff8a2b'; g.lineWidth = 3;
+    g.beginPath(); g.arc(cx, cy, 7, 0, 6.2832); g.fill(); g.stroke();
+    var url = c.toDataURL('image/png');
+    var l1 = document.createElement('link'); l1.rel = 'apple-touch-icon'; l1.href = url;
+    var l2 = document.createElement('link'); l2.rel = 'icon'; l2.type = 'image/png'; l2.href = url;
+    document.head.appendChild(l1); document.head.appendChild(l2);
+  } catch (e) {}
+})();
+</script>
+<meta name="icon-by-script" content="1
+<title>Van Dash</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #000000;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='640' viewBox='0 0 360 640'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.17' stroke-width='1'%3E%3Cpath d='M300 55Q293 61 292 68Q291 74 294 79Q297 84 302 86Q307 88 311 84Q315 81 317 74Q319 67 316 63Q313 59 306 57L300 55M284 21Q276 28 275 40Q273 51 266 59Q258 67 258 72Q257 78 260 81Q264 85 274 87Q284 90 296 100Q307 109 311 110Q315 111 318 109Q320 106 324 94Q328 83 336 78Q345 72 345 68Q346 64 343 60Q340 57 327 50Q313 44 302 33Q291 23 288 22L284 21M278 5Q265 12 260 18Q255 24 255 34Q254 45 250 59Q245 73 248 80Q251 88 256 91Q260 95 270 99Q281 103 289 113Q298 123 304 126Q309 128 315 126Q321 125 342 111L363 98M129 5Q114 12 112 18Q111 25 115 32Q119 39 128 42Q137 46 143 43Q149 40 151 32Q153 25 147 17Q142 10 136 7L129 5M307 458Q289 469 282 476Q276 483 275 490Q275 498 279 504Q283 509 289 509Q294 510 301 507Q308 504 313 500Q318 495 323 488Q327 482 328 477Q329 472 327 468Q325 464 321 461Q317 458 312 458L307 458M194 -2Q202 16 199 24Q196 32 200 37Q204 41 207 42Q210 42 212 40Q214 38 212 30Q209 21 209 19Q210 17 217 14Q224 11 228 13Q232 15 236 31Q239 47 238 64Q237 82 242 88Q246 94 260 106Q273 118 275 122Q276 127 276 138Q276 148 282 160Q288 171 290 172Q292 173 294 171Q297 170 316 150Q335 130 348 126L362 121M126 -2Q107 10 106 18Q105 26 108 34Q112 41 124 46Q136 51 140 50Q144 49 147 47Q151 44 156 35Q160 26 160 21Q159 16 152 7L145 -2M74 337Q61 342 59 348Q58 353 60 359Q63 366 69 369Q75 371 83 368Q91 365 94 358Q97 351 94 345Q91 340 82 338L74 337M304 449Q291 455 279 466Q267 477 265 480Q264 484 263 493Q263 502 261 505Q259 508 255 509Q251 509 242 508Q233 506 228 510Q224 514 222 520Q221 527 225 537Q229 547 228 563Q227 579 226 583Q224 587 222 588Q219 589 182 592Q144 595 134 613Q124 630 114 636L104 643M100 -3Q91 5 88 14Q86 23 90 35Q94 48 99 54Q104 60 120 63Q135 65 150 54Q165 42 169 41Q173 40 178 42Q182 45 189 54Q196 64 206 64Q217 64 220 65Q222 67 224 76Q226 86 237 100Q248 114 252 128Q256 143 256 149Q256 155 251 164Q245 172 246 178Q246 183 250 189Q254 194 264 199Q274 204 264 207Q254 209 249 214Q244 218 243 234Q242 249 244 253Q247 258 260 259Q272 260 279 258Q285 256 287 252Q289 249 290 243Q291 237 286 222Q282 208 307 185Q332 162 338 152Q344 143 353 140L362 137M85 -2Q70 26 76 34Q82 41 85 48Q89 55 94 74Q99 93 100 101Q100 109 102 112Q104 114 115 119Q126 124 131 123Q137 122 139 117Q141 112 141 100Q140 88 142 80Q145 72 151 64Q157 56 164 52Q170 48 174 50Q177 51 179 56Q181 61 181 65Q180 69 177 76Q173 82 174 84Q175 87 194 89Q214 91 221 96Q228 100 232 104Q236 109 242 129Q247 149 243 162Q239 174 241 188Q244 201 240 208Q236 216 235 226Q233 237 230 245Q226 253 227 256Q228 260 232 263Q236 267 242 268Q249 269 266 267Q282 265 287 263Q292 261 294 254Q297 246 295 231Q294 216 296 211Q298 206 323 178Q349 150 356 146L363 143M-2 152Q18 139 26 130Q35 121 38 119Q42 117 57 122Q72 128 86 124Q99 121 114 125Q129 130 134 130Q138 130 141 127Q144 124 148 110Q151 97 154 93Q157 90 178 93Q200 96 210 99Q219 102 225 108Q230 114 234 127Q237 140 238 146Q238 152 236 163Q233 174 234 186Q234 198 228 206Q221 215 222 222Q223 228 221 232Q219 235 212 239Q204 243 192 243Q181 244 179 245Q177 247 176 250Q176 253 177 256Q179 260 182 262Q186 265 199 267Q212 268 226 275Q240 281 252 277Q263 273 276 272Q290 270 294 268Q299 266 301 258Q304 251 303 234Q302 217 303 212Q305 206 329 181Q352 156 357 153L363 149M-2 159Q42 125 46 125Q50 126 61 131Q72 136 87 131Q103 127 120 131Q137 136 142 134Q147 131 151 119Q155 107 158 104Q162 100 177 99Q192 99 204 103Q216 107 221 113Q226 118 228 127Q231 136 231 144Q231 153 228 173Q225 193 213 198Q201 204 196 214Q192 224 189 226Q186 228 174 231Q162 234 152 229Q143 224 137 226Q131 227 120 242Q108 257 108 266Q107 274 111 282Q114 290 122 293Q130 296 136 295Q142 293 148 284Q154 275 157 273Q160 271 184 276Q208 282 215 285Q222 289 234 301Q245 312 250 315Q255 317 258 314Q262 311 260 300Q257 290 259 286Q261 282 267 280Q273 277 286 277Q299 276 304 272Q308 269 312 254Q315 239 312 229Q310 219 311 214Q312 208 337 182L363 155M-2 166Q18 148 30 140Q41 133 45 133Q49 133 61 138Q72 143 77 142Q81 142 92 137Q104 131 117 136Q130 141 135 142Q140 142 145 139Q150 136 154 124Q158 112 161 108Q165 105 177 103Q189 102 200 105Q210 109 216 114Q221 119 223 126Q225 133 225 145Q225 156 222 170Q219 183 208 189Q197 196 186 207Q176 219 171 219Q166 220 156 217Q146 214 136 218Q126 222 114 240Q102 257 101 264Q100 270 102 278Q103 287 108 293Q113 298 123 300Q133 302 139 300Q145 299 151 292Q157 285 160 283Q163 282 182 285Q201 289 210 293Q219 297 234 310Q250 324 261 325Q272 326 282 330Q293 334 305 329Q317 324 323 318Q329 312 328 306Q328 301 319 294Q311 286 317 274Q322 261 324 246Q327 232 325 222Q324 212 333 198Q342 183 352 172L363 161M-2 173Q19 151 30 145Q41 139 45 139Q49 140 60 144Q72 149 78 148Q84 147 94 142Q105 137 118 142Q132 148 139 148Q146 148 150 143Q154 139 159 126Q163 113 169 109Q176 106 182 105Q189 105 196 107Q202 109 208 113Q214 117 217 121Q219 126 220 140Q220 153 217 165Q213 176 203 182Q192 188 184 197Q175 206 160 205Q146 205 134 212Q122 219 109 237Q97 255 95 277Q93 299 82 299Q70 298 56 300Q41 302 30 300Q20 299 18 300Q16 301 15 309Q14 317 15 325Q15 334 24 357Q32 381 43 399Q54 418 63 424Q71 430 79 431Q87 433 94 431Q100 428 104 420Q107 411 113 406Q118 400 118 392Q117 383 120 368Q123 352 118 334Q112 315 114 312Q115 309 129 308Q144 306 154 299Q163 291 170 291Q178 291 196 296Q213 301 232 316Q250 330 260 332Q271 334 280 337Q290 340 296 339Q301 337 315 328Q329 319 332 312Q336 305 331 294Q327 283 330 273Q334 263 333 252Q333 242 335 226Q337 209 341 198Q346 187 354 178L362 168M-3 181Q20 155 30 150Q40 145 56 150Q73 155 80 154Q87 153 98 149Q108 144 130 153Q152 162 158 140Q165 119 168 116Q170 113 174 111L179 109M-3 189Q19 160 28 155L36 150M362 263Q349 251 347 243Q344 235 347 218Q350 202 356 193L362 184M-3 197Q10 185 16 174Q22 162 30 158L38 154M-3 209Q2 201 8 196Q15 191 19 179Q23 167 28 163L34 159M72 333Q57 339 55 347Q53 355 57 363Q61 371 68 374Q76 377 86 371Q96 366 99 362Q101 358 102 354Q102 350 101 346Q99 341 96 338Q93 336 82 334L72 333M69 329Q58 331 55 333Q52 335 50 339Q48 343 48 350Q48 357 50 362Q51 367 54 371Q57 375 62 378Q67 381 72 382Q76 382 82 380Q88 378 94 373Q100 368 103 364Q106 359 106 354Q107 349 104 344Q102 338 99 335Q95 332 82 330L69 329M52 308Q25 311 23 315Q21 319 21 326Q22 332 30 356Q38 379 55 400Q72 421 76 424Q80 426 84 426Q88 426 91 423Q93 419 93 408Q92 398 100 389Q109 381 113 374Q117 367 118 360Q119 354 118 348Q117 342 114 334Q110 326 105 322Q101 317 85 313Q70 309 61 308L52 308M42 316Q33 319 31 322Q30 325 35 348Q41 372 44 377Q48 381 56 387Q63 393 68 395Q72 396 76 396Q80 395 92 387Q103 378 107 373Q111 368 113 360Q115 353 113 345Q111 337 108 332Q104 327 100 324Q95 321 68 319L42 316M50 325Q45 328 44 330Q43 333 44 349Q45 365 49 372Q53 378 61 383Q69 388 76 387Q83 386 94 377Q105 369 108 362Q111 355 109 347Q108 339 104 335Q101 330 96 328Q92 326 71 325L50 325M-2 438Q8 441 12 438Q16 435 19 430L25 425M362 425Q345 429 338 427Q331 425 323 419Q316 412 303 397Q290 381 286 380Q282 378 281 381Q280 383 281 393Q283 403 281 409Q279 415 276 418Q272 422 262 427Q251 432 239 448Q227 463 211 473Q196 482 194 486Q192 490 191 501Q190 512 187 519Q183 526 180 528Q176 531 164 533Q153 536 145 547Q136 558 126 563Q115 568 106 577Q98 586 93 585Q88 584 78 577Q69 569 57 567Q44 565 40 558Q36 552 33 542Q30 531 30 489Q30 447 33 439Q36 430 41 428Q46 426 59 431Q72 436 84 437Q95 438 100 437Q104 435 116 427Q129 418 130 412Q130 405 127 392Q124 380 126 364Q127 348 124 335Q122 322 123 319Q125 315 137 313Q149 311 158 305Q168 299 174 299Q181 299 199 305Q217 310 232 323Q248 336 259 338Q270 339 280 343Q290 347 311 334Q332 321 341 309L349 298M170 308Q182 311 186 318Q190 324 198 320Q205 316 211 317Q217 317 230 329Q244 341 256 343Q268 345 272 347Q276 350 279 355Q281 360 274 368Q267 376 271 386Q274 397 274 402Q274 407 271 411Q268 415 258 422Q248 428 237 444Q226 460 206 471Q186 483 185 486Q184 489 185 499Q186 509 183 515Q179 521 166 525Q153 529 142 542Q132 555 122 559Q113 564 106 570Q99 577 95 577Q91 577 82 571Q72 565 61 561Q50 557 44 548Q38 539 36 530Q34 521 36 483Q38 445 39 442Q41 440 44 438Q47 437 72 441Q97 444 109 441Q120 437 134 435Q148 434 139 408Q130 382 130 354Q130 327 133 324Q135 321 144 319Q153 317 162 312L170 308M161 324Q168 324 172 330Q176 335 180 337Q183 338 189 336Q194 335 202 330Q209 324 213 324Q217 324 221 327Q225 329 234 339Q242 349 253 351Q264 353 265 356Q265 358 262 366Q258 375 262 385Q266 395 266 400Q266 404 264 407Q262 410 254 417Q245 423 238 436Q232 448 227 453Q222 458 202 467Q182 476 170 478Q158 481 156 484Q155 487 155 490Q155 493 158 495Q160 497 168 498Q176 499 177 503Q179 506 178 510Q176 513 174 515Q171 517 161 519Q151 522 140 536Q129 551 114 560Q98 570 94 570Q90 570 72 562Q55 554 50 548Q44 542 41 532Q38 522 39 502Q40 482 46 470Q52 457 58 454Q64 450 71 449Q78 448 89 449Q100 450 112 447Q125 443 142 445Q158 447 165 443Q172 440 174 437Q175 434 174 431Q174 428 161 421Q148 414 142 397Q135 380 137 356Q139 333 142 330Q145 327 153 326L161 324M211 333Q221 335 232 349Q243 363 250 380Q257 397 255 401Q254 405 247 413Q239 421 233 434Q227 448 219 453Q211 459 187 465Q163 470 158 472Q154 475 151 481Q148 487 147 498Q147 510 140 525Q132 540 127 545Q122 550 108 557Q93 565 75 557Q56 549 51 543Q46 537 43 530Q41 522 42 506Q42 491 45 483Q48 475 56 468Q63 461 70 458Q76 455 88 455Q100 455 114 452Q127 448 144 451Q162 454 170 451Q178 447 181 442Q184 437 183 432Q182 426 178 422Q174 417 166 414Q157 411 154 409Q150 406 146 398Q142 389 142 382Q142 375 145 371Q148 367 158 368Q168 369 174 359Q180 348 196 341L211 333M124 453Q141 456 146 460Q150 465 139 502Q127 539 122 544Q116 549 105 554Q94 560 88 559Q83 558 71 552Q59 546 54 541Q49 536 47 529Q44 522 44 508Q45 495 48 488Q50 480 55 475Q60 470 68 466Q75 462 88 461Q101 460 112 456L124 453M118 463Q131 464 133 468Q136 473 133 486Q131 498 124 518Q117 537 111 542Q105 547 98 549Q92 551 86 550Q79 548 70 543Q61 539 57 534Q53 530 51 524Q49 518 50 508Q51 497 54 490Q57 484 66 478Q75 472 96 467L118 463M94 479Q116 480 118 482Q119 485 119 490Q120 494 114 512Q108 530 104 534Q99 537 94 538Q88 539 76 534Q65 529 62 525Q60 521 59 516Q59 512 61 504Q63 496 66 492Q69 487 74 484Q79 482 86 480L94 479M88 491Q102 492 104 497Q106 502 104 511Q101 520 95 524Q89 527 83 525Q77 523 74 518Q72 513 74 506Q77 498 82 494L88 491M90 496Q99 498 100 503Q101 508 99 513Q96 519 92 520Q87 522 83 520Q80 518 79 514Q78 510 80 505Q82 501 86 498L90 496M252 587Q249 598 250 612Q252 625 250 634L248 643M244 572Q240 580 238 596Q237 613 235 617Q232 620 206 612Q180 603 175 604Q169 605 164 608Q159 611 159 614Q158 616 160 618Q161 621 165 623Q169 626 178 627Q186 629 191 636L196 642M258 220Q253 222 252 225Q250 228 252 237Q253 246 258 249Q264 253 271 252Q278 251 281 247Q283 242 282 236Q281 230 276 226Q271 222 264 221L258 220M279 284Q291 286 294 288Q296 290 292 296Q287 301 282 303Q277 306 274 304Q271 301 270 297Q268 292 270 289Q272 286 276 285L279 284M306 300Q297 305 293 309Q288 314 288 317Q287 320 289 323Q291 325 298 325Q306 325 314 319Q322 314 322 311Q323 308 322 306Q320 303 313 301L306 300M116 93Q110 100 111 104Q112 109 116 112Q121 115 126 115Q130 115 132 112Q133 109 132 105Q131 101 128 98Q124 95 120 94L116 93M65 44Q75 47 78 52Q82 57 83 78Q85 98 79 94Q72 90 62 89Q52 88 49 85Q46 83 46 78Q46 73 49 64Q51 56 54 52Q57 48 61 46L65 44M165 59Q170 60 171 63Q171 67 168 71Q165 75 162 77Q158 79 157 77Q155 75 156 72Q156 68 160 64L165 59M66 58Q72 59 73 62Q74 66 72 69Q71 72 67 73Q64 74 62 73Q60 72 59 70Q59 67 62 62L66 58M183 112Q193 113 198 115Q203 118 206 122Q210 125 211 130Q212 134 211 140Q210 147 207 152Q204 157 200 160Q197 162 191 163Q185 164 178 162Q170 160 167 154Q164 148 167 134Q169 121 172 118Q174 115 179 113L183 112M186 116Q201 122 204 125Q206 128 206 132Q206 136 202 143Q198 150 190 152Q181 154 176 151Q172 148 171 140Q171 133 173 127Q175 121 181 118L186 116M186 122Q195 124 197 128Q200 132 198 136Q196 140 192 142Q187 143 184 142Q180 141 179 138Q178 134 179 130Q180 126 183 124L186 122M351 320Q357 325 360 335L363 345M362 414Q346 419 340 417Q333 415 321 399Q309 384 305 374Q300 365 301 360Q302 354 307 348Q312 342 331 331L351 320M346 329Q353 333 358 345L363 357M362 406Q347 413 342 411Q336 409 328 400Q320 390 313 378Q306 366 307 360Q307 354 311 349Q315 343 322 339Q329 334 338 332L346 329M336 336Q344 336 347 337Q349 339 356 354L363 368M363 394Q350 403 345 402Q340 402 334 397Q328 392 320 381Q313 370 312 364Q311 359 313 354Q315 349 319 345Q324 341 330 338L336 336M332 342Q339 342 342 343Q345 345 351 358Q357 370 357 376Q357 383 353 387Q348 391 344 391Q341 391 338 389Q334 387 325 375Q317 364 318 357Q319 351 325 346L332 342M330 350Q337 350 339 352Q342 355 343 360Q344 365 342 368Q341 372 337 371Q333 370 329 366Q325 362 325 358Q324 355 327 352L330 350'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 360px 640px;
+    color: #e8eef5;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom);
+    min-height: 100vh;
+    -webkit-overflow-scrolling: auto;
+    min-height: 100dvh;
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    touch-action: pan-y;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
+  }
+  html { overscroll-behavior: none; overscroll-behavior-y: none; background: #000000; height: 100%; }
+  .hidden { display: none !important; }
+  .locrow { display: flex; align-items: center; gap: 12px; padding: 6px 14px; }
+  .locrow .pin { width: 20px; height: 27px; flex: none; }
+  .locrow .loctext { flex: 1; min-width: 0; }
+  .locrow .loclabel { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; }
+  .locrow #city { font-size: 20px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .card.mapcard { padding: 0 !important; overflow: hidden; position: relative; height: 170px; }
+  .maptiles { filter: none; }
+  .tripcard .tripbody { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+  .tripcard .tripbody .value { margin-top: 0; }
+  .tripcard .tripbody .sub { margin-top: 0; }
+  .tripcard .tripbody .btns { display: flex; align-items: center; gap: 8px; }
+  .tripcard .tripbody .btns button { margin-top: 0; }
+  .fuelbtn { background: #26303c; border: 0.5px solid #8a96a6; padding: 6px 10px; line-height: 0; }
+  .fuelbtn svg { width: 22px; height: 22px; stroke: #ff8a2b; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .fuelform { background: #151c25; border-radius: 14px; padding: 4px 14px 14px; border: 0.5px solid #8a96a6; margin-bottom: 14px; }
+  .fuelform .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .fuelform label.chk { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 15px; color: #e8eef5; }
+  .fuelform label.chk input { width: 22px; height: 22px; accent-color: #ff8a2b; }
+  .fuelrow { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 10px 0; border-top: 1px solid #26303c; }
+  .fuelrow:first-child { border-top: none; }
+  .fuelrow .a { font-size: 16px; font-weight: 600; }
+  .fuelrow .m { font-size: 18px; font-weight: 700; color: #ff8a2b; text-align: right; }
+  .fuelrow .b { font-size: 13px; color: #9fb0c3; }
+  .fuelrow .x { font-size: 13px; color: #7f8fa3; text-align: right; }
+  .fuelrow button.del { background: none; color: #7f8fa3; padding: 0; margin: 0; font-size: 12px; text-decoration: underline; }
+  #fuelList { background: #151c25; border-radius: 16px; padding: 4px 14px; border: 0.5px solid #8a96a6; }
+  .tripcard .tripbody button.unused { margin-top: 0; }
+  #map { width: 100%; height: 100%; background: #e8e6e0; }
+  .leaflet-container { background: #e8e6e0; font-family: inherit; }
+  .leaflet-control-attribution { background: rgba(255,255,255,0.7) !important; color: #555 !important; font-size: 9px !important; }
+  .leaflet-control-attribution a { color: #333 !important; }
+  .mapbtns { position: absolute; right: 8px; top: 8px; z-index: 1000; display: flex; flex-direction: column; gap: 6px; }
+  .mapbtns button { width: 40px; height: 40px; margin: 0; padding: 0; font-size: 24px; line-height: 1; background: rgba(21,28,37,0.92); border: 0.5px solid #8a96a6; border-radius: 10px; color: #ffffff; }
+  .youdot { width: 22px; height: 22px; background: #ff3b30; border: 4px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 8px rgba(255,59,48,0.30), 0 2px 6px rgba(0,0,0,0.6); }
+  .leaflet-marker-icon, .leaflet-marker-pane { z-index: 900 !important; }
+  header { display: none; text-align: center; padding: 4px 0 2px; }
+  .speed { text-align: center; padding: 6px 0 14px; }
+  .speed .num { font-size: 96px; font-weight: 700; line-height: 1; color: #ffffff; }
+  .speed .unit { font-size: 22px; color: #7f8fa3; margin-top: 2px; }
+  .ico { width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; stroke: #ff8a2b; fill: none;
+         stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .compass-wrap { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+  .compass-wrap svg { width: 64px; height: 64px; flex: none; }
+  #compassRing { transition: transform 0.25s linear; transform-origin: 50px 50px; }
+  .temp-wrap { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+  .thermo { width: 26px; height: 74px; flex: none; }
+  .wx-wrap { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+  .wx-wrap .bigicon { font-size: 44px; line-height: 1; }
+  .sunrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; text-align: center; }
+  .sunrow svg { width: 38px; height: 28px; stroke: #ffb84d; fill: none; stroke-width: 1.8; stroke-linecap: round; }
+  .sunrow .t { font-size: 18px; font-weight: 600; margin-top: 2px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .card { background: #151c25; border-radius: 14px; padding: 8px 12px;
+          border: 0.5px solid #8a96a6; }
+  .card.tap { border: 0.5px solid #8a96a6; }
+  .card .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; }
+  .card .value { font-size: 30px; font-weight: 600; margin-top: 6px; }
+  .card .sub { font-size: 13px; color: #9fb0c3; margin-top: 4px; }
+  .hint { font-size: 11px; color: #ff8a2b; margin-top: 3px; }
+  button {
+    background: #c9651a; color: white; border: none; border-radius: 10px;
+    padding: 7px 12px; font-size: 14px; margin-top: 4px;
+  }
+  button.alt { background: #26303c; }
+  #status { text-align: center; font-size: 13px; color: #e0a040; padding: 4px; min-height: 18px; }
+
+  /* Weather detail screen */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 0 8px; }
+  .topbar .title { font-size: 20px; font-weight: 600; text-align: center; flex: 1; }
+  .topbar button { margin: 0; background: #26303c; }
+  .topbar .spacer { width: 70px; }
+  .nowline { text-align: center; padding: 6px 0 14px; }
+  .nowline .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .nowline .desc { font-size: 18px; color: #9fb0c3; margin-top: 6px; }
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .stat { background: #151c25; border-radius: 12px; padding: 10px; text-align: center;
+          border: 0.5px solid #8a96a6; box-shadow: none; }
+  .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; }
+  .stat .v { font-size: 20px; font-weight: 600; margin-top: 4px; }
+  /* Battery card + settings */
+  .card.wide { grid-column: 1 / -1; }
+  .batt-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px; text-align: center; }
+  .batt-row .v { font-size: 30px; font-weight: 700; }
+  .batt-row .u { font-size: 12px; color: #7f8fa3; text-transform: uppercase; letter-spacing: 1px; }
+  .gear { float: right; background: none; margin: 0; padding: 0 4px; font-size: 18px; color: #7f8fa3; }
+  input.field { width: 100%; background: #151c25; color: #e8eef5; border: 1px solid #2a3a4e;
+                border-radius: 10px; padding: 12px; font-size: 16px; margin-top: 6px; }
+  .fieldlabel { font-size: 13px; color: #9fb0c3; margin-top: 14px; }
+  .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; margin: 6px 4px 8px; }
+  #forecast { background: #151c25; border-radius: 16px; padding: 4px 14px;
+              border: 0.5px solid #8a96a6; box-shadow: none; }
+  .day { display: grid; grid-template-columns: 62px 44px 1fr; align-items: center; gap: 8px;
+         padding: 10px 0; border-top: 1px solid #26303c; }
+  .day:first-child { border-top: none; }
+  .day .d { font-size: 18px; font-weight: 600; }
+  .day .ic { text-align: center; line-height: 1; }
+  .day .ic .emoji { font-size: 26px; }
+  .day .ic .rain { font-size: 12px; font-weight: 600; color: #6db3ff; min-height: 14px; }
+  .day .range { display: grid; grid-template-columns: 38px 1fr 38px; align-items: center; gap: 8px; }
+  .day .lo { text-align: right; color: #7f8fa3; font-size: 18px; }
+  .day .hi { text-align: left; font-size: 18px; font-weight: 600; }
+  .bar { position: relative; height: 5px; border-radius: 3px; background: #2b3542; }
+  .bar .fill { position: absolute; top: 0; bottom: 0; border-radius: 3px;
+               background: linear-gradient(90deg, #5fb8ff, #7fe08a, #ffd34d, #ff9a3c); }
+</style>
+</head>
+<body>
+
+<!-- ================= MAIN SCREEN ================= -->
+<div id="mainScreen">
+  <div class="speed">
+    <div class="num" id="speed">--</div>
+    <div class="unit">mph</div>
+  </div>
+
+  <div class="grid">
+    <div class="card wide locrow">
+      <svg class="pin" viewBox="0 0 24 32"><path d="M12 1C6.2 1 1.5 5.7 1.5 11.5c0 7.6 10.5 19 10.5 19s10.5-11.4 10.5-19C22.5 5.7 17.8 1 12 1z" fill="#ff8a2b"/><circle cx="12" cy="11.5" r="4" fill="#000000"/></svg>
+      <div class="loctext">
+        <div class="loclabel">Current city</div>
+        <div id="city">Finding location...</div>
+      </div>
+      <div id="updated" class="hidden">&nbsp;</div>
+    </div>
+    <div class="card tap" id="tempCard">
+      <div class="label"><svg class="ico" id="tempIco" viewBox="0 0 24 24"><path d="M14 14.76V4a2 2 0 0 0-4 0v10.76a4 4 0 1 0 4 0z"/></svg>Temperature</div>
+      <div class="temp-wrap">
+        <svg class="thermo" viewBox="0 0 26 74">
+          <defs>
+            <linearGradient id="thermoGrad" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0" stop-color="#2f7bff"/>
+              <stop offset="0.5" stop-color="#7fe08a"/>
+              <stop offset="0.8" stop-color="#ffd34d"/>
+              <stop offset="1" stop-color="#ff8a2b"/>
+            </linearGradient>
+            <clipPath id="thermoClip"><rect id="thermoFill" x="0" y="40" width="26" height="34"/></clipPath>
+          </defs>
+          <rect x="8" y="3" width="10" height="50" rx="5" fill="#0b0f14" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="13" cy="58" r="11" fill="#0b0f14" stroke="#ffffff" stroke-width="1.5"/>
+          <g clip-path="url(#thermoClip)">
+            <rect x="10" y="5" width="6" height="50" rx="3" fill="url(#thermoGrad)"/>
+            <circle cx="13" cy="58" r="8.5" fill="url(#thermoGrad)"/>
+          </g>
+        </svg>
+        <div>
+          <div class="value" id="temp" style="margin-top:0">--</div>
+          <div class="sub" id="hilo">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+    <div class="card tap" id="wxCard">
+      <div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 8.5 4.5 4.5 0 0 1 17.5 18z"/></svg>Weather</div>
+      <div class="wx-wrap">
+        <div class="bigicon" id="wxIcon">&#9729;&#65039;</div>
+        <div class="value" id="wx" style="font-size:20px;margin-top:0">--</div>
+      </div>
+      <div class="sub" id="wind">&nbsp;</div>
+      <div class="hint">Tap for weather details</div>
+    </div>
+    <div class="card">
+      <div class="label">Compass</div>
+      <div class="compass-wrap">
+        <svg viewBox="0 0 100 100">
+          <g id="compassRing">
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#ffffff" stroke-width="2"/>
+          <text x="50" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#e53935">N</text>
+          <text x="50" y="94" text-anchor="middle" font-size="9" fill="#7f8fa3">S</text>
+          <text x="90" y="54" text-anchor="middle" font-size="9" fill="#7f8fa3">E</text>
+          <text x="10" y="54" text-anchor="middle" font-size="9" fill="#7f8fa3">W</text>
+          </g>
+          <g id="compassNeedle">
+            <polygon points="40,50 60,50 50,20" fill="#e53935"/>
+            <polygon points="40,50 60,50 50,80" fill="#cfd8e3"/>
+            <circle cx="50" cy="50" r="4" fill="#0b0f14" stroke="#2f7bff" stroke-width="1.5"/>
+          </g>
+        </svg>
+        <div>
+          <div class="value" id="heading" style="margin-top:0">--</div>
+          <div class="sub" id="deg">&nbsp;</div>
+        </div>
+      </div>
+      <button id="compassBtn">Enable compass</button>
+    </div>
+    <div class="card">
+      <div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M2 20 9 7l4 7 3-5 6 11z"/></svg>Altitude</div>
+      <div class="value" id="alt">--</div>
+      <div class="sub">feet</div>
+    </div>
+    <div class="card tripcard">
+      <div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>Trip</div>
+      <div class="tripbody">
+        <div>
+          <div class="value" id="trip">0.0</div>
+          <div class="sub">miles</div>
+        </div>
+        <div class="btns">
+          <button class="fuelbtn" id="fuelBtn" aria-label="Fuel log"><svg viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16"/><path d="M3 21h13"/><path d="M6.5 7h6v4h-6z"/><path d="M15 9h2.2a1.8 1.8 0 0 1 1.8 1.8V16a1.5 1.5 0 0 0 3 0V9l-3-3"/></svg></button>
+          <button class="alt" id="resetBtn">Reset</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">Sun</div>
+      <div class="sunrow">
+        <div>
+          <svg viewBox="0 0 38 28"><path d="M4 22h30"/><path d="M10 22a9 9 0 0 1 18 0"/><path d="M19 4v5M8 9l3 3M30 9l-3 3"/><path d="M15 6l4-4 4 4"/></svg>
+          <div class="t" id="sunrise">--</div>
+        </div>
+        <div>
+          <svg viewBox="0 0 38 28"><path d="M4 22h30"/><path d="M10 22a9 9 0 0 1 18 0"/><path d="M19 4v5M8 9l3 3M30 9l-3 3"/><path d="M15 2l4 4 4-4"/></svg>
+          <div class="t" id="sunset">--</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:6px">
+    <div class="card wide">
+      <div class="label">Battery <button class="gear" id="gearBtn">&#9881;</button></div>
+      <div class="batt-row">
+        <div><div class="v" id="bSoc">--</div><div class="u">Charge %</div></div>
+        <div><div class="v" id="bAmps">--</div><div class="u">Amps</div></div>
+        <div><div class="v" id="bWatts">--</div><div class="u">Watts</div></div>
+      </div>
+      <div class="sub" id="bStatus" style="text-align:center">Tap the gear to set up</div>
+    </div>
+    <div class="card wide mapcard">
+      <div id="map"></div>
+      <div class="mapbtns">
+        <button id="zoomIn">+</button>
+        <button id="zoomOut">&minus;</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="status">Waiting for GPS...</div>
+</div>
+
+<!-- ================= SETTINGS SCREEN ================= -->
+<div id="settingsScreen" class="hidden">
+  <div class="topbar">
+    <button id="setBack">&lsaquo; Back</button>
+    <div class="title">Battery setup</div>
+    <div class="spacer"></div>
+  </div>
+  <div class="fieldlabel">VRM installation ID</div>
+  <input class="field" id="inInstall" inputmode="numeric" placeholder="for example 50309">
+  <div class="fieldlabel">VRM access token</div>
+  <input class="field" id="inToken" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="paste your token here">
+  <button id="saveBtn" style="width:100%;margin-top:18px">Save</button>
+  <button class="alt" id="clearBtn" style="width:100%">Remove saved token</button>
+  <div id="setMsg" class="sub" style="text-align:center;margin-top:12px">&nbsp;</div>
+  <div class="sub" style="margin-top:16px">Your token is stored only on this phone and is sent only to Victron's VRM service.</div>
+</div>
+
+<!-- ================= FUEL SCREEN ================= -->
+<div id="fuelScreen" class="hidden">
+  <div class="topbar">
+    <button id="fuelBack">&lsaquo; Back</button>
+    <div class="title">Fuel log</div>
+    <div class="spacer"></div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="label">Last MPG</div><div class="v" id="fLast">--</div></div>
+    <div class="stat"><div class="label">Average</div><div class="v" id="fAvg">--</div></div>
+    <div class="stat"><div class="label">Fill-ups</div><div class="v" id="fCount">0</div></div>
+    <div class="stat"><div class="label">Total gal</div><div class="v" id="fGal">--</div></div>
+    <div class="stat"><div class="label">Total spent</div><div class="v" id="fSpent">--</div></div>
+    <div class="stat"><div class="label">Cost / mile</div><div class="v" id="fCpm">--</div></div>
+  </div>
+
+  <div class="section-title">Add a fill-up</div>
+  <div class="fuelform">
+    <div class="fieldlabel">Odometer (miles)</div>
+    <input class="field" id="fOdo" inputmode="decimal" placeholder="from the dashboard">
+    <div class="two">
+      <div>
+        <div class="fieldlabel">Gallons</div>
+        <input class="field" id="fGalIn" inputmode="decimal" placeholder="0.000">
+      </div>
+      <div>
+        <div class="fieldlabel">Total paid ($)</div>
+        <input class="field" id="fPaid" inputmode="decimal" placeholder="0.00">
+      </div>
+    </div>
+    <div class="sub" id="fPpg" style="margin-top:8px">&nbsp;</div>
+    <label class="chk"><input type="checkbox" id="fFull" checked> Filled the tank all the way</label>
+    <button id="fSave" style="width:100%;margin-top:16px;padding:12px;font-size:16px">Save fill-up</button>
+    <div id="fMsg" class="sub" style="text-align:center;margin-top:10px">&nbsp;</div>
+  </div>
+
+  <div class="section-title">History</div>
+  <div id="fuelList"></div>
+</div>
+
+<!-- ================= WEATHER DETAIL SCREEN ================= -->
+<div id="weatherScreen" class="hidden">
+  <div class="topbar">
+    <button id="backBtn">&lsaquo; Back</button>
+    <div class="title" id="wCity">Weather</div>
+    <div class="spacer"></div>
+  </div>
+
+  <div class="nowline">
+    <div class="big" id="wTemp">--</div>
+    <div class="desc" id="wDesc">--</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="label">High</div><div class="v" id="wHigh">--</div></div>
+    <div class="stat"><div class="label">Low</div><div class="v" id="wLow">--</div></div>
+    <div class="stat"><div class="label">Feels like</div><div class="v" id="wFeels">--</div></div>
+    <div class="stat"><div class="label">Wind</div><div class="v" id="wWind">--</div></div>
+    <div class="stat"><div class="label">Gusts</div><div class="v" id="wGust">--</div></div>
+    <div class="stat"><div class="label">Rain today</div><div class="v" id="wRain">--</div></div>
+  </div>
+
+  <div class="section-title">7-day forecast</div>
+  <div id="forecast"></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const MS_TO_MPH = 2.23694;
+const M_TO_FT = 3.28084;
+const M_TO_MI = 0.000621371;
+
+const WX_CODES = {
+  0:"Clear",1:"Mostly clear",2:"Partly cloudy",3:"Overcast",
+  45:"Fog",48:"Freezing fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",
+  56:"Freezing drizzle",57:"Freezing drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",
+  66:"Freezing rain",67:"Freezing rain",71:"Light snow",73:"Snow",75:"Heavy snow",
+  77:"Snow grains",80:"Rain showers",81:"Rain showers",82:"Violent showers",
+  85:"Snow showers",86:"Heavy snow showers",95:"Thunderstorm",96:"Thunderstorm, hail",99:"Thunderstorm, hail"
+};
+
+// Weather icons (emoji, shown like the iPhone Weather app)
+function wxIcon(code) {
+  if (code === 0) return "☀️";
+  if (code === 1) return "🌤️";
+  if (code === 2) return "⛅";
+  if (code === 3) return "☁️";
+  if (code === 45 || code === 48) return "🌫️";
+  if (code >= 51 && code <= 57) return "🌦️";
+  if (code >= 61 && code <= 67) return "🌧️";
+  if (code >= 71 && code <= 77) return "❄️";
+  if (code >= 80 && code <= 82) return "🌧️";
+  if (code === 85 || code === 86) return "🌨️";
+  if (code >= 95) return "⛈️";
+  return "☁️";
+}
+
+const STATE_ABBR = {
+  "Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO",
+  "Connecticut":"CT","Delaware":"DE","Florida":"FL","Georgia":"GA","Hawaii":"HI","Idaho":"ID",
+  "Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY","Louisiana":"LA",
+  "Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN",
+  "Mississippi":"MS","Missouri":"MO","Montana":"MT","Nebraska":"NE","Nevada":"NV",
+  "New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC",
+  "North Dakota":"ND","Ohio":"OH","Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA",
+  "Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD","Tennessee":"TN","Texas":"TX",
+  "Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV",
+  "Wisconsin":"WI","Wyoming":"WY","District of Columbia":"DC"
+};
+
+// ---- Thermometer: fills and shifts color with the temperature (0F to 110F) ----
+function setThermo(f) {
+  const t = Math.max(0, Math.min(110, f));
+  const frac = t / 110;
+  // Tube runs from y=5 (top) to the bulb at the bottom (y=74)
+  const top = 74 - (8 + frac * 62);
+  const rect = $("thermoFill");
+  rect.setAttribute("y", top);
+  rect.setAttribute("height", 74 - top);
+  // Tint the little label icon: cold blue, mild green, warm yellow, hot orange
+  const col = f < 40 ? "#4f9bff" : f < 65 ? "#7fe08a" : f < 85 ? "#ffd34d" : "#ff8a2b";
+  $("tempIco").style.stroke = col;
+}
+
+// ---- Speed gauge (0 to 100 mph, 270 degree sweep) ----
+const GAUGE_MAX = 100, G_START = -135, G_SWEEP = 270;
+function gPoint(r, deg) {
+  const a = (deg - 90) * Math.PI / 180;
+  return [150 + r * Math.cos(a), 150 + r * Math.sin(a)];
+}
+(function buildGauge() {
+  if (!$("gaugeArc")) return;
+  const [x1, y1] = gPoint(120, G_START), [x2, y2] = gPoint(120, G_START + G_SWEEP);
+  $("gaugeArc").setAttribute("d", "M " + x1 + " " + y1 + " A 120 120 0 1 1 " + x2 + " " + y2);
+  let svg = "";
+  for (let v = 0; v <= GAUGE_MAX; v += 5) {
+    const deg = G_START + (v / GAUGE_MAX) * G_SWEEP;
+    const major = v % 20 === 0;
+    const [a1, b1] = gPoint(major ? 104 : 110, deg), [a2, b2] = gPoint(118, deg);
+    svg += '<line x1="' + a1 + '" y1="' + b1 + '" x2="' + a2 + '" y2="' + b2 +
+      '" stroke="' + (major ? "#e8eef5" : "#5f7288") + '" stroke-width="' + (major ? 2.5 : 1.5) + '"/>';
+    if (major) {
+      const [tx, ty] = gPoint(88, deg);
+      svg += '<text x="' + tx + '" y="' + (ty + 5) + '" text-anchor="middle" font-size="15" fill="#9fb0c3">' + v + '</text>';
+    }
+  }
+  $("gaugeTicks").innerHTML = svg;
+})();
+function setNeedle(mph) {
+  if (!$("needle")) return;
+  const m = Math.max(0, Math.min(GAUGE_MAX, mph));
+  $("needle").style.transform = "rotate(" + (G_START + (m / GAUGE_MAX) * G_SWEEP) + "deg)";
+}
+setNeedle(0);
+
+// ---- Screen switching ----
+$("tempCard").onclick = $("wxCard").onclick = () => {
+  $("mainScreen").classList.add("hidden");
+  $("weatherScreen").classList.remove("hidden");
+  window.scrollTo(0, 0);
+};
+$("backBtn").onclick = () => {
+  $("weatherScreen").classList.add("hidden");
+  $("mainScreen").classList.remove("hidden");
+  window.scrollTo(0, 0);
+};
+
+// ---- Fuel log (saved on the phone) ----
+let fuelLog = [];
+try { fuelLog = JSON.parse(localStorage.getItem("fuelLog") || "[]"); } catch (e) { fuelLog = []; }
+function saveFuel() { localStorage.setItem("fuelLog", JSON.stringify(fuelLog)); }
+function num(s) { const n = parseFloat(String(s).replace(/[^0-9.]/g, "")); return isNaN(n) ? null : n; }
+
+// MPG for each full fill-up: miles since the previous FULL fill-up divided by all gallons added since then
+function computeMpg() {
+  const out = fuelLog.map(() => null);
+  let anchor = null, galSince = 0;
+  for (let i = 0; i < fuelLog.length; i++) {
+    const e = fuelLog[i];
+    if (anchor === null) {
+      if (e.full) anchor = e.odo;
+      galSince = 0;
+      continue;
+    }
+    galSince += e.gal;
+    if (e.full) {
+      const miles = e.odo - anchor;
+      if (miles > 0 && galSince > 0) out[i] = { mpg: miles / galSince, miles: miles };
+      anchor = e.odo;
+      galSince = 0;
+    }
+  }
+  return out;
+}
+
+function showFuel() {
+  const res = computeMpg();
+  const good = res.filter(r => r);
+  $("fLast").textContent = good.length ? good[good.length - 1].mpg.toFixed(1) : "--";
+  // Average over the whole span: total miles divided by total gallons used in those measured stretches
+  let m = 0, g = 0;
+  for (let i = 0; i < fuelLog.length; i++) {
+    if (res[i]) { m += res[i].miles; g += res[i].miles / res[i].mpg; }
+  }
+  $("fAvg").textContent = g > 0 ? (m / g).toFixed(1) : "--";
+  $("fCount").textContent = fuelLog.length;
+  const totGal = fuelLog.reduce((s, e) => s + e.gal, 0);
+  const totPaid = fuelLog.reduce((s, e) => s + e.paid, 0);
+  $("fGal").textContent = fuelLog.length ? totGal.toFixed(1) : "--";
+  $("fSpent").textContent = fuelLog.length ? "$" + totPaid.toFixed(0) : "--";
+  // Cost per mile: dollars spent in each measured stretch divided by the miles of that stretch
+  let costM = 0, costD = 0, stretchStart = -1;
+  for (let i = 0; i < fuelLog.length; i++) {
+    if (stretchStart === -1) { if (fuelLog[i].full) stretchStart = i; continue; }
+    if (res[i]) {
+      for (let k = stretchStart + 1; k <= i; k++) costD += fuelLog[k].paid;
+      costM += res[i].miles;
+    }
+    if (fuelLog[i].full) stretchStart = i;
+  }
+  $("fCpm").textContent = costM > 0 && costD > 0 ? "$" + (costD / costM).toFixed(2) : "--";
+
+  if (!fuelLog.length) {
+    $("fuelList").innerHTML = '<div class="sub" style="padding:14px 0;text-align:center">No fill-ups yet. Add your first one above.</div>';
+    return;
+  }
+  const rows = [];
+  for (let i = fuelLog.length - 1; i >= 0; i--) {
+    const e = fuelLog[i], r = res[i];
+    const when = new Date(e.t).toLocaleDateString([], {month: "short", day: "numeric"});
+    const ppg = e.gal > 0 ? e.paid / e.gal : 0;
+    rows.push(
+      '<div class="fuelrow">' +
+        '<div class="a">' + when + ' \u2022 ' + e.gal.toFixed(2) + ' gal' + (e.full ? '' : ' (partial)') + '</div>' +
+        '<div class="m">' + (r ? r.mpg.toFixed(1) + ' mpg' : '--') + '</div>' +
+        '<div class="b">$' + e.paid.toFixed(2) + ' \u2022 $' + ppg.toFixed(3) + '/gal \u2022 odo ' + Math.round(e.odo).toLocaleString() + '</div>' +
+        '<div class="x">' + (r ? Math.round(r.miles) + ' mi' : '') + ' <button class="del" data-i="' + i + '">delete</button></div>' +
+      '</div>'
+    );
+  }
+  $("fuelList").innerHTML = rows.join("");
+  document.querySelectorAll("#fuelList .del").forEach(b => {
+    b.onclick = () => {
+      if (confirm("Delete this fill-up?")) { fuelLog.splice(parseInt(b.dataset.i, 10), 1); saveFuel(); showFuel(); }
+    };
+  });
+}
+function updatePpg() {
+  const g = num($("fGalIn").value), p = num($("fPaid").value);
+  $("fPpg").innerHTML = g && p ? "Price per gallon: $" + (p / g).toFixed(3) : "&nbsp;";
+}
+$("fGalIn").oninput = updatePpg;
+$("fPaid").oninput = updatePpg;
+$("fSave").onclick = () => {
+  const odo = num($("fOdo").value), gal = num($("fGalIn").value), paid = num($("fPaid").value);
+  if (odo == null || gal == null || paid == null || gal <= 0) { $("fMsg").textContent = "Fill in odometer, gallons and total paid."; return; }
+  const last = fuelLog.length ? fuelLog[fuelLog.length - 1] : null;
+  if (last && odo <= last.odo) { $("fMsg").textContent = "Odometer must be higher than your last entry (" + Math.round(last.odo).toLocaleString() + ")."; return; }
+  fuelLog.push({ t: Date.now(), odo: odo, gal: gal, paid: paid, full: $("fFull").checked });
+  saveFuel();
+  $("fOdo").value = ""; $("fGalIn").value = ""; $("fPaid").value = "";
+  $("fFull").checked = true;
+  updatePpg();
+  $("fMsg").textContent = "Saved.";
+  showFuel();
+};
+$("fuelBtn").onclick = (ev) => {
+  ev.stopPropagation();
+  $("fMsg").innerHTML = "&nbsp;";
+  showFuel();
+  $("mainScreen").classList.add("hidden");
+  $("fuelScreen").classList.remove("hidden");
+  window.scrollTo(0, 0);
+};
+$("fuelBack").onclick = () => {
+  $("fuelScreen").classList.add("hidden");
+  $("mainScreen").classList.remove("hidden");
+  window.scrollTo(0, 0);
+};
+showFuel();
+
+// ---- Trip odometer (saved on the phone) ----
+let tripMeters = parseFloat(localStorage.getItem("tripMeters") || "0");
+let lastPos = null;
+function showTrip() { $("trip").textContent = (tripMeters * M_TO_MI).toFixed(1); }
+showTrip();
+$("resetBtn").onclick = () => { tripMeters = 0; localStorage.setItem("tripMeters", "0"); showTrip(); };
+
+function distMeters(a, b) {
+  const R = 6371000, rad = Math.PI / 180;
+  const dLat = (b.latitude - a.latitude) * rad;
+  const dLon = (b.longitude - a.longitude) * rad;
+  const x = Math.sin(dLat/2)**2 +
+    Math.cos(a.latitude*rad) * Math.cos(b.latitude*rad) * Math.sin(dLon/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+
+// ---- Compass ----
+const DIRS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+function showHeading(deg) {
+  if (deg == null || isNaN(deg)) return;
+  deg = (deg + 360) % 360;
+  $("heading").textContent = DIRS[Math.round(deg / 22.5) % 16];
+  $("deg").textContent = Math.round(deg) + "°";
+  // The red needle stays pointing up; the ring turns so the direction you face is at the top
+  $("compassRing").style.transform = "rotate(" + (-deg) + "deg)";
+}
+let compassOn = false;
+function onOrientation(e) {
+  const h = e.webkitCompassHeading;
+  if (h != null) { compassOn = true; showHeading(h); }
+}
+function startCompass(fromTap) {
+  const done = () => {
+    window.addEventListener("deviceorientation", onOrientation, true);
+    $("compassBtn").style.display = "none";
+    try { localStorage.setItem("compassOK", "1"); } catch (e) {}
+  };
+  try {
+    if (typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function") {
+      DeviceOrientationEvent.requestPermission().then(r => {
+        if (r === "granted") done();
+        else if (fromTap) $("status").textContent = "Compass permission denied.";
+      }).catch(err => {
+        if (fromTap) $("status").textContent = "Compass error: " + err.message;
+      });
+    } else {
+      done();
+    }
+  } catch (err) { if (fromTap) $("status").textContent = "Compass error: " + err.message; }
+}
+$("compassBtn").onclick = () => startCompass(true);
+// The compass only starts when you tap the Enable compass button (no automatic permission popup)
+
+// ---- City and state (BigDataCloud, free, no account) ----
+let lastCityPos = null, lastCityTime = 0, cityName = "";
+async function updateCity(lat, lon) {
+  const now = Date.now();
+  if (lastCityPos && now - lastCityTime < 60 * 1000 &&
+      distMeters(lastCityPos, {latitude: lat, longitude: lon}) < 3000) return;
+  if (lastCityPos && distMeters(lastCityPos, {latitude: lat, longitude: lon}) < 1500) return;
+  lastCityPos = {latitude: lat, longitude: lon}; lastCityTime = now;
+  try {
+    const url = "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat +
+      "&longitude=" + lon + "&localityLanguage=en";
+    const res = await fetch(url);
+    const d = await res.json();
+    const town = d.city || d.locality || "";
+    const state = d.principalSubdivision || "";
+    const st = STATE_ABBR[state] || state;
+    cityName = town && st ? town + ", " + st : (town || st || "Unknown location");
+    $("city").textContent = cityName;
+    $("wCity").textContent = cityName;
+  } catch (err) {
+    if (!cityName) $("city").textContent = "Location offline";
+  }
+}
+
+// ---- Weather (Open-Meteo, free, no account) ----
+let lastWeather = 0, lastWeatherPos = null;
+async function updateWeather(lat, lon) {
+  const now = Date.now();
+  if (now - lastWeather < 10 * 60 * 1000 &&
+      lastWeatherPos && distMeters(lastWeatherPos, {latitude: lat, longitude: lon}) < 15000) return;
+  lastWeather = now; lastWeatherPos = {latitude: lat, longitude: lon};
+  try {
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
+      "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m" +
+      "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset" +
+      "&forecast_days=7&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto";
+    const res = await fetch(url);
+    const d = await res.json();
+    const c = d.current, dy = d.daily;
+    const compassDir = DIRS[Math.round(c.wind_direction_10m / 22.5) % 16];
+    const wxText = WX_CODES[c.weather_code] || "--";
+    const hi = Math.round(dy.temperature_2m_max[0]), lo = Math.round(dy.temperature_2m_min[0]);
+
+    // Main screen
+    $("temp").textContent = Math.round(c.temperature_2m) + "°F";
+    $("hilo").textContent = "High " + hi + "°  Low " + lo + "°";
+    $("wx").textContent = wxText;
+    $("wxIcon").textContent = wxIcon(c.weather_code);
+    setThermo(c.temperature_2m);
+    $("wind").textContent = "Wind " + Math.round(c.wind_speed_10m) + " mph " + compassDir;
+    const fmt = s => new Date(s).toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
+    $("sunrise").textContent = fmt(dy.sunrise[0]);
+    $("sunset").textContent = fmt(dy.sunset[0]);
+    $("updated").textContent = "Weather updated " +
+      new Date().toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
+
+    // Detail screen
+    $("wTemp").textContent = Math.round(c.temperature_2m) + "°F";
+    $("wDesc").textContent = wxIcon(c.weather_code) + " " + wxText;
+    $("wHigh").textContent = hi + "°";
+    $("wLow").textContent = lo + "°";
+    $("wFeels").textContent = Math.round(c.apparent_temperature) + "°";
+    $("wWind").textContent = Math.round(c.wind_speed_10m) + " " + compassDir;
+    $("wGust").textContent = Math.round(c.wind_gusts_10m) + " mph";
+    $("wRain").textContent = (dy.precipitation_probability_max[0] ?? 0) + "%";
+
+    // iPhone-style forecast rows: day, icon + rain chance, low, temperature bar, high
+    const weekMin = Math.min(...dy.temperature_2m_min);
+    const weekMax = Math.max(...dy.temperature_2m_max);
+    const span = Math.max(weekMax - weekMin, 1);
+    const days = [];
+    for (let i = 0; i < dy.time.length; i++) {
+      const dt = new Date(dy.time[i] + "T12:00:00");
+      const name = i === 0 ? "Today" : dt.toLocaleDateString([], {weekday: "short"});
+      const lo = dy.temperature_2m_min[i], hi = dy.temperature_2m_max[i];
+      const left = ((lo - weekMin) / span) * 100;
+      const width = Math.max(((hi - lo) / span) * 100, 6);
+      const rain = dy.precipitation_probability_max[i] ?? 0;
+      days.push(
+        '<div class="day">' +
+          '<div class="d">' + name + '</div>' +
+          '<div class="ic"><div class="emoji">' + wxIcon(dy.weather_code[i]) + '</div>' +
+            '<div class="rain">' + (rain >= 10 ? rain + '%' : '') + '</div></div>' +
+          '<div class="range">' +
+            '<div class="lo">' + Math.round(lo) + '°</div>' +
+            '<div class="bar"><div class="fill" style="left:' + left + '%;width:' + width + '%"></div></div>' +
+            '<div class="hi">' + Math.round(hi) + '°</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+    $("forecast").innerHTML = days.join("");
+  } catch (err) {
+    $("updated").textContent = "Weather offline";
+  }
+}
+
+// ---- Settings screen ----
+$("gearBtn").onclick = () => {
+  $("inInstall").value = localStorage.getItem("vrmInstall") || "";
+  $("inToken").value = localStorage.getItem("vrmToken") || "";
+  $("setMsg").innerHTML = "&nbsp;";
+  $("mainScreen").classList.add("hidden");
+  $("settingsScreen").classList.remove("hidden");
+  window.scrollTo(0, 0);
+};
+$("setBack").onclick = () => {
+  $("settingsScreen").classList.add("hidden");
+  $("mainScreen").classList.remove("hidden");
+};
+$("saveBtn").onclick = () => {
+  localStorage.setItem("vrmInstall", $("inInstall").value.replace(/\D/g, ""));
+  localStorage.setItem("vrmToken", $("inToken").value.replace(/\s/g, ""));
+  $("setMsg").textContent = "Saved.";
+  updateBattery();
+};
+$("clearBtn").onclick = () => {
+  localStorage.removeItem("vrmToken");
+  $("inToken").value = "";
+  $("setMsg").textContent = "Token removed.";
+};
+
+// ---- Victron battery via VRM (refreshes every 15 seconds) ----
+async function updateBattery() {
+  const id = localStorage.getItem("vrmInstall");
+  if (!id) { $("bStatus").textContent = "Tap the gear to set up"; return; }
+  try {
+    // The token now lives safely on the Netlify relay, not on the phone
+    const res = await fetch("/.netlify/functions/vrm?id=" + encodeURIComponent(id));
+    if (res.status === 401 || res.status === 403) { $("bStatus").textContent = "Token rejected, check Netlify setup"; return; }
+    if (!res.ok) { $("bStatus").textContent = "VRM error " + res.status; return; }
+    const d = await res.json();
+    const recs = d.records || [];
+    // Look for the battery monitor values by their standard codes
+    const find = code => recs.find(r => r.code === code && r.rawValue != null);
+    const soc = find("SOC"), volts = find("V"), amps = find("I"), pw = find("P");
+    const a = amps ? Number(amps.rawValue) : null;
+    const v = volts ? Number(volts.rawValue) : null;
+    let w = pw ? Number(pw.rawValue) : (a != null && v != null ? a * v : null);
+    $("bSoc").textContent = soc ? Math.round(Number(soc.rawValue)) + "%" : "--";
+    $("bAmps").textContent = a != null ? a.toFixed(1) : "--";
+    $("bWatts").textContent = w != null ? Math.round(w) : "--";
+    const stamp = recs.length && recs[0].timestamp ? new Date(recs[0].timestamp * 1000) : new Date();
+    $("bStatus").textContent = (a != null ? (a > 0.5 ? "Charging" : a < -0.5 ? "Discharging" : "Idle") + " \u2022 " : "") +
+      "updated " + stamp.toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
+  } catch (err) {
+    $("bStatus").textContent = "Can't reach VRM (" + (err && err.message ? err.message : "unknown") + ")";
+  }
+}
+// Battery polling is switched off for now (Victron relay not working yet).
+// updateBattery();
+// setInterval(updateBattery, 15000);
+
+// ---- GPS ----
+function onPosition(p) {
+  const c = p.coords;
+  $("status").textContent = "";
+  if (c.speed != null && c.speed >= 0) {
+    const mph = c.speed * MS_TO_MPH;
+    $("speed").textContent = mph < 1 ? "0" : Math.round(mph);
+    // speed shown as plain text
+  }
+  if (c.altitude != null) $("alt").textContent = Math.round(c.altitude * M_TO_FT).toLocaleString();
+  if (!compassOn && c.heading != null && !isNaN(c.heading) && c.speed > 1) showHeading(c.heading);
+
+  if (lastPos && c.accuracy < 50) {
+    const dm = distMeters(lastPos, c);
+    if (dm > 5 && dm < 2000) {
+      tripMeters += dm;
+      localStorage.setItem("tripMeters", String(tripMeters));
+      showTrip();
+      lastPos = c;
+    }
+  } else if (c.accuracy < 50) {
+    lastPos = c;
+  }
+  updateCity(c.latitude, c.longitude);
+  updateWeather(c.latitude, c.longitude);
+  updateMap(c.latitude, c.longitude);
+}
+function onError(e) {
+  $("status").textContent = e.code === 1
+    ? "Location blocked. In Settings, allow Location for Safari."
+    : "Can't get GPS signal right now.";
+}
+if ("geolocation" in navigator) {
+  navigator.geolocation.watchPosition(onPosition, onError,
+    {enableHighAccuracy: true, maximumAge: 1000, timeout: 20000});
+} else {
+  $("status").textContent = "This browser doesn't support GPS.";
+}
+
+// ---- Mini map (OpenStreetMap tiles, light look, follows you) ----
+let map = null, youMarker = null, mapFollow = true;
+try {
+  map = L.map("map", { zoomControl: false, attributionControl: true, dragging: true, tap: true }).setView([38.35, -120.77], 11);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    className: "maptiles",
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+  youMarker = L.marker([38.35, -120.77], {
+    icon: L.divIcon({ className: "", html: '<div class="youdot"></div>', iconSize: [22, 22], iconAnchor: [11, 11] })
+  }).addTo(map);
+  // Make sure the map fills its card once the page has finished laying out
+  // (no extra re-measuring: the plain setup was the one that worked)
+  $("zoomIn").onclick = () => map.zoomIn();
+  $("zoomOut").onclick = () => map.zoomOut();
+  map.on("dragstart", () => { mapFollow = false; });
+  // Tapping the dot area or double-tapping the map re-centers on you
+  map.on("dblclick", () => { mapFollow = true; if (youMarker) map.panTo(youMarker.getLatLng()); });
+} catch (e) {
+  const mc = document.querySelector(".mapcard");
+  if (mc) mc.classList.add("hidden");
+}
+let mapFirstFix = true;
+function updateMap(lat, lon) {
+  if (!map || !youMarker) return;
+  youMarker.setLatLng([lat, lon]);
+  if (mapFirstFix) { map.setView([lat, lon], 13); mapFirstFix = false; }
+  else if (mapFollow) map.panTo([lat, lon], { animate: true });
+}
+
+// ---- Keep the screen awake ----
+async function keepAwake() {
+  try { if ("wakeLock" in navigator) await navigator.wakeLock.request("screen"); } catch (e) {}
+}
+keepAwake();
+document.addEventListener("visibilitychange", () => { if (!document.hidden) keepAwake(); });
+</script>
+</body>
+</html>
