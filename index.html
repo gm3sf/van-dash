@@ -182,6 +182,11 @@
   .bar { position: relative; height: 5px; border-radius: 3px; background: #2b3542; }
   .bar .fill { position: absolute; top: 0; bottom: 0; border-radius: 3px;
                background: linear-gradient(90deg, #5fb8ff, #7fe08a, #ffd34d, #ff9a3c); }
+  .vmap { position: relative; width: 100%; height: 260px; margin-top: 6px; border-radius: 14px; overflow: hidden; background: #1a222c; border: 0.5px solid #8a96a6; }
+  .vmap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  .vmap .zbtns { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .vmap .zbtns button { width: 40px; height: 40px; margin: 0; padding: 0; font-size: 24px; line-height: 1; background: rgba(21,28,37,0.92); border: 0.5px solid #8a96a6; border-radius: 10px; color: #fff; }
+  .vmap .attr { position: absolute; left: 6px; bottom: 4px; font-size: 9px; color: #333; background: rgba(255,255,255,0.7); padding: 1px 4px; border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -306,8 +311,14 @@
     </div>
     </div>
 
+  <div class="vmap" id="vmap">
+    <canvas id="vmapCanvas"></canvas>
+    <div class="zbtns"><button id="vzIn">+</button><button id="vzOut">&minus;</button></div>
+    <div class="attr">&copy; OpenStreetMap</div>
+  </div>
+
   <div id="status">Waiting for GPS...</div>
-  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 151 (no map)</div>
+  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 152 (new map)</div>
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -841,6 +852,7 @@ function onPosition(p) {
   }
   updateCity(c.latitude, c.longitude);
   updateWeather(c.latitude, c.longitude);
+  vmapSet(c.latitude, c.longitude);
 
 }
 function onError(e) {
@@ -854,6 +866,65 @@ if ("geolocation" in navigator) {
 } else {
   $("status").textContent = "This browser doesn't support GPS.";
 }
+
+// ---- Home-made map (canvas, OpenStreetMap tiles) ----
+const vCanvas = $("vmapCanvas"), vctx = vCanvas.getContext("2d");
+let vLat = null, vLon = null, vZoom = 14, vW = 0, vH = 0;
+const vTiles = {};
+function vResize() {
+  const box = $("vmap").getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  vW = box.width; vH = box.height;
+  if (!vW || !vH) return;
+  vCanvas.width = Math.round(vW * dpr); vCanvas.height = Math.round(vH * dpr);
+  vctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  vDraw();
+}
+function vWorld(lat, lon, z) {
+  const n = Math.pow(2, z) * 256;
+  const s = Math.sin(lat * Math.PI / 180);
+  return { x: (lon + 180) / 360 * n, y: (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n };
+}
+function vDraw() {
+  if (!vW || !vH) return;
+  vctx.fillStyle = "#1a222c"; vctx.fillRect(0, 0, vW, vH);
+  if (vLat == null) {
+    vctx.fillStyle = "#7f8fa3"; vctx.font = "14px sans-serif"; vctx.textAlign = "center";
+    vctx.fillText("Waiting for GPS...", vW / 2, vH / 2);
+    return;
+  }
+  const c = vWorld(vLat, vLon, vZoom);
+  const left = c.x - vW / 2, top = c.y - vH / 2;
+  const n = Math.pow(2, vZoom);
+  const tx0 = Math.floor(left / 256), tx1 = Math.floor((left + vW) / 256);
+  const ty0 = Math.floor(top / 256), ty1 = Math.floor((top + vH) / 256);
+  for (let tx = tx0; tx <= tx1; tx++) {
+    for (let ty = ty0; ty <= ty1; ty++) {
+      if (ty < 0 || ty >= n) continue;
+      const wx = ((tx % n) + n) % n;
+      const key = vZoom + "/" + wx + "/" + ty;
+      let t = vTiles[key];
+      if (!t) {
+        t = vTiles[key] = new Image();
+        t.onload = vDraw;
+        t.src = "https://tile.openstreetmap.org/" + key + ".png";
+      }
+      if (t.complete && t.naturalWidth) vctx.drawImage(t, tx * 256 - left, ty * 256 - top, 256, 256);
+    }
+  }
+  // your location: red dot with white ring
+  const cx = vW / 2, cy = vH / 2;
+  vctx.beginPath(); vctx.arc(cx, cy, 16, 0, 6.2832); vctx.fillStyle = "rgba(255,59,48,0.30)"; vctx.fill();
+  vctx.beginPath(); vctx.arc(cx, cy, 9, 0, 6.2832); vctx.fillStyle = "#ff3b30"; vctx.fill();
+  vctx.lineWidth = 3; vctx.strokeStyle = "#ffffff"; vctx.stroke();
+}
+function vmapSet(lat, lon) { vLat = lat; vLon = lon; vDraw(); }
+$("vzIn").onclick = () => { if (vZoom < 18) { vZoom++; vDraw(); } };
+$("vzOut").onclick = () => { if (vZoom > 3) { vZoom--; vDraw(); } };
+window.addEventListener("resize", vResize);
+window.addEventListener("orientationchange", () => setTimeout(vResize, 300));
+vResize();
+setTimeout(vResize, 500);
 
 // ---- Keep the screen awake ----
 async function keepAwake() {
