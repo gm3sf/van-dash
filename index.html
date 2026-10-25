@@ -875,7 +875,8 @@ try {
     icon: L.divIcon({ className: "", html: '<div class="youdot"></div>', iconSize: [22, 22], iconAnchor: [11, 11] })
   }).addTo(map);
   // Make sure the map fills its card once the page has finished laying out
-  // (no extra re-measuring: the plain setup was the one that worked)
+  // One re-measure after the page has fully loaded, so Leaflet sees the final card size
+  window.addEventListener("load", () => { setTimeout(() => map.invalidateSize(), 300); });
   $("zoomIn").onclick = () => map.zoomIn();
   $("zoomOut").onclick = () => map.zoomOut();
   map.on("dragstart", () => { mapFollow = false; });
