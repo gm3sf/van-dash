@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 148 -->
+<!-- Van Dash rev 150 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,8 +59,6 @@
 </script>
 <meta name="icon-by-script" content="1
 <title>Van Dash</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
@@ -306,17 +304,10 @@
       </div>
       <div class="sub" id="bStatus" style="text-align:center">Tap the gear to set up</div>
     </div>
-    <div class="card wide mapcard">
-      <div id="map"></div>
-      <div class="mapbtns">
-        <button id="zoomIn">+</button>
-        <button id="zoomOut">&minus;</button>
-      </div>
     </div>
-  </div>
 
   <div id="status">Waiting for GPS...</div>
-  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 148</div>
+  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 150 (no map)</div>
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -850,7 +841,7 @@ function onPosition(p) {
   }
   updateCity(c.latitude, c.longitude);
   updateWeather(c.latitude, c.longitude);
-  updateMap(c.latitude, c.longitude);
+
 }
 function onError(e) {
   $("status").textContent = e.code === 1
@@ -862,47 +853,6 @@ if ("geolocation" in navigator) {
     {enableHighAccuracy: true, maximumAge: 1000, timeout: 20000});
 } else {
   $("status").textContent = "This browser doesn't support GPS.";
-}
-
-// ---- Mini map (OpenStreetMap tiles, light look, follows you) ----
-let map = null, youMarker = null, mapFollow = true;
-try {
-  map = L.map("map", { zoomControl: false, attributionControl: true, dragging: true, tap: true }).setView([38.35, -120.77], 11);
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    className: "maptiles",
-    attribution: "&copy; OpenStreetMap contributors"
-  }).addTo(map);
-  youMarker = L.marker([38.35, -120.77], {
-    icon: L.divIcon({ className: "", html: '<div class="youdot"></div>', iconSize: [22, 22], iconAnchor: [11, 11] })
-  }).addTo(map);
-  // Make sure the map fills its card once the page has finished laying out
-  // One re-measure after the page has fully loaded, so Leaflet sees the final card size
-  const fixMap = () => { document.body.classList.remove("leaflet-dragging"); map.invalidateSize(true); if (youMarker) map.setView(youMarker.getLatLng(), map.getZoom(), { animate: false }); };
-  window.addEventListener("load", () => { [100, 500, 1500, 3000].forEach(ms => setTimeout(fixMap, ms)); });
-  window.addEventListener("resize", fixMap);
-  window.addEventListener("orientationchange", () => setTimeout(fixMap, 300));
-  if (window.ResizeObserver) new ResizeObserver(() => map.invalidateSize(true)).observe(document.querySelector(".mapcard"));
-  $("zoomIn").onclick = () => map.zoomIn();
-  $("zoomOut").onclick = () => map.zoomOut();
-  map.on("dragstart", () => { mapFollow = false; });
-  // Tapping the dot area or double-tapping the map re-centers on you
-  map.on("dblclick", () => { mapFollow = true; if (youMarker) map.panTo(youMarker.getLatLng()); });
-} catch (e) {
-  const mc = document.querySelector(".mapcard");
-  if (mc) mc.classList.add("hidden");
-}
-let mapFirstFix = true;
-function updateMap(lat, lon) {
-  if (!map || !youMarker) return;
-  youMarker.setLatLng([lat, lon]);
-  if (mapFirstFix) {
-    mapFirstFix = false;
-    map.invalidateSize();
-    map.setView([lat, lon], 13);
-    setTimeout(() => { map.invalidateSize(); map.setView([lat, lon], 13); }, 500);
-  }
-  else if (mapFollow) map.panTo([lat, lon], { animate: true });
 }
 
 // ---- Keep the screen awake ----
