@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 154 -->
+<!-- Van Dash rev 155 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -159,9 +159,19 @@
   .stat .v { font-size: 20px; font-weight: 600; margin-top: 4px; }
   /* Battery card + settings */
   .card.wide { grid-column: 1 / -1; }
-  .batt-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px; text-align: center; }
-  .batt-row .v { font-size: 30px; font-weight: 700; }
-  .batt-row .u { font-size: 12px; color: #7f8fa3; text-transform: uppercase; letter-spacing: 1px; }
+  .battcard { padding: 6px 12px 8px; }
+  .battcard .bhead { display: flex; align-items: center; justify-content: space-between; }
+  .battcard .bhead .label { display: flex; align-items: center; }
+  .battcard .bhead .gear { float: none; margin: 0; }
+  .batt-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; }
+  .batt-row .bi { display: flex; align-items: center; gap: 5px; }
+  .batt-row .bsoc { flex: 1.4; }
+  .batt-row .bi svg { width: 20px; height: 20px; flex: none; fill: none; stroke: #ff8a2b; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .batt-row .v { font-size: 20px; font-weight: 700; line-height: 1; }
+  .batt-row .u { font-size: 11px; color: #7f8fa3; margin-left: 1px; }
+  .socbar { flex: 1; height: 6px; border-radius: 3px; background: #2b3542; overflow: hidden; min-width: 28px; }
+  .socbar .fill { height: 100%; width: 0%; border-radius: 3px; background: #7f8fa3; transition: width 0.4s, background 0.4s; }
+  .battcard .bstat { font-size: 11px; color: #7f8fa3; text-align: center; margin-top: 3px; }
   .gear { float: right; background: none; margin: 0; padding: 0 4px; font-size: 18px; color: #7f8fa3; }
   input.field { width: 100%; background: #151c25; color: #e8eef5; border: 1px solid #2a3a4e;
                 border-radius: 10px; padding: 12px; font-size: 16px; margin-top: 6px; }
@@ -300,14 +310,27 @@
   </div>
 
   <div class="grid" style="margin-top:6px">
-    <div class="card wide">
-      <div class="label">Battery <button class="gear" id="gearBtn">&#9881;</button></div>
-      <div class="batt-row">
-        <div><div class="v" id="bSoc">--</div><div class="u">Charge %</div></div>
-        <div><div class="v" id="bAmps">--</div><div class="u">Amps</div></div>
-        <div><div class="v" id="bWatts">--</div><div class="u">Watts</div></div>
+    <div class="card wide battcard">
+      <div class="bhead">
+        <div class="label"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="7" width="17" height="10" rx="2"/><path d="M22 10.5v3"/></svg>Battery</div>
+        <button class="gear" id="gearBtn">&#9881;</button>
       </div>
-      <div class="sub" id="bStatus" style="text-align:center">Tap the gear to set up</div>
+      <div class="batt-row">
+        <div class="bi bsoc">
+          <svg viewBox="0 0 24 24" id="bIco"><rect x="2" y="7" width="17" height="10" rx="2"/><path d="M22 10.5v3"/><rect id="bIcoFill" x="4" y="9" width="0" height="6" rx="1" fill="currentColor" stroke="none"/></svg>
+          <div class="v" id="bSoc">--</div>
+          <div class="socbar"><div class="fill" id="bBar"></div></div>
+        </div>
+        <div class="bi">
+          <svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
+          <div class="v" id="bAmps">--</div><div class="u">A</div>
+        </div>
+        <div class="bi">
+          <svg viewBox="0 0 24 24"><path d="M9 3v5M15 3v5"/><path d="M6 8h12v3a6 6 0 0 1-12 0z"/><path d="M12 17v4"/></svg>
+          <div class="v" id="bWatts">--</div><div class="u">W</div>
+        </div>
+      </div>
+      <div class="bstat" id="bStatus">Tap the gear to set up</div>
     </div>
     </div>
 
@@ -318,7 +341,7 @@
   </div>
 
   <div id="status">Waiting for GPS...</div>
-  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 154 (auto-update)</div>
+  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 155 (slim battery)</div>
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -814,6 +837,13 @@ async function updateBattery() {
     const v = volts ? Number(volts.rawValue) : null;
     let w = pw ? Number(pw.rawValue) : (a != null && v != null ? a * v : null);
     $("bSoc").textContent = soc ? Math.round(Number(soc.rawValue)) + "%" : "--";
+    if (soc) {
+      const pct = Math.max(0, Math.min(100, Number(soc.rawValue)));
+      const col = pct >= 60 ? "#4cd964" : pct >= 30 ? "#ffd34d" : "#ff3b30";
+      $("bBar").style.width = pct + "%"; $("bBar").style.background = col;
+      $("bIco").style.color = col; $("bIco").style.stroke = col;
+      $("bIcoFill").setAttribute("width", String(Math.round(pct / 100 * 13)));
+    }
     $("bAmps").textContent = a != null ? a.toFixed(1) : "--";
     $("bWatts").textContent = w != null ? Math.round(w) : "--";
     const stamp = recs.length && recs[0].timestamp ? new Date(recs[0].timestamp * 1000) : new Date();
