@@ -876,7 +876,11 @@ try {
   }).addTo(map);
   // Make sure the map fills its card once the page has finished laying out
   // One re-measure after the page has fully loaded, so Leaflet sees the final card size
-  window.addEventListener("load", () => { setTimeout(() => map.invalidateSize(), 300); });
+  const fixMap = () => { document.body.classList.remove("leaflet-dragging"); map.invalidateSize(true); if (youMarker) map.setView(youMarker.getLatLng(), map.getZoom(), { animate: false }); };
+  window.addEventListener("load", () => { [100, 500, 1500, 3000].forEach(ms => setTimeout(fixMap, ms)); });
+  window.addEventListener("resize", fixMap);
+  window.addEventListener("orientationchange", () => setTimeout(fixMap, 300));
+  if (window.ResizeObserver) new ResizeObserver(() => map.invalidateSize(true)).observe(document.querySelector(".mapcard"));
   $("zoomIn").onclick = () => map.zoomIn();
   $("zoomOut").onclick = () => map.zoomOut();
   map.on("dragstart", () => { mapFollow = false; });
@@ -890,7 +894,12 @@ let mapFirstFix = true;
 function updateMap(lat, lon) {
   if (!map || !youMarker) return;
   youMarker.setLatLng([lat, lon]);
-  if (mapFirstFix) { map.setView([lat, lon], 13); mapFirstFix = false; }
+  if (mapFirstFix) {
+    mapFirstFix = false;
+    map.invalidateSize();
+    map.setView([lat, lon], 13);
+    setTimeout(() => { map.invalidateSize(); map.setView([lat, lon], 13); }, 500);
+  }
   else if (mapFollow) map.panTo([lat, lon], { animate: true });
 }
 
