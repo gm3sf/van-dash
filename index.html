@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 153 -->
+<!-- Van Dash rev 154 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
   </div>
 
   <div id="status">Waiting for GPS...</div>
-  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 153 (shorter map)</div>
+  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 154 (auto-update)</div>
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -932,6 +932,20 @@ async function keepAwake() {
 }
 keepAwake();
 document.addEventListener("visibilitychange", () => { if (!document.hidden) keepAwake(); });
+
+// ---- Auto-update: when the app opens, fetch a fresh copy and reload if the revision changed ----
+async function checkForUpdate() {
+  try {
+    const res = await fetch(location.pathname + "?v=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) return;
+    const html = await res.text();
+    const m = html.match(/<!-- Van Dash rev (\d+) -->/);
+    const mine = document.documentElement.innerHTML.match(/<!-- Van Dash rev (\d+) -->/);
+    if (m && mine && m[1] !== mine[1]) location.replace(location.pathname + "?v=" + Date.now());
+  } catch (e) {}
+}
+checkForUpdate();
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkForUpdate(); });
 </script>
 </body>
 </html>
