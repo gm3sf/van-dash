@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 177 -->
+<!-- Van Dash rev 178 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -344,7 +344,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r177</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r178</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -429,7 +429,7 @@
     <div class="stat"><div class="label">High</div><div class="v" id="wHigh">--</div></div>
     <div class="stat"><div class="label">Low</div><div class="v" id="wLow">--</div></div>
     <div class="stat"><div class="label">Feels like</div><div class="v" id="wFeels">--</div></div>
-    <div class="stat"><div class="label">Wind</div><div class="v" id="wWind">--</div></div>
+    <div class="stat"><div class="label">Wind from</div><div class="v" id="wWind">--</div></div>
     <div class="stat"><div class="label">Gusts</div><div class="v" id="wGust">--</div></div>
     <div class="stat"><div class="label">Rain today</div><div class="v" id="wRain">--</div></div>
   </div>
@@ -705,7 +705,7 @@ async function updateWeather(lat, lon, forced) {
     $("wx").textContent = wxText;
     $("wxIcon").textContent = wxIcon(c.weather_code);
     setThermo(c.temperature_2m);
-    $("wind").textContent = "Wind " + Math.round(c.wind_speed_10m) + " mph " + compassDir;
+    $("wind").textContent = "Wind from " + compassDir + " " + Math.round(c.wind_speed_10m) + " mph";
     const fmt = s => new Date(s).toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
     $("sunrise").textContent = fmt(dy.sunrise[0]);
     $("sunset").textContent = fmt(dy.sunset[0]);
