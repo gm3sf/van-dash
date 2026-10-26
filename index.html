@@ -2,12 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 174 -->
+<!-- Van Dash rev 175 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Van Dash">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#000000">
 <script>
 (function () {
@@ -51,7 +50,7 @@
   } catch (e) {}
 })();
 </script>
-<meta name="icon-by-script" content="1">
+">
 <title>Van Dash</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -63,8 +62,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom);
     min-height: 100vh;
-    -webkit-overflow-scrolling: auto;
-    min-height: 100dvh;
+      min-height: 100dvh;
     overscroll-behavior: none;
     overscroll-behavior-y: none;
     touch-action: pan-y;
@@ -102,7 +100,6 @@
   
   
   
-  header { display: none; text-align: center; padding: 4px 0 2px; }
   .speedrow { display: flex; align-items: center; justify-content: center; gap: 14px; }
   .appbtn { flex: none; width: 64px; height: 64px; border-radius: 50%; background: #000000; border: 1.5px solid #cfd8e3; display: flex; align-items: center; justify-content: center; text-decoration: none; }
   .appbtn svg { width: 32px; height: 32px; fill: none; stroke: #cfd8e3; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -270,7 +267,7 @@
           <text x="90" y="54" text-anchor="middle" font-size="9" fill="#7f8fa3">E</text>
           <text x="10" y="54" text-anchor="middle" font-size="9" fill="#7f8fa3">W</text>
           </g>
-          <g id="compassNeedle">
+          <g>
             <polygon points="40,50 60,50 50,20" fill="#e53935"/>
             <polygon points="40,50 60,50 50,80" fill="#cfd8e3"/>
             <circle cx="50" cy="50" r="4" fill="#0b0f14" stroke="#2f7bff" stroke-width="1.5"/>
@@ -348,7 +345,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r174</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r175</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -412,8 +409,9 @@
     <div id="fMsg" class="sub" style="text-align:center;margin-top:10px">&nbsp;</div>
   </div>
 
-  <div class="section-title">History</div>
+  <div class="section-title" style="display:flex;justify-content:space-between">History<u class="clr">Clear all</u></div>
   <div id="fuelList"></div>
+  <div class="sub clr" style="text-align:center;margin:14px 0"><u>Clear all</u></div>
 </div>
 
 <div id="weatherScreen" class="hidden">
@@ -561,7 +559,7 @@ function showFuel() {
   $("fCpm").textContent = costM > 0 && costD > 0 ? "$" + (costD / costM).toFixed(2) : "--";
 
   if (!fuelLog.length) {
-    $("fuelList").innerHTML = '<div class="sub" style="padding:14px 0;text-align:center">No fill-ups yet. Add your first one above.</div>';
+    $("fuelList").innerHTML = '<div class="sub" style="padding:14px 0;text-align:center">No fill-ups yet.</div>';
     return;
   }
   const rows = [];
@@ -611,6 +609,7 @@ $("fuelBtn").onclick = (ev) => {
   go("mainScreen", "fuelScreen");
 };
 $("fuelBack").onclick = () => go("fuelScreen", "mainScreen");
+document.querySelectorAll(".clr").forEach(b => b.onclick = () => { if (fuelLog.length && confirm("Delete all " + fuelLog.length + " fill-ups?")) { fuelLog = []; saveFuel(); showFuel(); } });
 showFuel();
 
 let tripMeters = parseFloat(localStorage.getItem("tripMeters") || "0");
@@ -822,13 +821,13 @@ function gxLive(ws, st) {
   const send = b => { try { ws.send(b); } catch (e) {} };
   send(mqPkt(0x10, mqCat([mqStr("MQTT"), Uint8Array.of(4, 2, 0, 60), mqStr("vandash" + Math.random().toString(16).slice(2, 8))])));
   const subs = ["N/+/system/0/Dc/Battery/Soc", "N/+/system/0/Dc/Battery/Voltage", "N/+/system/0/Dc/Battery/Current", "N/+/system/0/Dc/Battery/Power", "N/+/system/0/Serial"];
-  st.textContent = "GX connected, waiting for data...";
+  st.textContent = "GX: waiting...";
   const parts = [Uint8Array.of(0, 1)];
   subs.forEach(t => { parts.push(mqStr(t)); parts.push(Uint8Array.of(0)); });
   send(mqPkt(0x82, mqCat(parts)));
   const keep = () => { if (gx.id) send(mqPkt(0x30, mqStr("R/" + gx.id + "/keepalive"))); };
   const ping = setInterval(() => { send(Uint8Array.of(0xC0, 0)); keep(); }, 25000);
-  setTimeout(() => { if (!gx.got) st.textContent = "GX connected but no data yet"; }, 8000);
+  setTimeout(() => { if (!gx.got) st.textContent = "GX: no data"; }, 8000);
   ws.onmessage = ev => {
     const u = new Uint8Array(ev.data); let i = 0;
     while (i < u.length) {
@@ -855,18 +854,18 @@ function gxLive(ws, st) {
       i = j + n;
     }
   };
-  ws.onclose = () => { clearInterval(ping); st.textContent = "GX disconnected, retrying..."; setTimeout(gxTest, 5000); };
+  ws.onclose = () => { clearInterval(ping); st.textContent = "GX: retrying..."; setTimeout(gxTest, 5000); };
 }
 function gxTest() {
   const host = "192.168.68.120";
   const st = $("bStatus");
-  st.textContent = "GX test: connecting...";
+  st.textContent = "GX: connecting...";
   let opened = false, ws;
   try { ws = new WebSocket("wss://" + host + "/websocket-mqtt", "mqtt"); }
-  catch (e) { st.textContent = "GX test: blocked before connecting (" + e.name + ")"; return; }
-  const timer = setTimeout(() => { if (!opened) { st.textContent = "GX test: no answer after 8 seconds"; try { ws.close(); } catch (e) {} } }, 8000);
+  catch (e) { st.textContent = "GX blocked"; return; }
+  const timer = setTimeout(() => { if (!opened) { st.textContent = "GX: no answer"; try { ws.close(); } catch (e) {} } }, 8000);
   ws.onopen = () => { opened = true; clearTimeout(timer); gxLive(ws, st); };
-  ws.onerror = () => { if (!opened) { clearTimeout(timer); st.textContent = "GX test: connection refused or blocked"; } };
+  ws.onerror = () => { if (!opened) { clearTimeout(timer); st.textContent = "GX: refused"; } };
 }
 $("bStatus").onclick = gxTest;
 gxTest();
