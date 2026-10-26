@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 158 -->
+<!-- Van Dash rev 159 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -341,7 +341,7 @@
   </div>
 
   <div id="status">Waiting for GPS...</div>
-  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 158 (GX test path fix)</div>
+  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 159 (live GX battery)</div>
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -854,6 +854,65 @@ async function updateBattery() {
   }
 }
 // ---- Local GX connection test (WebSocket to the GX on port 9001) ----
+function mqStr(s) { const b = new TextEncoder().encode(s); const o = new Uint8Array(2 + b.length); o[0] = b.length >> 8; o[1] = b.length & 255; o.set(b, 2); return o; }
+function mqCat(a) { let n = 0; a.forEach(x => n += x.length); const o = new Uint8Array(n); let p = 0; a.forEach(x => { o.set(x, p); p += x.length; }); return o; }
+function mqPkt(first, body) { const len = []; let n = body.length; do { let d = n % 128; n = Math.floor(n / 128); if (n > 0) d |= 128; len.push(d); } while (n > 0); return mqCat([Uint8Array.of(first, ...len), body]); }
+const gx = { soc: null, v: null, a: null, w: null, id: null, got: false };
+function gxShow() {
+  if (gx.soc != null) {
+    const pct = Math.max(0, Math.min(100, gx.soc));
+    const col = pct >= 60 ? "#4cd964" : pct >= 30 ? "#ffd34d" : "#ff3b30";
+    $("bSoc").textContent = Math.round(pct) + "%";
+    $("bBar").style.width = pct + "%"; $("bBar").style.background = col;
+    $("bIco").style.color = col; $("bIco").style.stroke = col;
+    $("bIcoFill").setAttribute("width", String(Math.round(pct / 100 * 13)));
+  }
+  const a = gx.a;
+  const w = gx.w != null ? gx.w : (gx.a != null && gx.v != null ? gx.a * gx.v : null);
+  if (a != null) $("bAmps").textContent = a.toFixed(1);
+  if (w != null) $("bWatts").textContent = Math.round(w);
+  $("bStatus").textContent = (a != null ? (a > 0.5 ? "Charging" : a < -0.5 ? "Discharging" : "Idle") + " • " : "") + (gx.v != null ? gx.v.toFixed(2) + " V • " : "") + "live";
+}
+function gxLive(ws, st) {
+  ws.binaryType = "arraybuffer";
+  const send = b => { try { ws.send(b); } catch (e) {} };
+  send(mqPkt(0x10, mqCat([mqStr("MQTT"), Uint8Array.of(4, 2, 0, 60), mqStr("vandash" + Math.random().toString(16).slice(2, 8))])));
+  const subs = ["N/+/system/0/Dc/Battery/Soc", "N/+/system/0/Dc/Battery/Voltage", "N/+/system/0/Dc/Battery/Current", "N/+/system/0/Dc/Battery/Power", "N/+/system/0/Serial"];
+  st.textContent = "GX connected, waiting for data...";
+  const parts = [Uint8Array.of(0, 1)];
+  subs.forEach(t => { parts.push(mqStr(t)); parts.push(Uint8Array.of(0)); });
+  send(mqPkt(0x82, mqCat(parts)));
+  const keep = () => { if (gx.id) send(mqPkt(0x30, mqStr("R/" + gx.id + "/keepalive"))); };
+  const ping = setInterval(() => { send(Uint8Array.of(0xC0, 0)); keep(); }, 25000);
+  setTimeout(() => { if (!gx.got) st.textContent = "GX connected but no data yet"; }, 8000);
+  ws.onmessage = ev => {
+    const u = new Uint8Array(ev.data); let i = 0;
+    while (i < u.length) {
+      const type = u[i] >> 4; let n = 0, m = 1, j = i + 1, b;
+      do { b = u[j++]; n += (b & 127) * m; m *= 128; } while (b & 128);
+      if (type === 3) {
+        const tl = (u[j] << 8) | u[j + 1];
+        const topic = new TextDecoder().decode(u.slice(j + 2, j + 2 + tl));
+        let k = j + 2 + tl; if (((u[i] >> 1) & 3) > 0) k += 2;
+        const pl = u.slice(k, j + n);
+        if (!gx.id) { gx.id = topic.split("/")[1]; keep(); }
+        try {
+          const val = JSON.parse(new TextDecoder().decode(pl)).value;
+          if (val != null) {
+            gx.got = true;
+            if (topic.endsWith("/Soc")) gx.soc = Number(val);
+            else if (topic.endsWith("/Voltage")) gx.v = Number(val);
+            else if (topic.endsWith("/Current")) gx.a = Number(val);
+            else if (topic.endsWith("/Power")) gx.w = Number(val);
+            gxShow();
+          }
+        } catch (e) {}
+      }
+      i = j + n;
+    }
+  };
+  ws.onclose = () => { clearInterval(ping); st.textContent = "GX disconnected, retrying..."; setTimeout(gxTest, 5000); };
+}
 function gxTest() {
   const host = "192.168.68.120";
   const st = $("bStatus");
@@ -862,7 +921,7 @@ function gxTest() {
   try { ws = new WebSocket("wss://" + host + "/websocket-mqtt", "mqtt"); }
   catch (e) { st.textContent = "GX test: blocked before connecting (" + e.name + ")"; return; }
   const timer = setTimeout(() => { if (!opened) { st.textContent = "GX test: no answer after 8 seconds"; try { ws.close(); } catch (e) {} } }, 8000);
-  ws.onopen = () => { opened = true; clearTimeout(timer); st.textContent = "GX test: SECURE CONNECTED"; try { ws.close(); } catch (e) {} };
+  ws.onopen = () => { opened = true; clearTimeout(timer); gxLive(ws, st); };
   ws.onerror = () => { if (!opened) { clearTimeout(timer); st.textContent = "GX test: connection refused or blocked"; } };
 }
 $("bStatus").onclick = gxTest;
