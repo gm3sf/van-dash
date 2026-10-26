@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 183 -->
+<!-- Van Dash rev 184 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -177,7 +177,7 @@
   .bar { position: relative; height: 5px; border-radius: 3px; background: #2b3542; }
   .bar .fill { position: absolute; top: 0; bottom: 0; border-radius: 3px;
                background: linear-gradient(90deg, #5fb8ff, #7fe08a, #ffd34d, #ff9a3c); }
-  .vmap { position: relative; width: 100%; height: 190px; margin-top: 6px; border-radius: 14px; overflow: hidden; background: #1a222c; border: 0.5px solid #8a96a6; }
+  .vmap { position: relative; width: 100%; height: 170px; margin-top: 6px; border-radius: 14px; overflow: hidden; background: #1a222c; border: 0.5px solid #8a96a6; }
   .vmap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; touch-action: none; }
   .vmap .zbtns { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; }
   #vSat { position: absolute; left: 8px; top: 8px; width: 40px; height: 40px; margin: 0; padding: 0; background: rgba(21,28,37,0.92); border: 0.5px solid #8a96a6; }
@@ -256,7 +256,7 @@
       <div class="hint">Tap for weather details</div>
     </div>
     <div class="card">
-      <div class="label">Compass</div>
+      <div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3 18 20 12 16 6 20z"/></svg>Compass</div>
       <div class="compass-wrap">
         <svg viewBox="0 0 100 100">
           <g id="compassRing">
@@ -298,7 +298,7 @@
       </div>
     </div>
     <div class="card">
-      <div class="label">Sun</div>
+      <div class="label"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Sun</div>
       <div class="sunrow">
         <div>
           <svg viewBox="0 0 38 28"><path d="M4 22h30"/><path d="M10 22a9 9 0 0 1 18 0"/><path d="M19 4v5M8 9l3 3M30 9l-3 3"/><path d="M15 6l4-4 4 4"/></svg>
@@ -344,7 +344,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r183</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r184</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -440,18 +440,8 @@
 
 <script>
 const $ = id => document.getElementById(id);
-const MS_TO_MPH = 2.23694;
-const M_TO_FT = 3.28084;
-const M_TO_MI = 0.000621371;
-
-const WX_CODES = {
-  0:"Clear",1:"Mostly clear",2:"Partly cloudy",3:"Overcast",
-  45:"Fog",48:"Freezing fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",
-  56:"Freezing drizzle",57:"Freezing drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",
-  66:"Freezing rain",67:"Freezing rain",71:"Light snow",73:"Snow",75:"Heavy snow",
-  77:"Snow grains",80:"Rain showers",81:"Rain showers",82:"Violent showers",
-  85:"Snow showers",86:"Heavy snow showers",95:"Thunderstorm",96:"Thunderstorm, hail",99:"Thunderstorm, hail"
-};
+const MS_TO_MPH = 2.23694, M_TO_FT = 3.28084, M_TO_MI = 0.000621371;
+const WX_CODES = {0:"Clear",1:"Mostly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Freezing fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",56:"Freezing drizzle",57:"Freezing drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Freezing rain",71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",80:"Rain showers",81:"Rain showers",82:"Violent showers",85:"Snow showers",86:"Heavy snow showers",95:"Thunderstorm",96:"Thunderstorm, hail",99:"Thunderstorm, hail"};
 
 function wxIcon(code) {
   if (code === 0) return "☀️";
@@ -477,8 +467,7 @@ function setThermo(f) {
   const rect = $("thermoFill");
   rect.setAttribute("y", top);
   rect.setAttribute("height", 74 - top);
-  const col = f < 40 ? "#4f9bff" : f < 65 ? "#7fe08a" : f < 85 ? "#ffd34d" : "#ff8a2b";
-  $("tempIco").style.stroke = col;
+  $("tempIco").style.stroke = "#ff8a2b";
 }
 
 
