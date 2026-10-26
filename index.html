@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 169 -->
+<!-- Van Dash rev 172 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -77,7 +77,7 @@
   .locrow .loctext { flex: 1; min-width: 0; }
   .locrow .loclabel { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; }
   .locrow #city { font-size: 20px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-  .card.mapcard { padding: 0 !important; overflow: hidden; position: relative; height: 240px; }
+  
   .tripcard .tripbody { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
   .tripcard .tripbody .value { margin-top: 0; }
   .tripcard .tripbody .sub { margin-top: 0; }
@@ -344,11 +344,11 @@
 
   <div class="vmap" id="vmap">
     <canvas id="vmapCanvas"></canvas>
-    <div class="zbtns"><button id="vzIn">+</button><button id="vzOut">&minus;</button></div>
+    <div class="zbtns"><button id="vzIn">+</button><button id="vzOut">&minus;</button><button id="vCtr">&#9678;</button></div>
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:8px;line-height:1;color:#5f7288;padding:2px 0 0">r169</div>
+  <div style="text-align:center;font-size:8px;line-height:1;color:#5f7288;padding:2px 0 0">r172</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -359,14 +359,14 @@
     <div class="title">Spotify</div>
     <div class="spacer"></div>
   </div>
-  <a class="card plrow" href="spotify://"><div class="pi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7 9.5c3.5-1 7.5-.7 10.5 1"/><path d="M7.8 12.8c3-.8 6-.5 8.5 1"/><path d="M8.6 15.8c2.4-.6 4.5-.4 6.4.7"/></svg></div><div class="pn">Open Spotify</div></a>
-  <a class="card plrow" href="spotify:playlist:5BhLHifOyFoHiLSD7sUEU5"><div class="pi"><svg viewBox="0 0 24 24"><path d="M13 3L5 13h6l-1 8 8-10h-6z"/></svg></div><div class="pn">Alternative</div></a>
-  <a class="card plrow" href="spotify:playlist:1iNSSO6uQTvHpVBH1K2MNb"><div class="pi"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/></svg></div><div class="pn">80's</div></a>
-  <a class="card plrow" href="spotify:playlist:0EL28nuoMrufmGVyxtWR3B"><div class="pi"><svg viewBox="0 0 24 24"><path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10h2a2 2 0 0 1 0 4h-2"/><path d="M8 3v3M12 3v3"/></svg></div><div class="pn">Coffee House</div></a>
-  <a class="card plrow" href="spotify:playlist:1Rm2fXxk56Qgr0iOWKytot"><div class="pi"><svg viewBox="0 0 24 24"><path d="M3 9c3-3 6 3 9 0s6 3 9 0"/><path d="M3 15c3-3 6 3 9 0s6 3 9 0"/></svg></div><div class="pn">Downtempo</div></a>
-  <a class="card plrow" href="spotify:playlist:5eSKWFtq1ry2O7GZ3tGE82"><div class="pi"><svg viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg></div><div class="pn">High School</div></a>
-  <a class="card plrow" href="spotify:playlist:5eSKWFtq1ry2O7GZ3tGE82"><div class="pi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></div><div class="pn">Texas Sun</div></a>
-  <a class="card plrow" href="spotify:artist:73mSg0dykFyhvU96tb5xQV"><div class="pi"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></div><div class="pn">Hermanos Gutierrez</div></a>
+  <div id="plList"></div>
+  
+  
+  
+  
+  
+  
+  
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -474,18 +474,7 @@ function wxIcon(code) {
   return "☁️";
 }
 
-const STATE_ABBR = {
-  "Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO",
-  "Connecticut":"CT","Delaware":"DE","Florida":"FL","Georgia":"GA","Hawaii":"HI","Idaho":"ID",
-  "Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY","Louisiana":"LA",
-  "Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN",
-  "Mississippi":"MS","Missouri":"MO","Montana":"MT","Nebraska":"NE","Nevada":"NV",
-  "New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC",
-  "North Dakota":"ND","Ohio":"OH","Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA",
-  "Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD","Tennessee":"TN","Texas":"TX",
-  "Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV",
-  "Wisconsin":"WI","Wyoming":"WY","District of Columbia":"DC"
-};
+const STATE_ABBR = Object.fromEntries("Alabama:AL,Alaska:AK,Arizona:AZ,Arkansas:AR,California:CA,Colorado:CO,Connecticut:CT,Delaware:DE,Florida:FL,Georgia:GA,Hawaii:HI,Idaho:ID,Illinois:IL,Indiana:IN,Iowa:IA,Kansas:KS,Kentucky:KY,Louisiana:LA,Maine:ME,Maryland:MD,Massachusetts:MA,Michigan:MI,Minnesota:MN,Mississippi:MS,Missouri:MO,Montana:MT,Nebraska:NE,Nevada:NV,New Hampshire:NH,New Jersey:NJ,New Mexico:NM,New York:NY,North Carolina:NC,North Dakota:ND,Ohio:OH,Oklahoma:OK,Oregon:OR,Pennsylvania:PA,Rhode Island:RI,South Carolina:SC,South Dakota:SD,Tennessee:TN,Texas:TX,Utah:UT,Vermont:VT,Virginia:VA,Washington:WA,West Virginia:WV,Wisconsin:WI,Wyoming:WY,District of Columbia:DC".split(",").map(s => s.split(":")));
 
 function setThermo(f) {
   const t = Math.max(0, Math.min(110, f));
@@ -505,6 +494,17 @@ function setThermo(f) {
 
 
 
+const PL = [
+  ["Open Spotify", "", '<circle cx="12" cy="12" r="9"/><path d="M7 9.5c3.5-1 7.5-.7 10.5 1"/><path d="M7.8 12.8c3-.8 6-.5 8.5 1"/><path d="M8.6 15.8c2.4-.6 4.5-.4 6.4.7"/>'],
+  ["Alternative", "playlist/5BhLHifOyFoHiLSD7sUEU5", '<path d="M13 3L5 13h6l-1 8 8-10h-6z"/>'],
+  ["80's", "playlist/1iNSSO6uQTvHpVBH1K2MNb", '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/>'],
+  ["Coffee House", "playlist/0EL28nuoMrufmGVyxtWR3B", '<path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10h2a2 2 0 0 1 0 4h-2"/><path d="M8 3v3M12 3v3"/>'],
+  ["Downtempo", "playlist/1Rm2fXxk56Qgr0iOWKytot", '<path d="M3 9c3-3 6 3 9 0s6 3 9 0"/><path d="M3 15c3-3 6 3 9 0s6 3 9 0"/>'],
+  ["High School", "playlist/5eSKWFtq1ry2O7GZ3tGE82", '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>'],
+  ["Texas Sun", "playlist/4hmdldJ2d92gZgJG7xZNw3", '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'],
+  ["Hermanos Gutierrez", "artist/73mSg0dykFyhvU96tb5xQV", '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>']
+];
+$("plList").innerHTML = PL.map(p => '<a class="card plrow" href="https://open.spotify.com/' + p[1] + '"><div class="pi"><svg viewBox="0 0 24 24">' + p[2] + '</svg></div><div class="pn">' + p[0] + '</div></a>').join("");
 $("spotBtn").onclick = e => { e.preventDefault(); $("mainScreen").classList.add("hidden"); $("spotScreen").classList.remove("hidden"); window.scrollTo(0, 0); };
 $("spotBack").onclick = () => { $("spotScreen").classList.add("hidden"); $("mainScreen").classList.remove("hidden"); window.scrollTo(0, 0); };
 $("tempCard").onclick = $("wxCard").onclick = () => {
@@ -681,9 +681,8 @@ $("compassBtn").onclick = () => startCompass(true);
 let lastCityPos = null, lastCityTime = 0, cityName = "";
 async function updateCity(lat, lon) {
   const now = Date.now();
-  if (lastCityPos && now - lastCityTime < 60 * 1000 &&
-      distMeters(lastCityPos, {latitude: lat, longitude: lon}) < 3000) return;
-  if (lastCityPos && distMeters(lastCityPos, {latitude: lat, longitude: lon}) < 1500) return;
+  if (lastCityPos && now - lastCityTime < 15 * 1000) return;
+  if (lastCityPos && distMeters(lastCityPos, {latitude: lat, longitude: lon}) < 400) return;
   lastCityPos = {latitude: lat, longitude: lon}; lastCityTime = now;
   try {
     const url = "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat +
@@ -705,8 +704,8 @@ let lastWeather = 0, lastWeatherPos = null;
 async function updateWeather(lat, lon, forced) {
   if (!wxLive && !forced) return;
   const now = Date.now();
-  if (!forced && now - lastWeather < 10 * 60 * 1000 &&
-      lastWeatherPos && distMeters(lastWeatherPos, {latitude: lat, longitude: lon}) < 15000) return;
+  if (!forced && now - lastWeather < 3 * 60 * 1000 &&
+      lastWeatherPos && distMeters(lastWeatherPos, {latitude: lat, longitude: lon}) < 3000) return;
   lastWeather = now; lastWeatherPos = {latitude: lat, longitude: lon};
   try {
     const url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
@@ -976,12 +975,25 @@ function vDraw() {
       if (t.complete && t.naturalWidth) vctx.drawImage(t, tx * 256 - left, ty * 256 - top, 256, 256);
     }
   }
-  const cx = vW / 2, cy = vH / 2;
+  const g = vWorld(vGLat, vGLon, vZoom), cx = g.x - left, cy = g.y - top;
   vctx.beginPath(); vctx.arc(cx, cy, 16, 0, 6.2832); vctx.fillStyle = "rgba(255,59,48,0.30)"; vctx.fill();
   vctx.beginPath(); vctx.arc(cx, cy, 9, 0, 6.2832); vctx.fillStyle = "#ff3b30"; vctx.fill();
   vctx.lineWidth = 3; vctx.strokeStyle = "#ffffff"; vctx.stroke();
 }
-function vmapSet(lat, lon) { vLat = lat; vLon = lon; vDraw(); }
+let vGLat = null, vGLon = null, vFollow = true, vDrag = null, vTimer = 0;
+function vmapSet(lat, lon) { vGLat = lat; vGLon = lon; if (vFollow) { vLat = lat; vLon = lon; } vDraw(); }
+function vHome() { vFollow = true; if (vGLat != null) vmapSet(vGLat, vGLon); }
+vCanvas.onpointerdown = e => { vDrag = {x: e.clientX, y: e.clientY}; vCanvas.setPointerCapture(e.pointerId); };
+vCanvas.onpointermove = e => {
+  if (!vDrag || vLat == null) return;
+  const c = vWorld(vLat, vLon, vZoom), n = Math.pow(2, vZoom) * 256;
+  const x = c.x - (e.clientX - vDrag.x), y = c.y - (e.clientY - vDrag.y);
+  vDrag = {x: e.clientX, y: e.clientY}; vFollow = false;
+  vLon = x / n * 360 - 180; vLat = Math.atan(Math.sinh(Math.PI * (1 - 2 * y / n))) * 180 / Math.PI;
+  vDraw(); clearTimeout(vTimer); vTimer = setTimeout(vHome, 20000);
+};
+vCanvas.onpointerup = vCanvas.onpointercancel = () => { vDrag = null; };
+$("vCtr").onclick = vHome;
 $("vzIn").onclick = () => { if (vZoom < 18) { vZoom++; vDraw(); } };
 $("vzOut").onclick = () => { if (vZoom > 3) { vZoom--; vDraw(); } };
 window.addEventListener("resize", vResize);
