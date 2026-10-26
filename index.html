@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 161 -->
+<!-- Van Dash rev 163 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -114,6 +114,10 @@
   .youdot { width: 22px; height: 22px; background: #ff3b30; border: 4px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 8px rgba(255,59,48,0.30), 0 2px 6px rgba(0,0,0,0.6); }
   .leaflet-marker-icon, .leaflet-marker-pane { z-index: 900 !important; }
   header { display: none; text-align: center; padding: 4px 0 2px; }
+  .speedrow { display: flex; align-items: center; justify-content: center; gap: 14px; }
+  .speedrow .speed { flex: none; margin: 6px 0 14px; }
+  .appbtn { flex: none; width: 64px; height: 64px; border-radius: 50%; background: #000000; border: 1.5px solid #cfd8e3; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+  .appbtn svg { width: 32px; height: 32px; fill: none; stroke: #cfd8e3; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .speed { width: 190px; height: 190px; margin: 6px auto 14px; border-radius: 50%; background: #151c25; border: 0.5px solid #8a96a6; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   .speed .num { font-size: 96px; font-weight: 700; line-height: 1; color: #ffffff; }
   .speed .unit { font-size: 22px; color: #7f8fa3; margin-top: 2px; }
@@ -206,9 +210,13 @@
 
 <!-- ================= MAIN SCREEN ================= -->
 <div id="mainScreen">
-  <div class="speed">
-    <div class="num" id="speed">--</div>
-    <div class="unit">mph</div>
+  <div class="speedrow">
+    <a class="appbtn" id="mapsBtn" href="comgooglemaps://" aria-label="Google Maps"><svg viewBox="0 0 24 24"><path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></a>
+    <div class="speed">
+      <div class="num" id="speed">0</div>
+      <div class="unit">mph</div>
+    </div>
+    <a class="appbtn" id="spotBtn" href="spotify://" aria-label="Spotify"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7 9.5c3.5-1 7.5-.7 10.5 1"/><path d="M7.8 12.8c3-.8 6-.5 8.5 1"/><path d="M8.6 15.8c2.4-.6 4.5-.4 6.4.7"/></svg></a>
   </div>
 
   <div class="grid">
@@ -344,7 +352,7 @@
   </div>
 
   <div id="status">Waiting for GPS...</div>
-  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 161 (round speed card)</div>
+  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 163 (Maps and Spotify buttons)</div>
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -825,17 +833,12 @@ $("clearBtn").onclick = () => {
 // ---- Victron battery via VRM (refreshes every 15 seconds) ----
 async function updateBattery() {
   const id = localStorage.getItem("vrmInstall");
-  if (!id) { $("bStatus").textContent = "Tap the gear to set up"; return; }
+  return; // VRM disabled
   try {
-    // The token now lives safely on the Netlify relay, not on the phone
-    const res = await fetch("/.netlify/functions/vrm?id=" + encodeURIComponent(id));
-    if (res.status === 401 || res.status === 403) { $("bStatus").textContent = "Token rejected, check Netlify setup"; return; }
-    if (!res.ok) { $("bStatus").textContent = "VRM error " + res.status; return; }
+    const res = null;
     const soc = null, a = null, w = null, recs = [];
     // (old VRM display code removed)
-    const stamp = recs.length && recs[0].timestamp ? new Date(recs[0].timestamp * 1000) : new Date();
-    $("bStatus").textContent = (a != null ? (a > 0.5 ? "Charging" : a < -0.5 ? "Discharging" : "Idle") + " \u2022 " : "") +
-      "updated " + stamp.toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
+    // (display removed)
   } catch (err) {
     $("bStatus").textContent = "Can't reach VRM (" + (err && err.message ? err.message : "unknown") + ")";
   }
