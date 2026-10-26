@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 167 -->
+<!-- Van Dash rev 168 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +16,6 @@
     c.width = c.height = S;
     var g = c.getContext('2d'), cx = S / 2, cy = S / 2;
     g.fillStyle = '#000'; g.fillRect(0, 0, S, S);
-    // faint topo contour lines
     g.strokeStyle = 'rgba(255,255,255,0.14)'; g.lineWidth = 1;
     for (var i = 0; i < 9; i++) {
       g.beginPath();
@@ -27,11 +26,8 @@
       }
       g.closePath(); g.stroke();
     }
-    // dark disc behind the compass
     g.fillStyle = '#05080c'; g.beginPath(); g.arc(cx, cy, 66, 0, 6.2832); g.fill();
-    // white ring
     g.strokeStyle = '#fff'; g.lineWidth = 5; g.beginPath(); g.arc(cx, cy, 62, 0, 6.2832); g.stroke();
-    // tick marks
     g.lineWidth = 2;
     for (var t = 0; t < 36; t++) {
       var ang = t * Math.PI / 18, len = (t % 9 === 0) ? 12 : 6;
@@ -40,14 +36,12 @@
       g.lineTo(cx + (54 - len) * Math.cos(ang), cy + (54 - len) * Math.sin(ang));
       g.stroke();
     }
-    // needle rotated 40 degrees: orange tip, gray tail
     g.save(); g.translate(cx, cy); g.rotate(40 * Math.PI / 180);
     g.fillStyle = '#ff8a2b';
     g.beginPath(); g.moveTo(0, -46); g.lineTo(11, 0); g.lineTo(-11, 0); g.closePath(); g.fill();
     g.fillStyle = '#8a96a6';
     g.beginPath(); g.moveTo(0, 46); g.lineTo(11, 0); g.lineTo(-11, 0); g.closePath(); g.fill();
     g.restore();
-    // center hub
     g.fillStyle = '#05080c'; g.strokeStyle = '#ff8a2b'; g.lineWidth = 3;
     g.beginPath(); g.arc(cx, cy, 7, 0, 6.2832); g.fill(); g.stroke();
     var url = c.toDataURL('image/png');
@@ -84,7 +78,6 @@
   .locrow .loclabel { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; }
   .locrow #city { font-size: 20px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
   .card.mapcard { padding: 0 !important; overflow: hidden; position: relative; height: 240px; }
-  .maptiles { filter: none; }
   .tripcard .tripbody { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
   .tripcard .tripbody .value { margin-top: 0; }
   .tripcard .tripbody .sub { margin-top: 0; }
@@ -97,14 +90,12 @@
   .fuelform label.chk { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 15px; color: #e8eef5; }
   .fuelform label.chk input { width: 22px; height: 22px; accent-color: #ff8a2b; }
   .fuelrow { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 10px 0; border-top: 1px solid #26303c; }
-  .fuelrow:first-child { border-top: none; }
   .fuelrow .a { font-size: 16px; font-weight: 600; }
   .fuelrow .m { font-size: 18px; font-weight: 700; color: #ff8a2b; text-align: right; }
   .fuelrow .b { font-size: 13px; color: #9fb0c3; }
   .fuelrow .x { font-size: 13px; color: #7f8fa3; text-align: right; }
   .fuelrow button.del { background: none; color: #7f8fa3; padding: 0; margin: 0; font-size: 12px; text-decoration: underline; }
   #fuelList { background: #151c25; border-radius: 16px; padding: 4px 14px; border: 0.5px solid #8a96a6; }
-  .tripcard .tripbody button.unused { margin-top: 0; }
   
   
   
@@ -115,7 +106,6 @@
   
   header { display: none; text-align: center; padding: 4px 0 2px; }
   .speedrow { display: flex; align-items: center; justify-content: center; gap: 14px; }
-  .speedrow .speed { flex: none; margin: 6px 0 14px; }
   .appbtn { flex: none; width: 64px; height: 64px; border-radius: 50%; background: #000000; border: 1.5px solid #cfd8e3; display: flex; align-items: center; justify-content: center; text-decoration: none; }
   .appbtn svg { width: 32px; height: 32px; fill: none; stroke: #cfd8e3; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .speed { width: 190px; height: 190px; margin: 6px auto 14px; border-radius: 50%; background: #151c25; border: 0.5px solid #8a96a6; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
@@ -136,7 +126,6 @@
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .card { background: #151c25; border-radius: 14px; padding: 8px 12px;
           border: 0.5px solid #8a96a6; }
-  .card.tap { border: 0.5px solid #8a96a6; }
   .card .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; }
   .card .value { font-size: 30px; font-weight: 600; margin-top: 6px; }
   .card .sub { font-size: 13px; color: #9fb0c3; margin-top: 4px; }
@@ -148,7 +137,6 @@
   button.alt { background: #26303c; }
   #status { text-align: center; font-size: 13px; color: #e0a040; padding: 4px; min-height: 18px; }
 
-  /* Weather detail screen */
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 0 8px; }
   .topbar .title { font-size: 20px; font-weight: 600; text-align: center; flex: 1; }
   .topbar button { margin: 0; background: #26303c; }
@@ -161,12 +149,10 @@
           border: 0.5px solid #8a96a6; box-shadow: none; }
   .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; }
   .stat .v { font-size: 20px; font-weight: 600; margin-top: 4px; }
-  /* Battery card + settings */
   .card.wide { grid-column: 1 / -1; }
   .battcard { padding: 6px 12px 8px; }
   .battcard .bhead { display: flex; align-items: center; justify-content: space-between; }
   .battcard .bhead .label { display: flex; align-items: center; }
-  .battcard .bhead .gear { float: none; margin: 0; }
   .batt-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
   .batt-row .bamp { flex: none; width: 78px; justify-content: flex-end; }
   .batt-row .bpow { flex: none; width: 96px; justify-content: flex-end; }
@@ -179,7 +165,6 @@
   .socbar { flex: none; width: 56px; height: 8px; border-radius: 4px; background: #2b3542; overflow: hidden; }
   .socbar .fill { height: 100%; width: 0%; border-radius: 3px; background: #7f8fa3; transition: width 0.4s, background 0.4s; }
   .battcard .bstat { font-size: 11px; color: #7f8fa3; text-align: center; margin-top: 3px; }
-  .gear { float: right; background: none; margin: 0; padding: 0 4px; font-size: 18px; color: #7f8fa3; }
   input.field { width: 100%; background: #151c25; color: #e8eef5; border: 1px solid #2a3a4e;
                 border-radius: 10px; padding: 12px; font-size: 16px; margin-top: 6px; }
   .fieldlabel { font-size: 13px; color: #9fb0c3; margin-top: 14px; }
@@ -208,11 +193,17 @@
   .plrow .pi { flex: none; width: 44px; height: 44px; border-radius: 50%; background: #000000; border: 1.5px solid #cfd8e3; display: flex; align-items: center; justify-content: center; }
   .plrow .pi svg { width: 24px; height: 24px; fill: none; stroke: #ff8a2b; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .plrow .pn { font-size: 18px; font-weight: 600; }
+  .wxcard { position: relative; }
+  .srchbtn { position: absolute; top: 2px; right: 2px; width: 44px; height: 44px; margin: 0; padding: 0; background: none; display: flex; align-items: center; justify-content: center; }
+  .srchbtn svg { width: 20px; height: 20px; fill: none; stroke: #ff8a2b; stroke-width: 2; stroke-linecap: round; }
+  .sres { display: block; padding: 14px 4px; border-top: 1px solid #26303c; font-size: 18px; font-weight: 600; color: #fff; }
+  .sres:first-child { border-top: none; }
+  .sres i { display: block; font-size: 13px; font-weight: 400; font-style: normal; color: #7f8fa3; }
+  #srchList { background: #151c25; border-radius: 16px; padding: 2px 14px; border: 0.5px solid #8a96a6; margin-top: 12px; }
 </style>
 </head>
 <body>
 
-<!-- ================= MAIN SCREEN ================= -->
 <div id="mainScreen">
   <a href="https://192.168.68.120" target="_blank" style="position:absolute;top:calc(env(safe-area-inset-top) + 14px);left:14px;width:80px;height:80px;display:flex;align-items:flex-start;justify-content:flex-start;padding:4px 0 0 4px;font-size:9px;color:#5f7288;text-decoration:none;opacity:0.7;z-index:5">GX</a>
   <div class="speedrow">
@@ -259,7 +250,8 @@
         </div>
       </div>
     </div>
-    <div class="card tap" id="wxCard">
+    <div class="card tap wxcard" id="wxCard">
+      <button class="srchbtn" id="srchBtn" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button>
       <div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 8.5 4.5 4.5 0 0 1 17.5 18z"/></svg>Weather</div>
       <div class="wx-wrap">
         <div class="bigicon" id="wxIcon">&#9729;&#65039;</div>
@@ -329,7 +321,7 @@
     <div class="card wide battcard">
       <div class="bhead">
         <div class="label"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="7" width="17" height="10" rx="2"/><path d="M22 10.5v3"/></svg>Battery</div>
-        <button class="gear" id="gearBtn">&#9881;</button>
+        
       </div>
       <div class="batt-row">
         <div class="bi bsoc">
@@ -356,12 +348,11 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:8px;line-height:1;color:#5f7288;padding:2px 0 0">r167</div>
+  <div style="text-align:center;font-size:8px;line-height:1;color:#5f7288;padding:2px 0 0">r168</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
 
-<!-- ================= SPOTIFY SCREEN ================= -->
 <div id="spotScreen" class="hidden">
   <div class="topbar">
     <button id="spotBack">&lsaquo; Back</button>
@@ -379,23 +370,13 @@
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
-<div id="settingsScreen" class="hidden">
-  <div class="topbar">
-    <button id="setBack">&lsaquo; Back</button>
-    <div class="title">Battery setup</div>
-    <div class="spacer"></div>
-  </div>
-  <div class="fieldlabel">VRM installation ID</div>
-  <input class="field" id="inInstall" inputmode="numeric" placeholder="for example 50309">
-  <div class="fieldlabel">VRM access token</div>
-  <input class="field" id="inToken" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="paste your token here">
-  <button id="saveBtn" style="width:100%;margin-top:18px">Save</button>
-  <button class="alt" id="clearBtn" style="width:100%">Remove saved token</button>
-  <div id="setMsg" class="sub" style="text-align:center;margin-top:12px">&nbsp;</div>
-  <div class="sub" style="margin-top:16px">Your token is stored only on this phone and is sent only to Victron's VRM service.</div>
+<div id="srchScreen" class="hidden">
+  <div class="topbar"><button id="srchBack">&lsaquo; Back</button><div class="title">Search weather</div><div class="spacer"></div></div>
+  <input class="field" id="srchIn" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="City or zip code">
+  <div id="srchList" class="hidden"></div>
+  <div id="srchMsg" class="sub" style="text-align:center;margin-top:12px">&nbsp;</div>
 </div>
 
-<!-- ================= FUEL SCREEN ================= -->
 <div id="fuelScreen" class="hidden">
   <div class="topbar">
     <button id="fuelBack">&lsaquo; Back</button>
@@ -443,6 +424,7 @@
     <div class="title" id="wCity">Weather</div>
     <div class="spacer"></div>
   </div>
+  <button class="alt hidden" id="srchLive" style="width:100%;margin:0 0 8px">Back to current location</button>
 
   <div class="nowline">
     <div class="big" id="wTemp">--</div>
@@ -477,7 +459,6 @@ const WX_CODES = {
   85:"Snow showers",86:"Heavy snow showers",95:"Thunderstorm",96:"Thunderstorm, hail",99:"Thunderstorm, hail"
 };
 
-// Weather icons (emoji, shown like the iPhone Weather app)
 function wxIcon(code) {
   if (code === 0) return "☀️";
   if (code === 1) return "🌤️";
@@ -506,16 +487,13 @@ const STATE_ABBR = {
   "Wisconsin":"WI","Wyoming":"WY","District of Columbia":"DC"
 };
 
-// ---- Thermometer: fills and shifts color with the temperature (0F to 110F) ----
 function setThermo(f) {
   const t = Math.max(0, Math.min(110, f));
   const frac = t / 110;
-  // Tube runs from y=5 (top) to the bulb at the bottom (y=74)
   const top = 74 - (8 + frac * 62);
   const rect = $("thermoFill");
   rect.setAttribute("y", top);
   rect.setAttribute("height", 74 - top);
-  // Tint the little label icon: cold blue, mild green, warm yellow, hot orange
   const col = f < 40 ? "#4f9bff" : f < 65 ? "#7fe08a" : f < 85 ? "#ffd34d" : "#ff8a2b";
   $("tempIco").style.stroke = col;
 }
@@ -526,7 +504,7 @@ function setThermo(f) {
       
 
 
-// ---- Screen switching ----
+
 $("spotBtn").onclick = e => { e.preventDefault(); $("mainScreen").classList.add("hidden"); $("spotScreen").classList.remove("hidden"); window.scrollTo(0, 0); };
 $("spotBack").onclick = () => { $("spotScreen").classList.add("hidden"); $("mainScreen").classList.remove("hidden"); window.scrollTo(0, 0); };
 $("tempCard").onclick = $("wxCard").onclick = () => {
@@ -540,13 +518,11 @@ $("backBtn").onclick = () => {
   window.scrollTo(0, 0);
 };
 
-// ---- Fuel log (saved on the phone) ----
 let fuelLog = [];
 try { fuelLog = JSON.parse(localStorage.getItem("fuelLog") || "[]"); } catch (e) { fuelLog = []; }
 function saveFuel() { localStorage.setItem("fuelLog", JSON.stringify(fuelLog)); }
 function num(s) { const n = parseFloat(String(s).replace(/[^0-9.]/g, "")); return isNaN(n) ? null : n; }
 
-// MPG for each full fill-up: miles since the previous FULL fill-up divided by all gallons added since then
 function computeMpg() {
   const out = fuelLog.map(() => null);
   let anchor = null, galSince = 0;
@@ -572,7 +548,6 @@ function showFuel() {
   const res = computeMpg();
   const good = res.filter(r => r);
   $("fLast").textContent = good.length ? good[good.length - 1].mpg.toFixed(1) : "--";
-  // Average over the whole span: total miles divided by total gallons used in those measured stretches
   let m = 0, g = 0;
   for (let i = 0; i < fuelLog.length; i++) {
     if (res[i]) { m += res[i].miles; g += res[i].miles / res[i].mpg; }
@@ -583,7 +558,6 @@ function showFuel() {
   const totPaid = fuelLog.reduce((s, e) => s + e.paid, 0);
   $("fGal").textContent = fuelLog.length ? totGal.toFixed(1) : "--";
   $("fSpent").textContent = fuelLog.length ? "$" + totPaid.toFixed(0) : "--";
-  // Cost per mile: dollars spent in each measured stretch divided by the miles of that stretch
   let costM = 0, costD = 0, stretchStart = -1;
   for (let i = 0; i < fuelLog.length; i++) {
     if (stretchStart === -1) { if (fuelLog[i].full) stretchStart = i; continue; }
@@ -654,7 +628,6 @@ $("fuelBack").onclick = () => {
 };
 showFuel();
 
-// ---- Trip odometer (saved on the phone) ----
 let tripMeters = parseFloat(localStorage.getItem("tripMeters") || "0");
 let lastPos = null;
 function showTrip() { $("trip").textContent = (tripMeters * M_TO_MI).toFixed(1); }
@@ -670,14 +643,12 @@ function distMeters(a, b) {
   return 2 * R * Math.asin(Math.sqrt(x));
 }
 
-// ---- Compass ----
 const DIRS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
 function showHeading(deg) {
   if (deg == null || isNaN(deg)) return;
   deg = (deg + 360) % 360;
   $("heading").textContent = DIRS[Math.round(deg / 22.5) % 16];
   $("deg").textContent = Math.round(deg) + "°";
-  // The red needle stays pointing up; the ring turns so the direction you face is at the top
   $("compassRing").style.transform = "rotate(" + (-deg) + "deg)";
 }
 let compassOn = false;
@@ -706,9 +677,7 @@ function startCompass(fromTap) {
   } catch (err) { if (fromTap) $("status").textContent = "Compass error: " + err.message; }
 }
 $("compassBtn").onclick = () => startCompass(true);
-// The compass only starts when you tap the Enable compass button (no automatic permission popup)
 
-// ---- City and state (BigDataCloud, free, no account) ----
 let lastCityPos = null, lastCityTime = 0, cityName = "";
 async function updateCity(lat, lon) {
   const now = Date.now();
@@ -732,11 +701,11 @@ async function updateCity(lat, lon) {
   }
 }
 
-// ---- Weather (Open-Meteo, free, no account) ----
 let lastWeather = 0, lastWeatherPos = null;
-async function updateWeather(lat, lon) {
+async function updateWeather(lat, lon, forced) {
+  if (!wxLive && !forced) return;
   const now = Date.now();
-  if (now - lastWeather < 10 * 60 * 1000 &&
+  if (!forced && now - lastWeather < 10 * 60 * 1000 &&
       lastWeatherPos && distMeters(lastWeatherPos, {latitude: lat, longitude: lon}) < 15000) return;
   lastWeather = now; lastWeatherPos = {latitude: lat, longitude: lon};
   try {
@@ -750,8 +719,7 @@ async function updateWeather(lat, lon) {
     const compassDir = DIRS[Math.round(c.wind_direction_10m / 22.5) % 16];
     const wxText = WX_CODES[c.weather_code] || "--";
     const hi = Math.round(dy.temperature_2m_max[0]), lo = Math.round(dy.temperature_2m_min[0]);
-
-    // Main screen
+    $("srchLive").classList.toggle("hidden", wxLive);
     $("temp").textContent = Math.round(c.temperature_2m) + "°F";
     $("hilo").textContent = "High " + hi + "°  Low " + lo + "°";
     $("wx").textContent = wxText;
@@ -764,7 +732,6 @@ async function updateWeather(lat, lon) {
     $("updated").textContent = "Weather updated " +
       new Date().toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
 
-    // Detail screen
     $("wTemp").textContent = Math.round(c.temperature_2m) + "°F";
     $("wDesc").textContent = wxIcon(c.weather_code) + " " + wxText;
     $("wHigh").textContent = hi + "°";
@@ -774,7 +741,6 @@ async function updateWeather(lat, lon) {
     $("wGust").textContent = Math.round(c.wind_gusts_10m) + " mph";
     $("wRain").textContent = (dy.precipitation_probability_max[0] ?? 0) + "%";
 
-    // iPhone-style forecast rows: day, icon + rain chance, low, temperature bar, high
     const weekMin = Math.min(...dy.temperature_2m_min);
     const weekMax = Math.max(...dy.temperature_2m_max);
     const span = Math.max(weekMax - weekMin, 1);
@@ -805,32 +771,55 @@ async function updateWeather(lat, lon) {
   }
 }
 
-// ---- Settings screen ----
-$("gearBtn").onclick = () => {
-  $("inInstall").value = localStorage.getItem("vrmInstall") || "";
-  $("inToken").value = localStorage.getItem("vrmToken") || "";
-  $("setMsg").innerHTML = "&nbsp;";
-  $("mainScreen").classList.add("hidden");
-  $("settingsScreen").classList.remove("hidden");
-  window.scrollTo(0, 0);
+// ---- Weather search ----
+let wxLive = true, srchT = null, srchN = 0;
+$("srchBtn").onclick = e => {
+  e.stopPropagation();
+  $("mainScreen").classList.add("hidden"); $("srchScreen").classList.remove("hidden");
+  $("srchIn").value = ""; $("srchList").classList.add("hidden"); $("srchMsg").innerHTML = "&nbsp;";
+  window.scrollTo(0, 0); setTimeout(() => $("srchIn").focus(), 50);
 };
-$("setBack").onclick = () => {
-  $("settingsScreen").classList.add("hidden");
-  $("mainScreen").classList.remove("hidden");
+$("srchBack").onclick = () => { $("srchScreen").classList.add("hidden"); $("mainScreen").classList.remove("hidden"); };
+async function srchGo(q) {
+  const n = ++srchN;
+  try {
+    let res = [];
+    if (/^\d{5}$/.test(q)) {
+      const r = await fetch("https://api.zippopotam.us/us/" + q);
+      if (r.ok) { const p = (await r.json()).places[0]; res = [{ name: p["place name"], admin1: p.state, country: "United States", latitude: +p.latitude, longitude: +p.longitude }]; }
+    } else {
+      const r = await fetch("https://geocoding-api.open-meteo.com/v1/search?count=8&language=en&format=json&name=" + encodeURIComponent(q));
+      res = (await r.json()).results || [];
+    }
+    if (n !== srchN) return;
+    $("srchList").classList.toggle("hidden", !res.length);
+    $("srchMsg").innerHTML = res.length ? "&nbsp;" : "No matches";
+    $("srchList").innerHTML = res.map((c, i) => '<a href="#" class="sres" data-i="' + i + '">' + c.name + '<i>' + [c.admin1, c.country].filter(Boolean).join(", ") + '</i></a>').join("");
+    document.querySelectorAll("#srchList .sres").forEach(a => {
+      a.onclick = ev => {
+        ev.preventDefault();
+        const c = res[+a.dataset.i], st = STATE_ABBR[c.admin1] || c.admin1 || "";
+        wxLive = false;
+        $("wCity").textContent = c.country === "United States" && st ? c.name + ", " + st : c.name;
+        updateWeather(c.latitude, c.longitude, true);
+        $("srchScreen").classList.add("hidden"); $("weatherScreen").classList.remove("hidden"); window.scrollTo(0, 0);
+      };
+    });
+  } catch (e) { if (n === srchN) $("srchMsg").textContent = "Search offline"; }
+}
+$("srchIn").oninput = () => {
+  clearTimeout(srchT);
+  const q = $("srchIn").value.trim();
+  if (q.length < 2) { $("srchList").classList.add("hidden"); return; }
+  srchT = setTimeout(() => srchGo(q), 250);
 };
-$("saveBtn").onclick = () => {
-  localStorage.setItem("vrmInstall", $("inInstall").value.replace(/\D/g, ""));
-  localStorage.setItem("vrmToken", $("inToken").value.replace(/\s/g, ""));
-  $("setMsg").textContent = "Saved.";
-};
-$("clearBtn").onclick = () => {
-  localStorage.removeItem("vrmToken");
-  $("inToken").value = "";
-  $("setMsg").textContent = "Token removed.";
+$("srchLive").onclick = () => {
+  wxLive = true; $("srchLive").classList.add("hidden");
+  if (cityName) $("wCity").textContent = cityName;
+  if (lastCityPos) updateWeather(lastCityPos.latitude, lastCityPos.longitude, true);
 };
 
 
-// ---- Local GX connection test (WebSocket to the GX on port 9001) ----
 function mqStr(s) { const b = new TextEncoder().encode(s); const o = new Uint8Array(2 + b.length); o[0] = b.length >> 8; o[1] = b.length & 255; o.set(b, 2); return o; }
 function mqCat(a) { let n = 0; a.forEach(x => n += x.length); const o = new Uint8Array(n); let p = 0; a.forEach(x => { o.set(x, p); p += x.length; }); return o; }
 function mqPkt(first, body) { const len = []; let n = body.length; do { let d = n % 128; n = Math.floor(n / 128); if (n > 0) d |= 128; len.push(d); } while (n > 0); return mqCat([Uint8Array.of(first, ...len), body]); }
@@ -905,14 +894,12 @@ $("bStatus").onclick = gxTest;
 gxTest();
 
 
-// ---- GPS ----
 function onPosition(p) {
   const c = p.coords;
   $("status").textContent = "";
   if (c.speed != null && c.speed >= 0) {
     const mph = c.speed * MS_TO_MPH;
     $("speed").textContent = mph < 1 ? "0" : Math.round(mph);
-    // speed shown as plain text
   }
   if (c.altitude != null) $("alt").textContent = Math.round(c.altitude * M_TO_FT).toLocaleString();
   if (!compassOn && c.heading != null && !isNaN(c.heading) && c.speed > 1) showHeading(c.heading);
@@ -945,7 +932,6 @@ if ("geolocation" in navigator) {
   $("status").textContent = "This browser doesn't support GPS.";
 }
 
-// ---- Home-made map (canvas, OpenStreetMap tiles) ----
 const vCanvas = $("vmapCanvas"), vctx = vCanvas.getContext("2d");
 let vLat = null, vLon = null, vZoom = 13, vW = 0, vH = 0;
 const vTiles = {};
@@ -990,7 +976,6 @@ function vDraw() {
       if (t.complete && t.naturalWidth) vctx.drawImage(t, tx * 256 - left, ty * 256 - top, 256, 256);
     }
   }
-  // your location: red dot with white ring
   const cx = vW / 2, cy = vH / 2;
   vctx.beginPath(); vctx.arc(cx, cy, 16, 0, 6.2832); vctx.fillStyle = "rgba(255,59,48,0.30)"; vctx.fill();
   vctx.beginPath(); vctx.arc(cx, cy, 9, 0, 6.2832); vctx.fillStyle = "#ff3b30"; vctx.fill();
@@ -1004,14 +989,12 @@ window.addEventListener("orientationchange", () => setTimeout(vResize, 300));
 vResize();
 setTimeout(vResize, 500);
 
-// ---- Keep the screen awake ----
 async function keepAwake() {
   try { if ("wakeLock" in navigator) await navigator.wakeLock.request("screen"); } catch (e) {}
 }
 keepAwake();
 document.addEventListener("visibilitychange", () => { if (!document.hidden) keepAwake(); });
 
-// ---- Auto-update: when the app opens, fetch a fresh copy and reload if the revision changed ----
 async function checkForUpdate() {
   try {
     const res = await fetch(location.pathname + "?v=" + Date.now(), { cache: "no-store" });
