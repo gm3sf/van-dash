@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 159 -->
+<!-- Van Dash rev 160 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -163,13 +163,16 @@
   .battcard .bhead { display: flex; align-items: center; justify-content: space-between; }
   .battcard .bhead .label { display: flex; align-items: center; }
   .battcard .bhead .gear { float: none; margin: 0; }
-  .batt-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; }
+  .batt-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+  .batt-row .bamp { flex: none; width: 78px; justify-content: flex-end; }
+  .batt-row .bpow { flex: none; width: 96px; justify-content: flex-end; }
+  .batt-row .bsoc .v { width: 46px; text-align: right; flex: none; }
   .batt-row .bi { display: flex; align-items: center; gap: 5px; }
-  .batt-row .bsoc { flex: 1.4; }
+  .batt-row .bsoc { flex: none; width: 150px; }
   .batt-row .bi svg { width: 20px; height: 20px; flex: none; fill: none; stroke: #ff8a2b; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .batt-row .v { font-size: 20px; font-weight: 700; line-height: 1; }
   .batt-row .u { font-size: 11px; color: #7f8fa3; margin-left: 1px; }
-  .socbar { flex: 1; height: 6px; border-radius: 3px; background: #2b3542; overflow: hidden; min-width: 28px; }
+  .socbar { flex: none; width: 56px; height: 8px; border-radius: 4px; background: #2b3542; overflow: hidden; }
   .socbar .fill { height: 100%; width: 0%; border-radius: 3px; background: #7f8fa3; transition: width 0.4s, background 0.4s; }
   .battcard .bstat { font-size: 11px; color: #7f8fa3; text-align: center; margin-top: 3px; }
   .gear { float: right; background: none; margin: 0; padding: 0 4px; font-size: 18px; color: #7f8fa3; }
@@ -222,7 +225,7 @@
       <div class="temp-wrap">
         <svg class="thermo" viewBox="0 0 26 74">
           <defs>
-            <linearGradient id="thermoGrad" x1="0" y1="1" x2="0" y2="0">
+            <linearGradient id="thermoGrad" gradientUnits="userSpaceOnUse" x1="0" y1="69" x2="0" y2="3">
               <stop offset="0" stop-color="#2f7bff"/>
               <stop offset="0.5" stop-color="#7fe08a"/>
               <stop offset="0.8" stop-color="#ffd34d"/>
@@ -321,11 +324,11 @@
           <div class="v" id="bSoc">--</div>
           <div class="socbar"><div class="fill" id="bBar"></div></div>
         </div>
-        <div class="bi">
+        <div class="bi bamp">
           <svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
           <div class="v" id="bAmps">--</div><div class="u">A</div>
         </div>
-        <div class="bi">
+        <div class="bi bpow">
           <svg viewBox="0 0 24 24"><path d="M9 3v5M15 3v5"/><path d="M6 8h12v3a6 6 0 0 1-12 0z"/><path d="M12 17v4"/></svg>
           <div class="v" id="bWatts">--</div><div class="u">W</div>
         </div>
@@ -341,7 +344,7 @@
   </div>
 
   <div id="status">Waiting for GPS...</div>
-  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 159 (live GX battery)</div>
+  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 160 (battery layout, thermometer gradient)</div>
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -828,24 +831,8 @@ async function updateBattery() {
     const res = await fetch("/.netlify/functions/vrm?id=" + encodeURIComponent(id));
     if (res.status === 401 || res.status === 403) { $("bStatus").textContent = "Token rejected, check Netlify setup"; return; }
     if (!res.ok) { $("bStatus").textContent = "VRM error " + res.status; return; }
-    const d = await res.json();
-    const recs = d.records || [];
-    // Look for the battery monitor values by their standard codes
-    const find = code => recs.find(r => r.code === code && r.rawValue != null);
-    const soc = find("SOC"), volts = find("V"), amps = find("I"), pw = find("P");
-    const a = amps ? Number(amps.rawValue) : null;
-    const v = volts ? Number(volts.rawValue) : null;
-    let w = pw ? Number(pw.rawValue) : (a != null && v != null ? a * v : null);
-    $("bSoc").textContent = soc ? Math.round(Number(soc.rawValue)) + "%" : "--";
-    if (soc) {
-      const pct = Math.max(0, Math.min(100, Number(soc.rawValue)));
-      const col = pct >= 60 ? "#4cd964" : pct >= 30 ? "#ffd34d" : "#ff3b30";
-      $("bBar").style.width = pct + "%"; $("bBar").style.background = col;
-      $("bIco").style.color = col; $("bIco").style.stroke = col;
-      $("bIcoFill").setAttribute("width", String(Math.round(pct / 100 * 13)));
-    }
-    $("bAmps").textContent = a != null ? a.toFixed(1) : "--";
-    $("bWatts").textContent = w != null ? Math.round(w) : "--";
+    const soc = null, a = null, w = null, recs = [];
+    // (old VRM display code removed)
     const stamp = recs.length && recs[0].timestamp ? new Date(recs[0].timestamp * 1000) : new Date();
     $("bStatus").textContent = (a != null ? (a > 0.5 ? "Charging" : a < -0.5 ? "Discharging" : "Idle") + " \u2022 " : "") +
       "updated " + stamp.toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
