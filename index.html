@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 157 -->
+<!-- Van Dash rev 158 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -341,7 +341,7 @@
   </div>
 
   <div id="status">Waiting for GPS...</div>
-  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 157 (secure GX test)</div>
+  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 158 (GX test path fix)</div>
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -859,7 +859,7 @@ function gxTest() {
   const st = $("bStatus");
   st.textContent = "GX test: connecting...";
   let opened = false, ws;
-  try { ws = new WebSocket("wss://" + host + "/mqtt", "mqtt"); }
+  try { ws = new WebSocket("wss://" + host + "/websocket-mqtt", "mqtt"); }
   catch (e) { st.textContent = "GX test: blocked before connecting (" + e.name + ")"; return; }
   const timer = setTimeout(() => { if (!opened) { st.textContent = "GX test: no answer after 8 seconds"; try { ws.close(); } catch (e) {} } }, 8000);
   ws.onopen = () => { opened = true; clearTimeout(timer); st.textContent = "GX test: SECURE CONNECTED"; try { ws.close(); } catch (e) {} };
