@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 184 -->
+<!-- Van Dash rev 185 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -88,8 +88,7 @@
   .fuelform label.chk input { width: 22px; height: 22px; accent-color: #ff8a2b; }
   .fuelrow { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 10px 0; border-top: 1px solid #26303c; }
   .fuelrow .m { font-size: 18px; font-weight: 700; color: #ff8a2b; text-align: right; }
-  .fuelrow .b { font-size: 13px; color: #9fb0c3; }
-  .fuelrow button.del { background: none; color: #7f8fa3; padding: 0; margin: 0; font-size: 12px; text-decoration: underline; }
+  .fuelrow .b { font-size: 13px; color: #9fb0c3; }  .fuelrow button.del { background: none; color: #7f8fa3; padding: 0; margin: 0; font-size: 12px; text-decoration: underline; }
   #fuelList { background: #151c25; border-radius: 16px; padding: 4px 14px; border: 0.5px solid #8a96a6; }
   
   
@@ -99,8 +98,9 @@
   
   
   
-  .speedrow { display: flex; align-items: center; justify-content: center; gap: 14px; }
-  .appbtn { flex: none; width: 64px; height: 64px; border-radius: 50%; background: #000000; border: 1.5px solid #cfd8e3; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+  .speedrow { display: flex; align-items: center; }
+  .speedrow .appbtn { margin: 0 auto; }
+  .appbtn { flex: 1; max-width: 64px; width: 64px; height: 64px; border-radius: 50%; background: #000000; border: 1.5px solid #cfd8e3; display: flex; align-items: center; justify-content: center; text-decoration: none; }
   .appbtn svg { width: 32px; height: 32px; fill: none; stroke: #cfd8e3; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .speed { width: 190px; height: 190px; margin: 6px auto 14px; border-radius: 50%; background: #151c25; border: 0.5px solid #8a96a6; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   .speed .num { font-size: 96px; font-weight: 700; line-height: 1; color: #ffffff; }
@@ -344,7 +344,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r184</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r185</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -504,11 +504,7 @@ function computeMpg() {
   let anchor = null, galSince = 0;
   for (let i = 0; i < fuelLog.length; i++) {
     const e = fuelLog[i];
-    if (anchor === null) {
-      if (e.full) anchor = e.odo;
-      galSince = 0;
-      continue;
-    }
+    if (anchor === null) { if (e.full) anchor = e.odo; galSince = 0; continue; }
     galSince += e.gal;
     if (e.full) {
       const miles = e.odo - anchor;
