@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 155 -->
+<!-- Van Dash rev 156 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -341,7 +341,7 @@
   </div>
 
   <div id="status">Waiting for GPS...</div>
-  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 155 (slim battery)</div>
+  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 156 (GX test)</div>
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -853,7 +853,21 @@ async function updateBattery() {
     $("bStatus").textContent = "Can't reach VRM (" + (err && err.message ? err.message : "unknown") + ")";
   }
 }
-// Battery polling is switched off for now (Victron relay not working yet).
+// ---- Local GX connection test (WebSocket to the GX on port 9001) ----
+function gxTest() {
+  const host = "192.168.68.120";
+  const st = $("bStatus");
+  st.textContent = "GX test: connecting...";
+  let opened = false, ws;
+  try { ws = new WebSocket("ws://" + host + ":9001/"); }
+  catch (e) { st.textContent = "GX test: blocked before connecting (" + e.name + ")"; return; }
+  const timer = setTimeout(() => { if (!opened) { st.textContent = "GX test: no answer after 8 seconds"; try { ws.close(); } catch (e) {} } }, 8000);
+  ws.onopen = () => { opened = true; clearTimeout(timer); st.textContent = "GX test: CONNECTED"; try { ws.close(); } catch (e) {} };
+  ws.onerror = () => { if (!opened) { clearTimeout(timer); st.textContent = "GX test: connection refused or blocked"; } };
+}
+$("bStatus").onclick = gxTest;
+gxTest();
+// Battery polling via VRM is switched off.
 // updateBattery();
 // setInterval(updateBattery, 15000);
 
