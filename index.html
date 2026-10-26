@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 172 -->
+<!-- Van Dash rev 174 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -90,10 +90,8 @@
   .fuelform label.chk { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 15px; color: #e8eef5; }
   .fuelform label.chk input { width: 22px; height: 22px; accent-color: #ff8a2b; }
   .fuelrow { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 10px 0; border-top: 1px solid #26303c; }
-  .fuelrow .a { font-size: 16px; font-weight: 600; }
   .fuelrow .m { font-size: 18px; font-weight: 700; color: #ff8a2b; text-align: right; }
   .fuelrow .b { font-size: 13px; color: #9fb0c3; }
-  .fuelrow .x { font-size: 13px; color: #7f8fa3; text-align: right; }
   .fuelrow button.del { background: none; color: #7f8fa3; padding: 0; margin: 0; font-size: 12px; text-decoration: underline; }
   #fuelList { background: #151c25; border-radius: 16px; padding: 4px 14px; border: 0.5px solid #8a96a6; }
   
@@ -143,7 +141,6 @@
   .topbar .spacer { width: 70px; }
   .nowline { text-align: center; padding: 6px 0 14px; }
   .nowline .big { font-size: 64px; font-weight: 700; line-height: 1; }
-  .nowline .desc { font-size: 18px; color: #9fb0c3; margin-top: 6px; }
   .stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
   .stat { background: #151c25; border-radius: 12px; padding: 10px; text-align: center;
           border: 0.5px solid #8a96a6; box-shadow: none; }
@@ -187,6 +184,8 @@
   .vmap { position: relative; width: 100%; height: 170px; margin-top: 6px; border-radius: 14px; overflow: hidden; background: #1a222c; border: 0.5px solid #8a96a6; }
   .vmap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; touch-action: none; }
   .vmap .zbtns { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; }
+  #vSat { position: absolute; left: 8px; top: 8px; width: 40px; height: 40px; margin: 0; padding: 0; background: rgba(21,28,37,0.92); border: 0.5px solid #8a96a6; }
+  #vSat svg { width: 22px; height: 22px; fill: none; stroke: #ff8a2b; stroke-width: 1.8; }
   .vmap .zbtns button { width: 40px; height: 40px; margin: 0; padding: 0; font-size: 24px; line-height: 1; background: rgba(21,28,37,0.92); border: 0.5px solid #8a96a6; border-radius: 10px; color: #fff; }
   .vmap .attr { position: absolute; left: 6px; bottom: 4px; font-size: 9px; color: #333; background: rgba(255,255,255,0.7); padding: 1px 4px; border-radius: 3px; }
   .plrow { display: flex; align-items: center; gap: 14px; margin-top: 10px; text-decoration: none; color: #ffffff; }
@@ -338,17 +337,18 @@
           <div class="v" id="bWatts">--</div><div class="u">W</div>
         </div>
       </div>
-      <div class="bstat" id="bStatus">Tap the gear to set up</div>
+      <div class="bstat" id="bStatus">Connecting...</div>
     </div>
     </div>
 
   <div class="vmap" id="vmap">
     <canvas id="vmapCanvas"></canvas>
+    <button id="vSat"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="M2 12l10 5 10-5"/><path d="M2 16l10 5 10-5"/></svg></button>
     <div class="zbtns"><button id="vzIn">+</button><button id="vzOut">&minus;</button><button id="vCtr">&#9678;</button></div>
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:8px;line-height:1;color:#5f7288;padding:2px 0 0">r172</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r174</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -369,7 +369,6 @@
   
 </div>
 
-<!-- ================= SETTINGS SCREEN ================= -->
 <div id="srchScreen" class="hidden">
   <div class="topbar"><button id="srchBack">&lsaquo; Back</button><div class="title">Search weather</div><div class="spacer"></div></div>
   <input class="field" id="srchIn" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="City or zip code">
@@ -417,7 +416,6 @@
   <div id="fuelList"></div>
 </div>
 
-<!-- ================= WEATHER DETAIL SCREEN ================= -->
 <div id="weatherScreen" class="hidden">
   <div class="topbar">
     <button id="backBtn">&lsaquo; Back</button>
@@ -428,7 +426,7 @@
 
   <div class="nowline">
     <div class="big" id="wTemp">--</div>
-    <div class="desc" id="wDesc">--</div>
+    <div id="wDesc" style="font-size:18px;color:#9fb0c3;margin-top:6px">--</div>
   </div>
 
   <div class="stat-row">
@@ -505,18 +503,11 @@ const PL = [
   ["Hermanos Gutierrez", "artist/73mSg0dykFyhvU96tb5xQV", '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>']
 ];
 $("plList").innerHTML = PL.map(p => '<a class="card plrow" href="https://open.spotify.com/' + p[1] + '"><div class="pi"><svg viewBox="0 0 24 24">' + p[2] + '</svg></div><div class="pn">' + p[0] + '</div></a>').join("");
-$("spotBtn").onclick = e => { e.preventDefault(); $("mainScreen").classList.add("hidden"); $("spotScreen").classList.remove("hidden"); window.scrollTo(0, 0); };
-$("spotBack").onclick = () => { $("spotScreen").classList.add("hidden"); $("mainScreen").classList.remove("hidden"); window.scrollTo(0, 0); };
-$("tempCard").onclick = $("wxCard").onclick = () => {
-  $("mainScreen").classList.add("hidden");
-  $("weatherScreen").classList.remove("hidden");
-  window.scrollTo(0, 0);
-};
-$("backBtn").onclick = () => {
-  $("weatherScreen").classList.add("hidden");
-  $("mainScreen").classList.remove("hidden");
-  window.scrollTo(0, 0);
-};
+function go(a, b) { $(a).classList.add("hidden"); $(b).classList.remove("hidden"); window.scrollTo(0, 0); }
+$("spotBtn").onclick = e => { e.preventDefault(); go("mainScreen", "spotScreen"); };
+$("spotBack").onclick = () => go("spotScreen", "mainScreen");
+$("tempCard").onclick = $("wxCard").onclick = () => go("mainScreen", "weatherScreen");
+$("backBtn").onclick = () => go("weatherScreen", "mainScreen");
 
 let fuelLog = [];
 try { fuelLog = JSON.parse(localStorage.getItem("fuelLog") || "[]"); } catch (e) { fuelLog = []; }
@@ -580,10 +571,10 @@ function showFuel() {
     const ppg = e.gal > 0 ? e.paid / e.gal : 0;
     rows.push(
       '<div class="fuelrow">' +
-        '<div class="a">' + when + ' \u2022 ' + e.gal.toFixed(2) + ' gal' + (e.full ? '' : ' (partial)') + '</div>' +
+        '<div style="font-size:16px;font-weight:600">' + when + ' \u2022 ' + e.gal.toFixed(2) + ' gal' + (e.full ? '' : ' (partial)') + '</div>' +
         '<div class="m">' + (r ? r.mpg.toFixed(1) + ' mpg' : '--') + '</div>' +
         '<div class="b">$' + e.paid.toFixed(2) + ' \u2022 $' + ppg.toFixed(3) + '/gal \u2022 odo ' + Math.round(e.odo).toLocaleString() + '</div>' +
-        '<div class="x">' + (r ? Math.round(r.miles) + ' mi' : '') + ' <button class="del" data-i="' + i + '">delete</button></div>' +
+        '<div class="b" style="color:#7f8fa3;text-align:right">' + (r ? Math.round(r.miles) + ' mi' : '') + ' <button class="del" data-i="' + i + '">delete</button></div>' +
       '</div>'
     );
   }
@@ -617,15 +608,9 @@ $("fuelBtn").onclick = (ev) => {
   ev.stopPropagation();
   $("fMsg").innerHTML = "&nbsp;";
   showFuel();
-  $("mainScreen").classList.add("hidden");
-  $("fuelScreen").classList.remove("hidden");
-  window.scrollTo(0, 0);
+  go("mainScreen", "fuelScreen");
 };
-$("fuelBack").onclick = () => {
-  $("fuelScreen").classList.add("hidden");
-  $("mainScreen").classList.remove("hidden");
-  window.scrollTo(0, 0);
-};
+$("fuelBack").onclick = () => go("fuelScreen", "mainScreen");
 showFuel();
 
 let tripMeters = parseFloat(localStorage.getItem("tripMeters") || "0");
@@ -657,6 +642,7 @@ function onOrientation(e) {
   if (h != null) { compassOn = true; showHeading(h); }
 }
 function startCompass(fromTap) {
+  const er = err => { if (fromTap) $("status").textContent = "Compass error: " + err.message; };
   const done = () => {
     window.addEventListener("deviceorientation", onOrientation, true);
     $("compassBtn").style.display = "none";
@@ -668,13 +654,11 @@ function startCompass(fromTap) {
       DeviceOrientationEvent.requestPermission().then(r => {
         if (r === "granted") done();
         else if (fromTap) $("status").textContent = "Compass permission denied.";
-      }).catch(err => {
-        if (fromTap) $("status").textContent = "Compass error: " + err.message;
-      });
+      }).catch(er);
     } else {
       done();
     }
-  } catch (err) { if (fromTap) $("status").textContent = "Compass error: " + err.message; }
+  } catch (err) { er(err); }
 }
 $("compassBtn").onclick = () => startCompass(true);
 
@@ -733,12 +717,7 @@ async function updateWeather(lat, lon, forced) {
 
     $("wTemp").textContent = Math.round(c.temperature_2m) + "°F";
     $("wDesc").textContent = wxIcon(c.weather_code) + " " + wxText;
-    $("wHigh").textContent = hi + "°";
-    $("wLow").textContent = lo + "°";
-    $("wFeels").textContent = Math.round(c.apparent_temperature) + "°";
-    $("wWind").textContent = Math.round(c.wind_speed_10m) + " " + compassDir;
-    $("wGust").textContent = Math.round(c.wind_gusts_10m) + " mph";
-    $("wRain").textContent = (dy.precipitation_probability_max[0] ?? 0) + "%";
+    [["wHigh", hi + "°"], ["wLow", lo + "°"], ["wFeels", Math.round(c.apparent_temperature) + "°"], ["wWind", Math.round(c.wind_speed_10m) + " " + compassDir], ["wGust", Math.round(c.wind_gusts_10m) + " mph"], ["wRain", (dy.precipitation_probability_max[0] ?? 0) + "%"]].forEach(a => $(a[0]).textContent = a[1]);
 
     const weekMin = Math.min(...dy.temperature_2m_min);
     const weekMax = Math.max(...dy.temperature_2m_max);
@@ -770,7 +749,7 @@ async function updateWeather(lat, lon, forced) {
   }
 }
 
-// ---- Weather search ----
+
 let wxLive = true, srchT = null, srchN = 0;
 $("srchBtn").onclick = e => {
   e.stopPropagation();
@@ -934,6 +913,7 @@ if ("geolocation" in navigator) {
 const vCanvas = $("vmapCanvas"), vctx = vCanvas.getContext("2d");
 let vLat = null, vLon = null, vZoom = 13, vW = 0, vH = 0;
 const vTiles = {};
+let vSatOn = localStorage.getItem("vSat") === "1";
 function vResize() {
   const box = $("vmap").getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
@@ -965,12 +945,12 @@ function vDraw() {
     for (let ty = ty0; ty <= ty1; ty++) {
       if (ty < 0 || ty >= n) continue;
       const wx = ((tx % n) + n) % n;
-      const key = vZoom + "/" + wx + "/" + ty;
+      const key = vSatOn + vZoom + "/" + wx + "/" + ty;
       let t = vTiles[key];
       if (!t) {
         t = vTiles[key] = new Image();
         t.onload = vDraw;
-        t.src = "https://tile.openstreetmap.org/" + key + ".png";
+        t.src = vSatOn ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + vZoom + "/" + ty + "/" + wx : "https://tile.openstreetmap.org/" + vZoom + "/" + wx + "/" + ty + ".png";
       }
       if (t.complete && t.naturalWidth) vctx.drawImage(t, tx * 256 - left, ty * 256 - top, 256, 256);
     }
@@ -994,6 +974,9 @@ vCanvas.onpointermove = e => {
 };
 vCanvas.onpointerup = vCanvas.onpointercancel = () => { vDrag = null; };
 $("vCtr").onclick = vHome;
+function vSatSet() { $("vSat").style.borderColor = vSatOn ? "#ff8a2b" : ""; vDraw(); }
+$("vSat").onclick = () => { vSatOn = !vSatOn; localStorage.setItem("vSat", vSatOn ? "1" : "0"); vSatSet(); };
+vSatSet();
 $("vzIn").onclick = () => { if (vZoom < 18) { vZoom++; vDraw(); } };
 $("vzOut").onclick = () => { if (vZoom > 3) { vZoom--; vDraw(); } };
 window.addEventListener("resize", vResize);
