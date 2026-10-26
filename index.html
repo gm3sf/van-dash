@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 163 -->
+<!-- Van Dash rev 164 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -105,14 +105,14 @@
   .fuelrow button.del { background: none; color: #7f8fa3; padding: 0; margin: 0; font-size: 12px; text-decoration: underline; }
   #fuelList { background: #151c25; border-radius: 16px; padding: 4px 14px; border: 0.5px solid #8a96a6; }
   .tripcard .tripbody button.unused { margin-top: 0; }
-  #map { position: absolute; top: 0; left: 0; width: 100%; height: 240px; background: #e8e6e0; }
-  .leaflet-container { background: #e8e6e0; font-family: inherit; }
-  .leaflet-control-attribution { background: rgba(255,255,255,0.7) !important; color: #555 !important; font-size: 9px !important; }
-  .leaflet-control-attribution a { color: #333 !important; }
-  .mapbtns { position: absolute; right: 8px; top: 8px; z-index: 1000; display: flex; flex-direction: column; gap: 6px; }
-  .mapbtns button { width: 40px; height: 40px; margin: 0; padding: 0; font-size: 24px; line-height: 1; background: rgba(21,28,37,0.92); border: 0.5px solid #8a96a6; border-radius: 10px; color: #ffffff; }
-  .youdot { width: 22px; height: 22px; background: #ff3b30; border: 4px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 8px rgba(255,59,48,0.30), 0 2px 6px rgba(0,0,0,0.6); }
-  .leaflet-marker-icon, .leaflet-marker-pane { z-index: 900 !important; }
+  
+  
+  
+  
+  
+  
+  
+  
   header { display: none; text-align: center; padding: 4px 0 2px; }
   .speedrow { display: flex; align-items: center; justify-content: center; gap: 14px; }
   .speedrow .speed { flex: none; margin: 6px 0 14px; }
@@ -204,6 +204,10 @@
   .vmap .zbtns { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; }
   .vmap .zbtns button { width: 40px; height: 40px; margin: 0; padding: 0; font-size: 24px; line-height: 1; background: rgba(21,28,37,0.92); border: 0.5px solid #8a96a6; border-radius: 10px; color: #fff; }
   .vmap .attr { position: absolute; left: 6px; bottom: 4px; font-size: 9px; color: #333; background: rgba(255,255,255,0.7); padding: 1px 4px; border-radius: 3px; }
+  .plrow { display: flex; align-items: center; gap: 14px; margin-top: 10px; text-decoration: none; color: #ffffff; }
+  .plrow .pi { flex: none; width: 44px; height: 44px; border-radius: 50%; background: #000000; border: 1.5px solid #cfd8e3; display: flex; align-items: center; justify-content: center; }
+  .plrow .pi svg { width: 24px; height: 24px; fill: none; stroke: #ff8a2b; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .plrow .pn { font-size: 18px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -216,7 +220,7 @@
       <div class="num" id="speed">0</div>
       <div class="unit">mph</div>
     </div>
-    <a class="appbtn" id="spotBtn" href="spotify://" aria-label="Spotify"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7 9.5c3.5-1 7.5-.7 10.5 1"/><path d="M7.8 12.8c3-.8 6-.5 8.5 1"/><path d="M8.6 15.8c2.4-.6 4.5-.4 6.4.7"/></svg></a>
+    <a class="appbtn" id="spotBtn" href="#" aria-label="Spotify"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7 9.5c3.5-1 7.5-.7 10.5 1"/><path d="M7.8 12.8c3-.8 6-.5 8.5 1"/><path d="M8.6 15.8c2.4-.6 4.5-.4 6.4.7"/></svg></a>
   </div>
 
   <div class="grid">
@@ -351,8 +355,26 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
+  <div style="text-align:center;font-size:8px;line-height:1;color:#5f7288;padding:2px 0 0">r164</div>
   <div id="status">Waiting for GPS...</div>
-  <div style="text-align:center;font-size:11px;color:#5f7288;padding:4px 0">rev 163 (Maps and Spotify buttons)</div>
+  
+</div>
+
+<!-- ================= SPOTIFY SCREEN ================= -->
+<div id="spotScreen" class="hidden">
+  <div class="topbar">
+    <button id="spotBack">&lsaquo; Back</button>
+    <div class="title">Spotify</div>
+    <div class="spacer"></div>
+  </div>
+  <a class="card plrow" href="spotify://"><div class="pi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7 9.5c3.5-1 7.5-.7 10.5 1"/><path d="M7.8 12.8c3-.8 6-.5 8.5 1"/><path d="M8.6 15.8c2.4-.6 4.5-.4 6.4.7"/></svg></div><div class="pn">Open Spotify</div></a>
+  <a class="card plrow" href="spotify:playlist:5BhLHifOyFoHiLSD7sUEU5"><div class="pi"><svg viewBox="0 0 24 24"><path d="M13 3L5 13h6l-1 8 8-10h-6z"/></svg></div><div class="pn">Alternative</div></a>
+  <a class="card plrow" href="spotify:playlist:1iNSSO6uQTvHpVBH1K2MNb"><div class="pi"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/></svg></div><div class="pn">80's</div></a>
+  <a class="card plrow" href="spotify:playlist:0EL28nuoMrufmGVyxtWR3B"><div class="pi"><svg viewBox="0 0 24 24"><path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10h2a2 2 0 0 1 0 4h-2"/><path d="M8 3v3M12 3v3"/></svg></div><div class="pn">Coffee House</div></a>
+  <a class="card plrow" href="spotify:playlist:1Rm2fXxk56Qgr0iOWKytot"><div class="pi"><svg viewBox="0 0 24 24"><path d="M3 9c3-3 6 3 9 0s6 3 9 0"/><path d="M3 15c3-3 6 3 9 0s6 3 9 0"/></svg></div><div class="pn">Downtempo</div></a>
+  <a class="card plrow" href="spotify:playlist:5eSKWFtq1ry2O7GZ3tGE82"><div class="pi"><svg viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg></div><div class="pn">High School</div></a>
+  <a class="card plrow" href="spotify:playlist:5eSKWFtq1ry2O7GZ3tGE82"><div class="pi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></div><div class="pn">Texas Sun</div></a>
+  <a class="card plrow" href="spotify:artist:73mSg0dykFyhvU96tb5xQV"><div class="pi"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></div><div class="pn">Hermanos Gutierrez</div></a>
 </div>
 
 <!-- ================= SETTINGS SCREEN ================= -->
@@ -497,38 +519,15 @@ function setThermo(f) {
   $("tempIco").style.stroke = col;
 }
 
-// ---- Speed gauge (0 to 100 mph, 270 degree sweep) ----
-const GAUGE_MAX = 100, G_START = -135, G_SWEEP = 270;
-function gPoint(r, deg) {
-  const a = (deg - 90) * Math.PI / 180;
-  return [150 + r * Math.cos(a), 150 + r * Math.sin(a)];
-}
-(function buildGauge() {
-  if (!$("gaugeArc")) return;
-  const [x1, y1] = gPoint(120, G_START), [x2, y2] = gPoint(120, G_START + G_SWEEP);
-  $("gaugeArc").setAttribute("d", "M " + x1 + " " + y1 + " A 120 120 0 1 1 " + x2 + " " + y2);
-  let svg = "";
-  for (let v = 0; v <= GAUGE_MAX; v += 5) {
-    const deg = G_START + (v / GAUGE_MAX) * G_SWEEP;
-    const major = v % 20 === 0;
-    const [a1, b1] = gPoint(major ? 104 : 110, deg), [a2, b2] = gPoint(118, deg);
-    svg += '<line x1="' + a1 + '" y1="' + b1 + '" x2="' + a2 + '" y2="' + b2 +
-      '" stroke="' + (major ? "#e8eef5" : "#5f7288") + '" stroke-width="' + (major ? 2.5 : 1.5) + '"/>';
-    if (major) {
-      const [tx, ty] = gPoint(88, deg);
-      svg += '<text x="' + tx + '" y="' + (ty + 5) + '" text-anchor="middle" font-size="15" fill="#9fb0c3">' + v + '</text>';
-    }
-  }
-  $("gaugeTicks").innerHTML = svg;
-})();
-function setNeedle(mph) {
-  if (!$("needle")) return;
-  const m = Math.max(0, Math.min(GAUGE_MAX, mph));
-  $("needle").style.transform = "rotate(" + (G_START + (m / GAUGE_MAX) * G_SWEEP) + "deg)";
-}
-setNeedle(0);
+
+
+    
+      
+
 
 // ---- Screen switching ----
+$("spotBtn").onclick = e => { e.preventDefault(); $("mainScreen").classList.add("hidden"); $("spotScreen").classList.remove("hidden"); window.scrollTo(0, 0); };
+$("spotBack").onclick = () => { $("spotScreen").classList.add("hidden"); $("mainScreen").classList.remove("hidden"); window.scrollTo(0, 0); };
 $("tempCard").onclick = $("wxCard").onclick = () => {
   $("mainScreen").classList.add("hidden");
   $("weatherScreen").classList.remove("hidden");
@@ -822,7 +821,6 @@ $("saveBtn").onclick = () => {
   localStorage.setItem("vrmInstall", $("inInstall").value.replace(/\D/g, ""));
   localStorage.setItem("vrmToken", $("inToken").value.replace(/\s/g, ""));
   $("setMsg").textContent = "Saved.";
-  updateBattery();
 };
 $("clearBtn").onclick = () => {
   localStorage.removeItem("vrmToken");
@@ -830,19 +828,7 @@ $("clearBtn").onclick = () => {
   $("setMsg").textContent = "Token removed.";
 };
 
-// ---- Victron battery via VRM (refreshes every 15 seconds) ----
-async function updateBattery() {
-  const id = localStorage.getItem("vrmInstall");
-  return; // VRM disabled
-  try {
-    const res = null;
-    const soc = null, a = null, w = null, recs = [];
-    // (old VRM display code removed)
-    // (display removed)
-  } catch (err) {
-    $("bStatus").textContent = "Can't reach VRM (" + (err && err.message ? err.message : "unknown") + ")";
-  }
-}
+
 // ---- Local GX connection test (WebSocket to the GX on port 9001) ----
 function mqStr(s) { const b = new TextEncoder().encode(s); const o = new Uint8Array(2 + b.length); o[0] = b.length >> 8; o[1] = b.length & 255; o.set(b, 2); return o; }
 function mqCat(a) { let n = 0; a.forEach(x => n += x.length); const o = new Uint8Array(n); let p = 0; a.forEach(x => { o.set(x, p); p += x.length; }); return o; }
@@ -916,9 +902,7 @@ function gxTest() {
 }
 $("bStatus").onclick = gxTest;
 gxTest();
-// Battery polling via VRM is switched off.
-// updateBattery();
-// setInterval(updateBattery, 15000);
+
 
 // ---- GPS ----
 function onPosition(p) {
