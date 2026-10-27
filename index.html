@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 190 -->
+<!-- Van Dash rev 191 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r190</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r191</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -895,12 +895,25 @@ function vDraw() {
       if (t.complete && t.naturalWidth) vctx.drawImage(t, tx * 256 - left, ty * 256 - top, 256, 256);
     }
   }
-  const g = vWorld(vGLat, vGLon, vZoom), cx = g.x - left, cy = g.y - top;
+  const g = vWorld(vFollow ? vLat : vGLat, vFollow ? vLon : vGLon, vZoom), cx = g.x - left, cy = g.y - top;
   vctx.beginPath(); vctx.arc(cx, cy, 16, 0, 6.2832); vctx.fillStyle = "rgba(255,59,48,0.30)"; vctx.fill();
   vctx.beginPath(); vctx.arc(cx, cy, 9, 0, 6.2832); vctx.fillStyle = "#ff3b30"; vctx.fill(); vctx.lineWidth = 3; vctx.strokeStyle = "#fff"; vctx.stroke();
 }
 let vGLat = null, vGLon = null, vFollow = true, vDrag = null, vTimer = 0;
-function vmapSet(lat, lon) { vGLat = lat; vGLon = lon; if (vFollow) { vLat = lat; vLon = lon; } vDraw(); }
+let vAnim = 0;
+function vmapSet(lat, lon) {
+  const fl = vGLat, fo = vGLon; vGLat = lat; vGLon = lon;
+  if (!vFollow) { vDraw(); return; }
+  if (fl == null || vLat == null || Math.abs(lat - vLat) > 0.01 || Math.abs(lon - vLon) > 0.01) { vLat = lat; vLon = lon; vDraw(); return; }
+  cancelAnimationFrame(vAnim);
+  const a0 = vLat, o0 = vLon, t0 = performance.now();
+  const step = now => {
+    const k = Math.min(1, (now - t0) / 1000);
+    vLat = a0 + (lat - a0) * k; vLon = o0 + (lon - o0) * k; vDraw();
+    if (k < 1 && vFollow) vAnim = requestAnimationFrame(step);
+  };
+  vAnim = requestAnimationFrame(step);
+}
 function vHome() { vFollow = true; if (vGLat != null) vmapSet(vGLat, vGLon); }
 vCanvas.onpointerdown = e => { vDrag = {x: e.clientX, y: e.clientY}; vCanvas.setPointerCapture(e.pointerId); };
 vCanvas.onpointermove = e => {
