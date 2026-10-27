@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 188 -->
+<!-- Van Dash rev 189 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -131,7 +131,7 @@
   .stat { background: #151c25; border-radius: 12px; padding: 10px; text-align: center;
           border: 0.5px solid #8a96a6; box-shadow: none; }
   .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; } .stat .v { font-size: 20px; font-weight: 600; margin-top: 4px; }
-  .card.wide { grid-column: 1 / -1; } .battcard { padding: 6px 12px 8px; }
+  .card.wide { grid-column: 1 / -1; } .grid > .card:not(.wide) { min-height: 112px; } .battcard { padding: 6px 12px 8px; }
   .battcard .bhead { display: flex; align-items: center; justify-content: space-between; } .battcard .bhead .label { display: flex; align-items: center; }
   .batt-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
   .batt-row .bamp { flex: none; width: 78px; justify-content: flex-end; }
@@ -190,7 +190,7 @@
   </div>
 
   <div class="grid">
-    <div class="card wide locrow">
+    <div class="card wide locrow" style="order:2">
       <svg class="pin" viewBox="0 0 24 32"><path d="M12 1C6.2 1 1.5 5.7 1.5 11.5c0 7.6 10.5 19 10.5 19s10.5-11.4 10.5-19C22.5 5.7 17.8 1 12 1z" fill="#ff8a2b"/><circle cx="12" cy="11.5" r="4" fill="#000000"/></svg>
       <div class="loctext">
         <div class="loclabel">Current city</div>
@@ -198,7 +198,7 @@
       </div>
       <div id="updated" class="hidden">&nbsp;</div>
     </div>
-    <div class="card tap" id="tempCard">
+    <div class="card tap" id="tempCard" style="order:6">
       <div class="label"><svg class="ico" id="tempIco" viewBox="0 0 24 24"><path d="M14 14.76V4a2 2 0 0 0-4 0v10.76a4 4 0 1 0 4 0z"/></svg>Temperature</div>
       <div class="temp-wrap">
         <svg class="thermo" viewBox="0 0 26 74">
@@ -224,7 +224,7 @@
         </div>
       </div>
     </div>
-    <div class="card tap wxcard" id="wxCard">
+    <div class="card tap wxcard" id="wxCard" style="order:7">
       <button class="srchbtn" id="srchBtn" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button>
       <div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 8.5 4.5 4.5 0 0 1 17.5 18z"/></svg>Weather</div>
       <div class="wx-wrap">
@@ -234,7 +234,7 @@
       <div class="sub" id="wind">&nbsp;</div>
       <div class="hint">Tap for weather details</div>
     </div>
-    <div class="card">
+    <div class="card" style="order:3">
       <div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3 18 20 12 16 6 20z"/></svg>Compass</div>
       <div class="compass-wrap">
         <svg viewBox="0 0 100 100">
@@ -258,12 +258,12 @@
       </div>
       <button id="compassBtn">Enable compass</button>
     </div>
-    <div class="card">
+    <div class="card" style="order:8">
       <div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M2 20 9 7l4 7 3-5 6 11z"/></svg>Altitude</div>
       <div class="value" id="alt">--</div>
       <div class="sub">feet</div>
     </div>
-    <div class="card tripcard">
+    <div class="card tripcard" style="order:4">
       <div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>Trip</div>
       <div class="tripbody">
         <div>
@@ -276,7 +276,7 @@
         </div>
       </div>
     </div>
-    <div class="card">
+    <div class="card" style="order:9">
       <div class="label"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Sun</div>
       <div class="sunrow">
         <div>
@@ -289,10 +289,7 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="grid" style="margin-top:6px">
-    <div class="card wide battcard">
+    <div class="card wide battcard" style="order:5">
       <div class="bhead">
         <div class="label"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="7" width="17" height="10" rx="2"/><path d="M22 10.5v3"/></svg>Battery</div>
         
@@ -323,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r188</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r189</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
