@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 186 -->
+<!-- Van Dash rev 187 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -323,7 +323,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r186</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r187</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -814,9 +814,9 @@ $("revBtn").onclick = () => {
   if (revT) return;
   const t0 = Date.now();
   revT = setInterval(() => {
-    const k = (Date.now() - t0) / 2400;
+    const k = (Date.now() - t0) / 3500;
     if (k >= 1) { clearInterval(revT); revT = null; setArc(gpsMph); return; }
-    setArc(75 * (1 - Math.abs(2 * k - 1)));
+    setArc(75 * (k < 0.29 ? k / 0.29 : 1 - (k - 0.29) / 0.71));
   }, 30);
 };
 function onPosition(p) {
