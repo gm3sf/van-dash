@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 199 -->
+<!-- Van Dash rev 200 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r199</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r200</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1138,7 +1138,7 @@ function decorateResults() {
 (function () {
   var b = document.getElementById("cityRef");
   if (!b) return;
-  b.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 12a8 8 0 1 1-4.2-7"/><path d="M20 3v5h-5"/></svg>';
+  b.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M19 12a7 7 0 1 1-2.3-5.2"/><path d="M19.5 2.5v4.5h-4.5"/></svg>';
 })();
 
 /* ---------- Clear X in search box ---------- */
@@ -1180,6 +1180,57 @@ function decorateResults() {
   }
   upd();
   setInterval(upd, 500);
+})();
+
+/* ---------- Wind ring in Weather card ---------- */
+(function () {
+  var card = $("wxCard");
+  var wrap = card.querySelector(".wx-wrap");
+  var hint = card.querySelector(".hint");
+  if (hint) hint.style.display = "none";
+  $("wind").style.display = "none";
+
+  var box = document.createElement("div");
+  box.id = "wxWind";
+  box.style.cssText = "position:absolute;right:10px;bottom:8px;width:60px;text-align:center;line-height:1";
+  box.innerHTML = '<div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Wind</div>' +
+    '<svg viewBox="0 0 100 100" style="width:46px;height:46px;display:block;margin:2px auto 0">' +
+    '<g id="wxWindRing" style="transform-origin:50px 50px;transition:transform 0.25s linear">' +
+    '<circle cx="50" cy="50" r="46" fill="none" stroke="#ffffff" stroke-width="3"/>' +
+    '<text x="50" y="20" text-anchor="middle" font-size="15" font-weight="700" fill="#e53935">N</text>' +
+    '<g id="wxWindArrow" style="transform-origin:50px 50px">' +
+    '<path d="M50 80 L50 30" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+    '<path d="M33 47 L50 28 L67 47" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' +
+    '</g></g></svg>' +
+    '<div id="wxWindSpd" style="font-size:12px;color:#9fb0c3;margin-top:3px">--</div>';
+  card.appendChild(box);
+
+  var windFrom = null, windMph = null, heading = 0;
+
+  function draw() {
+    if (windFrom == null) return;
+    // ring rotates like the compass; arrow points the way the wind is blowing toward
+    $("wxWindRing").style.transform = "rotate(" + (-heading) + "deg)";
+    $("wxWindArrow").style.transform = "rotate(" + ((windFrom + 180) % 360) + "deg)";
+    $("wxWindSpd").textContent = windMph + " mph";
+  }
+
+  function readWind() {
+    var m = ($("wind").textContent || "").match(/from\s+([NESW]+)\s+(\d+)/);
+    if (!m) return;
+    var i = DIRS.indexOf(m[1]);
+    if (i < 0) return;
+    windFrom = i * 22.5; windMph = m[2];
+    draw();
+  }
+  new MutationObserver(readWind).observe($("wind"), { childList: true, characterData: true, subtree: true });
+  readWind();
+
+  var origShow = showHeading;
+  showHeading = function (deg) {
+    origShow(deg);
+    if (deg != null && !isNaN(deg)) { heading = (deg + 360) % 360; draw(); }
+  };
 })();
 </script>
 </body>
