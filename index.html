@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 204 -->
+<!-- Van Dash rev 206 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r204</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r206</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1372,9 +1372,21 @@ function decorateResults() {
   // rev 203: wind unit centered vertically in the card (below the title), nudged right
   if (box) {
     box.style.bottom = "auto";
-    box.style.top = "calc(50% + 8px)";
-    box.style.transform = "translateY(-50%)";
+    box.style.top = "12px";
+    box.style.transform = "none";
     box.style.right = "12px";
+    box.style.display = "flex";
+    box.style.flexDirection = "column";
+    box.style.alignItems = "center";
+    var wl0 = box.firstElementChild;
+    var sv0 = box.querySelector("svg");
+    var sp0 = $("wxWindSpd");
+    if (wl0 && sv0) {
+      sv0.style.margin = "0";
+      wl0.style.marginTop = "3px";
+      box.insertBefore(sv0, wl0);
+    }
+    if (sp0) sp0.style.marginTop = "3px";
   }
   // rev 204: wind unit as one piece, no box
   if (box) {
