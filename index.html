@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 196 -->
+<!-- Van Dash rev 197 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r196</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r197</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -952,6 +952,188 @@ async function checkForUpdate() {
 }
 checkForUpdate();
 document.addEventListener("visibilitychange", () => { if (!document.hidden) checkForUpdate(); });
+<script>
+/* ===== Part 2: speed limit + weather favorites ===== */
+
+/* ---------- Speed limit sign ---------- */
+(function () {
+  var unit = document.querySelector(".speed .unit");
+  if (!unit) return;
+  var sign = document.createElement("div");
+  sign.id = "limSign";
+  sign.style.cssText = "position:absolute;right:22px;bottom:34px;width:34px;height:42px;background:#fff;border:2px solid #111;border-radius:5px;color:#111;font-weight:800;text-align:center;line-height:1;display:none;z-index:3";
+  sign.innerHTML = '<div style="font-size:7px;margin-top:3px">SPEED<br>LIMIT</div><div id="limNum" style="font-size:17px;margin-top:2px">--</div>';
+  document.querySelector(".speed").appendChild(sign);
+})();
+
+var limShown = null, limCand = null, limCount = 0, limLastT = 0, limBusy = false, limHead = null;
+
+function setRedZone(lim) {
+  var stops = document.querySelectorAll("#arcG stop");
+  if (stops.length < 3) return;
+  var f = Math.max(0.3, Math.min(0.98, lim / 75));
+  stops[2].setAttribute("offset", String(f));
+  stops[1].setAttribute("offset", String(f * 0.57));
+}
+
+function showLimit(lim) {
+  limShown = lim;
+  var s = document.getElementById("limSign");
+  if (lim == null) { if (s) s.style.display = "none"; return; }
+  s.style.display = "block";
+  document.getElementById("limNum").textContent = lim;
+  setRedZone(lim);
+  if (typeof setArc === "function" && !revT) setArc(gpsMph);
+}
+
+function parseMaxspeed(v) {
+  if (!v) return null;
+  var m = String(v).match(/^(\d+)\s*(mph)?$/i);
+  if (!m) return null;
+  var n = parseInt(m[1], 10);
+  if (!m[2]) n = Math.round(n * 0.621371);
+  return n >= 5 && n <= 85 ? n : null;
+}
+
+function angDiff(a, b) {
+  var d = Math.abs(a - b) % 360;
+  return d > 180 ? 360 - d : d;
+}
+
+function bearing(lat1, lon1, lat2, lon2) {
+  var r = Math.PI / 180, y = Math.sin((lon2 - lon1) * r) * Math.cos(lat2 * r);
+  var x = Math.cos(lat1 * r) * Math.sin(lat2 * r) - Math.sin(lat1 * r) * Math.cos(lat2 * r) * Math.cos((lon2 - lon1) * r);
+  return (Math.atan2(y, x) / r + 360) % 360;
+}
+
+async function lookupLimit(lat, lon, heading) {
+  if (limBusy) return;
+  limBusy = true;
+  try {
+    var q = "[out:json][timeout:8];way(around:25," + lat + "," + lon + ")[highway][maxspeed];out geom tags;";
+    var res = await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: "data=" + encodeURIComponent(q) });
+    var data = await res.json();
+    var best = null, bestScore = 1e9;
+    (data.elements || []).forEach(function (w) {
+      var lim = parseMaxspeed(w.tags && w.tags.maxspeed);
+      if (lim == null || !w.geometry || w.geometry.length < 2) return;
+      var hw = w.tags.highway || "";
+      if (/_link$/.test(hw)) return;
+      var g = w.geometry, minD = 1e9, segB = 0;
+      for (var i = 0; i < g.length - 1; i++) {
+        var mx = (g[i].lat + g[i + 1].lat) / 2, my = (g[i].lon + g[i + 1].lon) / 2;
+        var d = distMeters({ latitude: lat, longitude: lon }, { latitude: mx, longitude: my });
+        if (d < minD) { minD = d; segB = bearing(g[i].lat, g[i].lon, g[i + 1].lat, g[i + 1].lon); }
+      }
+      var diff = Math.min(angDiff(heading, segB), angDiff(heading, (segB + 180) % 360));
+      if (diff > 30) return;
+      var score = minD + diff;
+      if (score < bestScore) { bestScore = score; best = lim; }
+    });
+    if (best == null) { limCand = null; limCount = 0; return; }
+    if (best === limShown) { limCand = null; limCount = 0; return; }
+    if (best === limCand) limCount++; else { limCand = best; limCount = 1; }
+    if (limCount >= 3 || limShown == null && limCount >= 2) { showLimit(best); limCand = null; limCount = 0; }
+  } catch (e) {}
+  finally { limBusy = false; }
+}
+
+(function () {
+  var orig = onPosition;
+  onPosition = function (p) {
+    orig(p);
+    try {
+      var c = p.coords, now = Date.now();
+      if (c.heading != null && !isNaN(c.heading) && c.speed != null && c.speed * MS_TO_MPH > 5) limHead = c.heading;
+      if (limHead != null && c.speed != null && c.speed * MS_TO_MPH > 5 && now - limLastT > 10000) {
+        limLastT = now;
+        lookupLimit(c.latitude, c.longitude, limHead);
+      }
+    } catch (e) {}
+  };
+})();
+
+/* ---------- Weather favorites ---------- */
+var favs = [];
+try { favs = JSON.parse(localStorage.getItem("wxFavs") || "[]"); } catch (e) { favs = []; }
+function saveFavs() { try { localStorage.setItem("wxFavs", JSON.stringify(favs)); } catch (e) {} }
+
+function openFav(f) {
+  wxLive = false;
+  $("wCity").textContent = f.label;
+  updateWeather(f.lat, f.lon, true);
+  $("srchScreen").classList.add("hidden");
+  $("weatherScreen").classList.remove("hidden");
+  window.scrollTo(0, 0);
+}
+
+function renderFavs() {
+  var box = $("favBox");
+  if (!box) return;
+  if (!favs.length) { box.innerHTML = ""; box.style.display = "none"; return; }
+  box.style.display = "block";
+  box.innerHTML = '<div class="section-title" style="margin-top:14px">Saved places</div>' + favs.map(function (f, i) {
+    return '<div style="display:flex;align-items:center;gap:8px;margin-top:6px">' +
+      '<button class="alt" data-go="' + i + '" style="flex:1;margin:0;padding:12px;font-size:16px;text-align:left">' + f.label + '</button>' +
+      '<button class="alt" data-del="' + i + '" style="margin:0;padding:12px 14px;font-size:16px;color:#ff8a2b">\u2715</button></div>';
+  }).join("");
+  box.querySelectorAll("[data-go]").forEach(function (b) { b.onclick = function () { openFav(favs[+b.dataset.go]); }; });
+  box.querySelectorAll("[data-del]").forEach(function (b) { b.onclick = function () { favs.splice(+b.dataset.del, 1); saveFavs(); renderFavs(); decorateResults(); }; });
+}
+
+function favKey(lat, lon) { return lat.toFixed(2) + "," + lon.toFixed(2); }
+
+function decorateResults() {
+  var list = $("srchList");
+  if (!list || !window.lastSrchRes) return;
+  list.querySelectorAll(".sres").forEach(function (a) {
+    var c = window.lastSrchRes[+a.dataset.i];
+    if (!c || a.querySelector(".fstar")) { if (a.querySelector(".fstar")) a.querySelector(".fstar").remove(); if (!c) return; }
+    var saved = favs.some(function (f) { return favKey(f.lat, f.lon) === favKey(c.latitude, c.longitude); });
+    var st = document.createElement("span");
+    st.className = "fstar";
+    st.textContent = saved ? "\u2605" : "\u2606";
+    st.style.cssText = "float:right;font-size:26px;color:#ff8a2b;padding:0 6px;line-height:1";
+    st.onclick = function (ev) {
+      ev.preventDefault(); ev.stopPropagation();
+      var key = favKey(c.latitude, c.longitude), idx = favs.findIndex(function (f) { return favKey(f.lat, f.lon) === key; });
+      if (idx >= 0) favs.splice(idx, 1);
+      else {
+        var s = STATE_ABBR[c.admin1] || c.admin1 || "";
+        favs.push({ label: c.country === "United States" && s ? c.name + ", " + s : c.name, lat: c.latitude, lon: c.longitude });
+        if (favs.length > 15) favs.shift();
+      }
+      saveFavs(); renderFavs(); decorateResults();
+    };
+    a.insertBefore(st, a.firstChild);
+  });
+}
+
+(function () {
+  var field = $("srchIn");
+  var box = document.createElement("div");
+  box.id = "favBox";
+  box.style.display = "none";
+  field.parentNode.insertBefore(box, $("srchMsg").nextSibling);
+
+  var origFetch = window.fetch;
+  window.fetch = function (u) {
+    var p = origFetch.apply(this, arguments);
+    if (typeof u === "string" && (u.indexOf("geocoding-api.open-meteo.com") >= 0 || u.indexOf("zippopotam.us") >= 0)) {
+      p.then(function (r) { return r.clone().json(); }).then(function (j) {
+        var res = [];
+        if (j.results) res = j.results;
+        else if (j.places) { var pl = j.places[0]; res = [{ name: pl["place name"], admin1: pl.state, country: "United States", latitude: +pl.latitude, longitude: +pl.longitude }]; }
+        window.lastSrchRes = res;
+        setTimeout(decorateResults, 80);
+      }).catch(function () {});
+    }
+    return p;
+  };
+
+  $("srchBtn").addEventListener("click", function () { renderFavs(); });
+  renderFavs();
+})();
 </script>
 </body>
 </html>
