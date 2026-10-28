@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 201 -->
+<!-- Van Dash rev 202 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r201</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r202</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1332,6 +1332,95 @@ function decorateResults() {
     prevShow(deg);
     if (deg != null && !isNaN(deg)) { hd = (deg + 360) % 360; drawBox(); }
   };
+})();
+
+/* ---------- rev 202: layout tweaks ---------- */
+(function () {
+  // --- Weather card on main page ---
+  var card = $("wxCard");
+  var sb = $("srchBtn");
+  var place = $("wxPlace");
+  var box = $("wxWind");
+  var wrap = card.querySelector(".wx-wrap");
+  var wxv = $("wx");
+  var icon = $("wxIcon");
+
+  // magnifying glass leaves the card (moves to weather page below)
+  if (sb) sb.style.display = "none";
+
+  // bigger sun + Clear
+  if (icon) icon.style.fontSize = "54px";
+  if (wxv) wxv.style.fontSize = "22px";
+  if (wrap) { wrap.style.gap = "8px"; wrap.style.marginLeft = "-2px"; wrap.style.marginTop = "2px"; }
+
+  // Current location sits at the bottom, lined up with the mph text
+  if (place) {
+    place.style.cssText = "position:absolute;left:12px;bottom:12px;font-size:12px;color:#ff8a2b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;line-height:1";
+  }
+
+  // bigger wind ring, moved left
+  if (box) {
+    box.style.right = "22px";
+    box.style.bottom = "10px";
+    box.style.width = "72px";
+    var svg = box.querySelector("svg");
+    if (svg) { svg.style.width = "58px"; svg.style.height = "58px"; }
+    var spd = $("wxWindSpd");
+    if (spd) { spd.style.lineHeight = "1"; spd.style.marginTop = "4px"; }
+  }
+
+  // --- Weather page: search icon next to the big temperature ---
+  var scr = $("weatherScreen");
+  var nl = $("wTemp").parentNode;
+  nl.style.position = "relative";
+  var s2 = document.createElement("button");
+  s2.id = "srchBtn2";
+  s2.setAttribute("aria-label", "Search");
+  s2.style.cssText = "position:absolute;right:6px;top:10px;width:56px;height:56px;margin:0;padding:0;background:none;display:flex;align-items:center;justify-content:center";
+  s2.innerHTML = '<svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>';
+  nl.appendChild(s2);
+  s2.onclick = function (e) {
+    e.stopPropagation();
+    $("weatherScreen").classList.add("hidden");
+    $("srchScreen").classList.remove("hidden");
+    $("srchIn").value = "";
+    $("srchList").classList.add("hidden");
+    $("srchMsg").innerHTML = "&nbsp;";
+    try { renderFavs(); } catch (er) {}
+    var clr = $("srchClr"); if (clr) clr.style.display = "none";
+    window.scrollTo(0, 0);
+    setTimeout(function () { $("srchIn").focus(); }, 50);
+  };
+
+  // search Back button should return to wherever you came from
+  $("srchBack").addEventListener("click", function () {
+    // original handler already shows mainScreen; if we came from weather page, go back there
+    if (window.__fromWeather) {
+      $("mainScreen").classList.add("hidden");
+      $("weatherScreen").classList.remove("hidden");
+    }
+  });
+  s2.addEventListener("click", function () { window.__fromWeather = true; });
+  $("srchBtn").addEventListener("click", function () { window.__fromWeather = false; });
+
+  // --- Weather page: wind sentence always abbreviated, ring closer to center ---
+  var w2 = $("wBox2");
+  if (w2) {
+    w2.style.justifyContent = "flex-start";
+    var ringSvg = w2.querySelector("svg");
+    if (ringSvg) { ringSvg.style.width = "92px"; ringSvg.style.height = "92px"; ringSvg.style.marginLeft = "auto"; ringSvg.style.marginRight = "26px"; }
+  }
+  var wl = $("wBoxWind");
+  if (wl) wl.style.fontSize = "20px";
+  setInterval(function () {
+    var el = $("wBoxWind");
+    if (!el) return;
+    var m = ($("wWind").textContent || "").trim().match(/^(\d+)\s+([NESW]+)$/);
+    if (m) {
+      var t = m[1] + " mph from " + m[2];
+      if (el.textContent !== t) el.textContent = t;
+    }
+  }, 200);
 })();
 </script>
 </body>
