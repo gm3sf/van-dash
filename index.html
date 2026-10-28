@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 200 -->
+<!-- Van Dash rev 201 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r200</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r201</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1230,6 +1230,107 @@ function decorateResults() {
   showHeading = function (deg) {
     origShow(deg);
     if (deg != null && !isNaN(deg)) { heading = (deg + 360) % 360; draw(); }
+  };
+})();
+
+/* ---------- rev 201: weather card cleanup + weather page boxes ---------- */
+(function () {
+  // --- Card: take N out of the small ring, tidy layout ---
+  var ring = $("wxWindRing");
+  if (ring) { var n = ring.querySelector("text"); if (n) n.remove(); }
+  var sb = $("srchBtn");
+  if (sb) { sb.style.top = "-4px"; sb.style.right = "-2px"; }
+  var wrap = $("wxCard").querySelector(".wx-wrap");
+  if (wrap) { wrap.style.gap = "4px"; wrap.style.marginLeft = "-2px"; }
+  var wxv = $("wx");
+  if (wxv) wxv.style.fontSize = "18px";
+  var box = $("wxWind");
+  if (box) { box.style.right = "12px"; box.style.bottom = "10px"; box.style.width = "64px"; }
+
+  // --- Weather page: two wide boxes ---
+  var scr = $("weatherScreen");
+  var statRow = scr.querySelector(".stat-row");
+  var big = $("wTemp").parentNode;
+  var descEl = $("wDesc");
+  if (descEl) descEl.style.display = "none";
+  statRow.style.display = "none";
+
+  var boxCss = "background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;padding:14px;margin-bottom:10px";
+  var lblCss = "font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#7f8fa3";
+
+  var b1 = document.createElement("div");
+  b1.id = "wBox1";
+  b1.style.cssText = boxCss + ";display:flex;align-items:center;gap:14px";
+  b1.innerHTML =
+    '<div style="flex:none;text-align:center;width:96px">' +
+      '<div id="wBoxIcon" style="font-size:54px;line-height:1">--</div>' +
+      '<div id="wBoxDesc" style="font-size:15px;font-weight:600;margin-top:6px">--</div>' +
+    '</div>' +
+    '<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px 10px">' +
+      '<div><div style="' + lblCss + '">High</div><div id="wBoxHigh" style="font-size:22px;font-weight:600;margin-top:3px">--</div></div>' +
+      '<div><div style="' + lblCss + '">Low</div><div id="wBoxLow" style="font-size:22px;font-weight:600;margin-top:3px">--</div></div>' +
+      '<div><div style="' + lblCss + '">Feels like</div><div id="wBoxFeels" style="font-size:22px;font-weight:600;margin-top:3px">--</div></div>' +
+      '<div><div style="' + lblCss + '">Rain today</div><div id="wBoxRain" style="font-size:22px;font-weight:600;margin-top:3px">--</div></div>' +
+    '</div>';
+
+  var b2 = document.createElement("div");
+  b2.id = "wBox2";
+  b2.style.cssText = boxCss + ";display:flex;align-items:center;justify-content:space-between;gap:12px";
+  b2.innerHTML =
+    '<div style="flex:1;min-width:0">' +
+      '<div style="' + lblCss + '">Wind from</div>' +
+      '<div id="wBoxWind" style="font-size:22px;font-weight:600;margin-top:4px">--</div>' +
+      '<div style="' + lblCss + ';margin-top:12px">Gusts</div>' +
+      '<div id="wBoxGust" style="font-size:22px;font-weight:600;margin-top:3px">--</div>' +
+    '</div>' +
+    '<svg viewBox="0 0 100 100" style="width:84px;height:84px;flex:none">' +
+      '<g id="wBoxRing" style="transform-origin:50px 50px;transition:transform 0.25s linear">' +
+        '<circle cx="50" cy="50" r="46" fill="none" stroke="#ffffff" stroke-width="3"/>' +
+        '<g id="wBoxArrow" style="transform-origin:50px 50px">' +
+          '<path d="M50 80 L50 30" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+          '<path d="M33 47 L50 28 L67 47" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' +
+        '</g>' +
+      '</g>' +
+    '</svg>';
+
+  big.parentNode.insertBefore(b1, statRow);
+  big.parentNode.insertBefore(b2, statRow);
+
+  var FULL = { N: "north", NNE: "north-northeast", NE: "northeast", ENE: "east-northeast", E: "east", ESE: "east-southeast", SE: "southeast", SSE: "south-southeast", S: "south", SSW: "south-southwest", SW: "southwest", WSW: "west-southwest", W: "west", WNW: "west-northwest", NW: "northwest", NNW: "north-northwest" };
+  var wFrom = null, hd = 0;
+
+  function drawBox() {
+    if (wFrom == null) return;
+    $("wBoxRing").style.transform = "rotate(" + (-hd) + "deg)";
+    $("wBoxArrow").style.transform = "rotate(" + ((wFrom + 180) % 360) + "deg)";
+  }
+
+  function sync() {
+    var d = ($("wDesc").textContent || "").trim();
+    var sp = d.indexOf(" ");
+    if (sp > 0) {
+      $("wBoxIcon").textContent = d.slice(0, sp);
+      $("wBoxDesc").textContent = d.slice(sp + 1);
+    }
+    $("wBoxHigh").textContent = $("wHigh").textContent;
+    $("wBoxLow").textContent = $("wLow").textContent;
+    $("wBoxFeels").textContent = $("wFeels").textContent;
+    $("wBoxRain").textContent = $("wRain").textContent;
+    $("wBoxGust").textContent = $("wGust").textContent;
+    var w = ($("wWind").textContent || "").trim().match(/^(\d+)\s+([NESW]+)$/);
+    if (w) {
+      $("wBoxWind").textContent = w[1] + " mph from the " + (FULL[w[2]] || w[2]);
+      var i = DIRS.indexOf(w[2]);
+      if (i >= 0) { wFrom = i * 22.5; drawBox(); }
+    }
+  }
+  sync();
+  setInterval(sync, 500);
+
+  var prevShow = showHeading;
+  showHeading = function (deg) {
+    prevShow(deg);
+    if (deg != null && !isNaN(deg)) { hd = (deg + 360) % 360; drawBox(); }
   };
 })();
 </script>
