@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 206 -->
+<!-- Van Dash rev 207 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r206</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r207</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1463,6 +1463,163 @@ function decorateResults() {
       if (el.textContent !== t) el.textContent = t;
     }
   }, 200);
+})();
+
+/* ---------- rev 207: full-screen map + speed overlay + breadcrumbs ---------- */
+(function () {
+  // ----- breadcrumb recording (runs always, saved on the phone) -----
+  var crumbs = [];
+  try { crumbs = JSON.parse(localStorage.getItem("vdCrumbs") || "[]"); } catch (e) { crumbs = []; }
+  var lastSave = 0;
+  function saveCrumbs() { try { localStorage.setItem("vdCrumbs", JSON.stringify(crumbs)); } catch (e) {} }
+  function addCrumb(lat, lon, acc) {
+    if (acc != null && acc > 50) return;
+    var last = crumbs[crumbs.length - 1];
+    if (last && distMeters({ latitude: last[0], longitude: last[1] }, { latitude: lat, longitude: lon }) < 15) return;
+    crumbs.push([+lat.toFixed(6), +lon.toFixed(6)]);
+    if (crumbs.length > 20000) crumbs.shift();
+    var now = Date.now();
+    if (now - lastSave > 10000) { lastSave = now; saveCrumbs(); }
+    if (!fs.classList.contains("hidden")) fDraw();
+  }
+  var prevPos = onPosition;
+  onPosition = function (p) {
+    prevPos(p);
+    try {
+      var c = p.coords;
+      addCrumb(c.latitude, c.longitude, c.accuracy);
+      fLat = c.latitude; fLon = c.longitude;
+      var mph = c.speed != null && c.speed >= 0 ? c.speed * MS_TO_MPH : 0;
+      fSpd.textContent = mph < 1 ? "0" : Math.round(mph);
+      if (!fs.classList.contains("hidden")) { if (fFollow) { fcLat = fLat; fcLon = fLon; } fDraw(); }
+    } catch (e) {}
+  };
+  window.addEventListener("pagehide", saveCrumbs);
+  document.addEventListener("visibilitychange", function () { if (document.hidden) saveCrumbs(); });
+
+  // ----- full-screen layer -----
+  var fs = document.createElement("div");
+  fs.id = "fullMap";
+  fs.className = "hidden";
+  fs.style.cssText = "position:fixed;left:0;top:0;right:0;bottom:0;background:#1a222c;z-index:50;touch-action:none";
+  fs.innerHTML =
+    '<canvas id="fCanvas" style="position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none"></canvas>' +
+    '<button id="fBack" style="position:absolute;left:12px;top:calc(env(safe-area-inset-top) + 10px);margin:0;padding:10px 16px;font-size:16px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">&lsaquo; Back</button>' +
+    '<div id="fSpdBox" style="position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 8px);min-width:96px;padding:6px 16px 8px;text-align:center;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:16px">' +
+      '<div id="fSpd" style="font-size:46px;font-weight:700;line-height:1;color:#fff">0</div>' +
+      '<div style="font-size:13px;color:#7f8fa3;margin-top:2px">mph</div></div>' +
+    '<div style="position:absolute;right:12px;top:calc(env(safe-area-inset-top) + 10px);display:flex;flex-direction:column;gap:8px">' +
+      '<button id="fIn" style="width:46px;height:46px;margin:0;padding:0;font-size:26px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">+</button>' +
+      '<button id="fOut" style="width:46px;height:46px;margin:0;padding:0;font-size:26px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">&minus;</button>' +
+      '<button id="fCtr" style="width:46px;height:46px;margin:0;padding:0;font-size:24px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">&#9678;</button>' +
+      '<button id="fSat" style="width:46px;height:46px;margin:0;padding:0;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6"><svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:#ff8a2b;stroke-width:1.8"><path d="M12 3 2 8l10 5 10-5z"/><path d="M2 12l10 5 10-5"/><path d="M2 16l10 5 10-5"/></svg></button>' +
+    '</div>' +
+    '<div style="position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);display:flex;gap:8px;align-items:center">' +
+      '<div id="fCount" style="padding:8px 12px;font-size:13px;color:#cfd8e3;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px">0 pts</div>' +
+      '<button id="fClr" style="margin:0;padding:8px 12px;font-size:13px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Clear trail</button>' +
+    '</div>';
+  document.body.appendChild(fs);
+
+  var fCanvas = document.getElementById("fCanvas"), fctx = fCanvas.getContext("2d");
+  var fSpd = document.getElementById("fSpd");
+  var fLat = null, fLon = null, fcLat = null, fcLon = null, fFollow = true, fZoom = 15, fW = 0, fH = 0, fDrag = null, fTimer = 0;
+  var fSatOn = localStorage.getItem("vSat") === "1";
+  var fTiles = {};
+
+  function fResize() {
+    var r = fs.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    fW = r.width; fH = r.height;
+    if (!fW || !fH) return;
+    fCanvas.width = Math.round(fW * dpr); fCanvas.height = Math.round(fH * dpr);
+    fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    fDraw();
+  }
+  function fDraw() {
+    if (!fW || !fH) return;
+    fctx.fillStyle = "#1a222c"; fctx.fillRect(0, 0, fW, fH);
+    document.getElementById("fCount").textContent = crumbs.length + " pts";
+    if (fcLat == null) {
+      fctx.fillStyle = "#7f8fa3"; fctx.font = "15px sans-serif"; fctx.textAlign = "center";
+      fctx.fillText("Waiting for GPS...", fW / 2, fH / 2);
+      return;
+    }
+    var c = vWorld(fcLat, fcLon, fZoom), left = c.x - fW / 2, top = c.y - fH / 2, n = Math.pow(2, fZoom);
+    var tx0 = Math.floor(left / 256), tx1 = Math.floor((left + fW) / 256), ty0 = Math.floor(top / 256), ty1 = Math.floor((top + fH) / 256);
+    for (var tx = tx0; tx <= tx1; tx++) {
+      for (var ty = ty0; ty <= ty1; ty++) {
+        if (ty < 0 || ty >= n) continue;
+        var wx = ((tx % n) + n) % n, key = fSatOn + "/" + fZoom + "/" + wx + "/" + ty, t = fTiles[key];
+        if (!t) {
+          t = fTiles[key] = new Image();
+          t.onload = fDraw;
+          t.src = fSatOn ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + fZoom + "/" + ty + "/" + wx : "https://tile.openstreetmap.org/" + fZoom + "/" + wx + "/" + ty + ".png";
+        }
+        if (t.complete && t.naturalWidth) fctx.drawImage(t, tx * 256 - left, ty * 256 - top, 256, 256);
+      }
+    }
+    // breadcrumb trail
+    if (crumbs.length > 1) {
+      fctx.lineJoin = "round"; fctx.lineCap = "round";
+      fctx.beginPath();
+      for (var i = 0; i < crumbs.length; i++) {
+        var w = vWorld(crumbs[i][0], crumbs[i][1], fZoom), x = w.x - left, y = w.y - top;
+        if (i === 0) fctx.moveTo(x, y); else fctx.lineTo(x, y);
+      }
+      fctx.strokeStyle = "rgba(0,0,0,0.55)"; fctx.lineWidth = 8; fctx.stroke();
+      fctx.strokeStyle = "#ff8a2b"; fctx.lineWidth = 5; fctx.stroke();
+    }
+    // your position
+    if (fLat != null) {
+      var g = vWorld(fLat, fLon, fZoom), cx = g.x - left, cy = g.y - top;
+      fctx.beginPath(); fctx.arc(cx, cy, 18, 0, 6.2832); fctx.fillStyle = "rgba(255,59,48,0.30)"; fctx.fill();
+      fctx.beginPath(); fctx.arc(cx, cy, 10, 0, 6.2832); fctx.fillStyle = "#ff3b30"; fctx.fill();
+      fctx.lineWidth = 3; fctx.strokeStyle = "#fff"; fctx.stroke();
+    }
+  }
+  function fHome() { fFollow = true; if (fLat != null) { fcLat = fLat; fcLon = fLon; } fDraw(); }
+
+  fCanvas.onpointerdown = function (e) { fDrag = { x: e.clientX, y: e.clientY }; fCanvas.setPointerCapture(e.pointerId); };
+  fCanvas.onpointermove = function (e) {
+    if (!fDrag || fcLat == null) return;
+    var c = vWorld(fcLat, fcLon, fZoom), n = Math.pow(2, fZoom) * 256;
+    var x = c.x - (e.clientX - fDrag.x), y = c.y - (e.clientY - fDrag.y);
+    fDrag = { x: e.clientX, y: e.clientY }; fFollow = false;
+    fcLon = x / n * 360 - 180; fcLat = Math.atan(Math.sinh(Math.PI * (1 - 2 * y / n))) * 180 / Math.PI;
+    fDraw(); clearTimeout(fTimer); fTimer = setTimeout(fHome, 30000);
+  };
+  fCanvas.onpointerup = fCanvas.onpointercancel = function () { fDrag = null; };
+
+  document.getElementById("fIn").onclick = function () { if (fZoom < 18) { fZoom++; fDraw(); } };
+  document.getElementById("fOut").onclick = function () { if (fZoom > 3) { fZoom--; fDraw(); } };
+  document.getElementById("fCtr").onclick = fHome;
+  function fSatSet() { document.getElementById("fSat").style.borderColor = fSatOn ? "#ff8a2b" : ""; fDraw(); }
+  document.getElementById("fSat").onclick = function () { fSatOn = !fSatOn; fSatSet(); };
+  document.getElementById("fClr").onclick = function () {
+    if (crumbs.length && confirm("Clear the trail (" + crumbs.length + " points)?")) { crumbs = []; saveCrumbs(); fDraw(); }
+  };
+
+  function openFull() {
+    fSatOn = localStorage.getItem("vSat") === "1";
+    fSatSet();
+    fs.classList.remove("hidden");
+    if (vGLat != null) { fLat = vGLat; fLon = vGLon; }
+    fFollow = true; fcLat = fLat; fcLon = fLon;
+    fSpd.textContent = $("speed").textContent;
+    fResize();
+  }
+  function closeFull() { fs.classList.add("hidden"); }
+  document.getElementById("fBack").onclick = closeFull;
+
+  // tap the small map (not its buttons) to open full screen; dragging still pans it
+  var tapStart = null;
+  vCanvas.addEventListener("pointerdown", function (e) { tapStart = { x: e.clientX, y: e.clientY, t: Date.now() }; });
+  vCanvas.addEventListener("pointerup", function (e) {
+    if (!tapStart) return;
+    var d = Math.abs(e.clientX - tapStart.x) + Math.abs(e.clientY - tapStart.y);
+    if (d < 8 && Date.now() - tapStart.t < 400) openFull();
+    tapStart = null;
+  });
+  window.addEventListener("resize", function () { if (!fs.classList.contains("hidden")) fResize(); });
 })();
 </script>
 </body>
