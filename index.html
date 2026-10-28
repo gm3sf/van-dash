@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 202 -->
+<!-- Van Dash rev 203 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r202</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r203</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1367,6 +1367,37 @@ function decorateResults() {
     if (svg) { svg.style.width = "58px"; svg.style.height = "58px"; }
     var spd = $("wxWindSpd");
     if (spd) { spd.style.lineHeight = "1"; spd.style.marginTop = "4px"; }
+  }
+
+  // rev 203: wind unit centered vertically in the card (below the title), nudged right
+  if (box) {
+    box.style.bottom = "auto";
+    box.style.top = "calc(50% + 8px)";
+    box.style.transform = "translateY(-50%)";
+    box.style.right = "12px";
+  }
+  // rev 203: wind unit becomes a small rounded box inside the card
+  if (box) {
+    box.style.border = "0.5px solid #8a96a6";
+    box.style.borderRadius = "12px";
+    box.style.background = "#151c25";
+    box.style.padding = "6px 4px 5px";
+    box.style.width = "78px";
+    box.style.right = "10px";
+    var sv = box.querySelector("svg");
+    if (sv) { sv.style.width = "50px"; sv.style.height = "50px"; }
+  }
+  // long conditions: stack words on two lines, shrink a single long word
+  if (wxv) {
+    wxv.style.maxWidth = "88px"; wxv.style.lineHeight = "1.1"; wxv.style.whiteSpace = "normal";
+    var lastTxt = null;
+    setInterval(function () {
+      var t = (wxv.textContent || "").trim();
+      if (t === lastTxt) return;
+      lastTxt = t;
+      var longest = t.split(/\s+/).reduce(function (m, w) { return Math.max(m, w.length); }, 0);
+      wxv.style.fontSize = longest >= 11 ? "14px" : longest >= 9 ? "17px" : "22px";
+    }, 400);
   }
 
   // --- Weather page: search icon next to the big temperature ---
