@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 194 -->
+<!-- Van Dash rev 195 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -196,7 +196,7 @@
         <div class="loclabel">Current city</div>
         <div id="city">Finding location...</div>
       </div>
-      <button id="cityRef" style="margin:0;padding:0;width:44px;height:44px;background:none;line-height:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button><div id="updated" class="hidden">&nbsp;</div>
+      <button id="cityRef" style="margin:0;padding:0;width:44px;height:44px;background:none;line-height:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round"><path d="M20 12a8 8 0 1 1-4-6.9M20 4v5h-5"/></svg></button><div id="updated" class="hidden">&nbsp;</div>
     </div>
     <div class="card tap" id="tempCard" style="order:6">
       <div class="label"><svg class="ico" id="tempIco" viewBox="0 0 24 24"><path d="M14 14.76V4a2 2 0 0 0-4 0v10.76a4 4 0 1 0 4 0z"/></svg>Temperature</div>
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r194</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r195</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -782,7 +782,7 @@ function gxLive(ws, st) {
       i = j + n;
     }
   };
-  ws.onclose = () => { clearInterval(ping); st.textContent = "GX: retrying..."; setTimeout(gxTest, 5000); };
+  ws.onclose = () => { clearInterval(ping); st.textContent = "GX: tap"; /* manual */ };
 }
 function gxTest() {
   const host = "192.168.68.120";
@@ -797,7 +797,7 @@ function gxTest() {
 }
 $("cityRef").onclick = () => { lastCityPos = null; if (vGLat != null) { updateCity(vGLat, vGLon); updateWeather(vGLat, vGLon, wxLive); } };
 $("bStatus").onclick = gxTest;
-gxTest();
+$('bStatus').textContent = 'GX: tap';
 
 
 let revT = null, gpsMph = 0;
