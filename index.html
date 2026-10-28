@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 207 -->
+<!-- Van Dash rev 208 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r207</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r208</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1472,7 +1472,9 @@ function decorateResults() {
   try { crumbs = JSON.parse(localStorage.getItem("vdCrumbs") || "[]"); } catch (e) { crumbs = []; }
   var lastSave = 0;
   function saveCrumbs() { try { localStorage.setItem("vdCrumbs", JSON.stringify(crumbs)); } catch (e) {} }
+  var recOn = localStorage.getItem("vdRec") === "1";
   function addCrumb(lat, lon, acc) {
+    if (!recOn) return;
     if (acc != null && acc > 50) return;
     var last = crumbs[crumbs.length - 1];
     if (last && distMeters({ latitude: last[0], longitude: last[1] }, { latitude: lat, longitude: lon }) < 15) return;
@@ -1516,7 +1518,9 @@ function decorateResults() {
     '</div>' +
     '<div style="position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);display:flex;gap:8px;align-items:center">' +
       '<div id="fCount" style="padding:8px 12px;font-size:13px;color:#cfd8e3;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px">0 pts</div>' +
-      '<button id="fClr" style="margin:0;padding:8px 12px;font-size:13px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Clear trail</button>' +
+      '<button id="fStart" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Start trail</button>' +
+      '<button id="fStop" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Stop trail</button>' +
+      '<button id="fClr" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Clear trail</button>' +
     '</div>';
   document.body.appendChild(fs);
 
@@ -1597,6 +1601,45 @@ function decorateResults() {
   document.getElementById("fClr").onclick = function () {
     if (crumbs.length && confirm("Clear the trail (" + crumbs.length + " points)?")) { crumbs = []; saveCrumbs(); fDraw(); }
   };
+
+  function recSet() {
+    document.getElementById("fStart").style.borderColor = recOn ? "#4cd964" : "#8a96a6";
+    document.getElementById("fStart").style.color = recOn ? "#4cd964" : "#fff";
+    document.getElementById("fStart").textContent = recOn ? "Recording" : "Start trail";
+    document.getElementById("fStop").style.opacity = recOn ? "1" : "0.5";
+  }
+  document.getElementById("fStart").onclick = function () { recOn = true; localStorage.setItem("vdRec", "1"); recSet(); };
+  document.getElementById("fStop").onclick = function () { recOn = false; localStorage.setItem("vdRec", "0"); saveCrumbs(); recSet(); };
+  recSet();
+
+  // ----- pinch to zoom (both maps) -----
+  function pinchify(canvas, getZoom, setZoom, minZ, maxZ) {
+    var pts = {}, startDist = 0, startZoom = 0, pinching = false;
+    function cnt() { return Object.keys(pts).length; }
+    function dist() { var k = Object.keys(pts); if (k.length < 2) return 0; var a = pts[k[0]], b = pts[k[1]]; return Math.hypot(a.x - b.x, a.y - b.y); }
+    canvas.addEventListener("pointerdown", function (e) {
+      pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (cnt() === 2) { pinching = true; startDist = dist(); startZoom = getZoom(); }
+    }, true);
+    canvas.addEventListener("pointermove", function (e) {
+      if (!pts[e.pointerId]) return;
+      pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (pinching && cnt() >= 2 && startDist > 0) {
+        e.stopImmediatePropagation();
+        var z = Math.round(startZoom + Math.log(dist() / startDist) / Math.LN2 * 1.4);
+        z = Math.max(minZ, Math.min(maxZ, z));
+        if (z !== getZoom()) setZoom(z);
+      }
+    }, true);
+    function up(e) {
+      delete pts[e.pointerId];
+      if (cnt() < 2) pinching = false;
+    }
+    canvas.addEventListener("pointerup", up, true);
+    canvas.addEventListener("pointercancel", up, true);
+  }
+  pinchify(fCanvas, function () { return fZoom; }, function (z) { fZoom = z; fDraw(); }, 3, 18);
+  pinchify(vCanvas, function () { return vZoom; }, function (z) { vZoom = z; vDraw(); }, 3, 18);
 
   function openFull() {
     fSatOn = localStorage.getItem("vSat") === "1";
