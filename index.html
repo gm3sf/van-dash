@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 203 -->
+<!-- Van Dash rev 204 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r203</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r204</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1376,16 +1376,15 @@ function decorateResults() {
     box.style.transform = "translateY(-50%)";
     box.style.right = "12px";
   }
-  // rev 203: wind unit becomes a small rounded box inside the card
+  // rev 204: wind unit as one piece, no box
   if (box) {
-    box.style.border = "0.5px solid #8a96a6";
-    box.style.borderRadius = "12px";
-    box.style.background = "#151c25";
-    box.style.padding = "6px 4px 5px";
-    box.style.width = "78px";
-    box.style.right = "10px";
+    box.style.border = "none";
+    box.style.background = "none";
+    box.style.padding = "0";
+    box.style.width = "72px";
+    box.style.right = "8px";
     var sv = box.querySelector("svg");
-    if (sv) { sv.style.width = "50px"; sv.style.height = "50px"; }
+    if (sv) { sv.style.width = "58px"; sv.style.height = "58px"; }
   }
   // long conditions: stack words on two lines, shrink a single long word
   if (wxv) {
