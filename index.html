@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 198 -->
+<!-- Van Dash rev 199 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r198</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r199</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1132,6 +1132,54 @@ function decorateResults() {
 
   $("srchBtn").addEventListener("click", function () { renderFavs(); });
   renderFavs();
+})();
+
+/* ---------- Refresh arrow with gap ---------- */
+(function () {
+  var b = document.getElementById("cityRef");
+  if (!b) return;
+  b.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 12a8 8 0 1 1-4.2-7"/><path d="M20 3v5h-5"/></svg>';
+})();
+
+/* ---------- Clear X in search box ---------- */
+(function () {
+  var inp = $("srchIn");
+  var wrap = document.createElement("div");
+  wrap.style.cssText = "position:relative";
+  inp.parentNode.insertBefore(wrap, inp);
+  wrap.appendChild(inp);
+  inp.style.paddingRight = "44px";
+  var x = document.createElement("button");
+  x.id = "srchClr";
+  x.textContent = "\u2715";
+  x.style.cssText = "position:absolute;right:6px;top:50%;margin:3px 0 0;transform:translateY(-50%);width:36px;height:36px;padding:0;background:none;color:#7f8fa3;font-size:20px;display:none";
+  wrap.appendChild(x);
+  function sync() { x.style.display = inp.value ? "block" : "none"; }
+  inp.addEventListener("input", sync);
+  $("srchBtn").addEventListener("click", function () { setTimeout(sync, 0); });
+  x.onclick = function (e) {
+    e.preventDefault();
+    inp.value = "";
+    $("srchList").classList.add("hidden");
+    $("srchMsg").innerHTML = "&nbsp;";
+    sync();
+    inp.focus();
+  };
+})();
+
+/* ---------- Place label in Weather card ---------- */
+(function () {
+  var wind = $("wind");
+  var lbl = document.createElement("div");
+  lbl.id = "wxPlace";
+  lbl.style.cssText = "font-size:12px;color:#ff8a2b;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
+  wind.parentNode.insertBefore(lbl, wind.nextSibling);
+  function upd() {
+    var t = wxLive ? "Current location" : $("wCity").textContent;
+    if (lbl.textContent !== t) lbl.textContent = t;
+  }
+  upd();
+  setInterval(upd, 500);
 })();
 </script>
 </body>
