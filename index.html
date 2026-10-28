@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 208 -->
+<!-- Van Dash rev 209 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r208</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r209</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1526,6 +1526,7 @@ function decorateResults() {
 
   var fCanvas = document.getElementById("fCanvas"), fctx = fCanvas.getContext("2d");
   var fSpd = document.getElementById("fSpd");
+  var fPinch = 1, vPinch = 1;
   var fLat = null, fLon = null, fcLat = null, fcLon = null, fFollow = true, fZoom = 15, fW = 0, fH = 0, fDrag = null, fTimer = 0;
   var fSatOn = localStorage.getItem("vSat") === "1";
   var fTiles = {};
@@ -1541,12 +1542,16 @@ function decorateResults() {
   function fDraw() {
     if (!fW || !fH) return;
     fctx.fillStyle = "#1a222c"; fctx.fillRect(0, 0, fW, fH);
-    document.getElementById("fCount").textContent = crumbs.length + " pts";
+    var tm = 0;
+    for (var q = 1; q < crumbs.length; q++) tm += distMeters({ latitude: crumbs[q - 1][0], longitude: crumbs[q - 1][1] }, { latitude: crumbs[q][0], longitude: crumbs[q][1] });
+    document.getElementById("fCount").textContent = (tm * M_TO_MI).toFixed(2) + " mi \u2022 " + crumbs.length + " pts";
     if (fcLat == null) {
       fctx.fillStyle = "#7f8fa3"; fctx.font = "15px sans-serif"; fctx.textAlign = "center";
       fctx.fillText("Waiting for GPS...", fW / 2, fH / 2);
       return;
     }
+    fctx.save();
+    if (fPinch !== 1) { fctx.translate(fW / 2, fH / 2); fctx.scale(fPinch, fPinch); fctx.translate(-fW / 2, -fH / 2); }
     var c = vWorld(fcLat, fcLon, fZoom), left = c.x - fW / 2, top = c.y - fH / 2, n = Math.pow(2, fZoom);
     var tx0 = Math.floor(left / 256), tx1 = Math.floor((left + fW) / 256), ty0 = Math.floor(top / 256), ty1 = Math.floor((top + fH) / 256);
     for (var tx = tx0; tx <= tx1; tx++) {
@@ -1579,6 +1584,7 @@ function decorateResults() {
       fctx.beginPath(); fctx.arc(cx, cy, 10, 0, 6.2832); fctx.fillStyle = "#ff3b30"; fctx.fill();
       fctx.lineWidth = 3; fctx.strokeStyle = "#fff"; fctx.stroke();
     }
+    fctx.restore();
   }
   function fHome() { fFollow = true; if (fLat != null) { fcLat = fLat; fcLon = fLon; } fDraw(); }
 
@@ -1613,7 +1619,7 @@ function decorateResults() {
   recSet();
 
   // ----- pinch to zoom (both maps) -----
-  function pinchify(canvas, getZoom, setZoom, minZ, maxZ) {
+  function pinchify(canvas, getZoom, setZoom, minZ, maxZ, setScale) {
     var pts = {}, startDist = 0, startZoom = 0, pinching = false;
     function cnt() { return Object.keys(pts).length; }
     function dist() { var k = Object.keys(pts); if (k.length < 2) return 0; var a = pts[k[0]], b = pts[k[1]]; return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -1626,20 +1632,30 @@ function decorateResults() {
       pts[e.pointerId] = { x: e.clientX, y: e.clientY };
       if (pinching && cnt() >= 2 && startDist > 0) {
         e.stopImmediatePropagation();
-        var z = Math.round(startZoom + Math.log(dist() / startDist) / Math.LN2 * 1.4);
-        z = Math.max(minZ, Math.min(maxZ, z));
-        if (z !== getZoom()) setZoom(z);
+        var zf = startZoom + Math.log(dist() / startDist) / Math.LN2;
+        zf = Math.max(minZ, Math.min(maxZ, zf));
+        var base = Math.round(zf);
+        if (base !== getZoom()) { setZoom(base); }
+        setScale(Math.pow(2, zf - getZoom()));
       }
     }, true);
     function up(e) {
       delete pts[e.pointerId];
-      if (cnt() < 2) pinching = false;
+      if (cnt() < 2) { if (pinching) setScale(1); pinching = false; }
     }
     canvas.addEventListener("pointerup", up, true);
     canvas.addEventListener("pointercancel", up, true);
   }
-  pinchify(fCanvas, function () { return fZoom; }, function (z) { fZoom = z; fDraw(); }, 3, 18);
-  pinchify(vCanvas, function () { return vZoom; }, function (z) { vZoom = z; vDraw(); }, 3, 18);
+  pinchify(fCanvas, function () { return fZoom; }, function (z) { fZoom = z; }, 3, 18, function (s) { fPinch = s; fDraw(); });
+  var origVDraw = vDraw;
+  vDraw = function () {
+    if (vPinch === 1 || !vW || !vH) { origVDraw(); return; }
+    vctx.save();
+    vctx.translate(vW / 2, vH / 2); vctx.scale(vPinch, vPinch); vctx.translate(-vW / 2, -vH / 2);
+    origVDraw();
+    vctx.restore();
+  };
+  pinchify(vCanvas, function () { return vZoom; }, function (z) { vZoom = z; }, 3, 18, function (s) { vPinch = s; vDraw(); });
 
   function openFull() {
     fSatOn = localStorage.getItem("vSat") === "1";
