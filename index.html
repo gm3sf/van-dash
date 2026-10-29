@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 211 -->
+<!-- Van Dash rev 212 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r211</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r212</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1551,9 +1551,12 @@ function decorateResults() {
       return;
     }
     fctx.save();
+    if (window.__mapHead) { fctx.translate(fW / 2, fH / 2); fctx.rotate(-window.__mapHead * Math.PI / 180); fctx.translate(-fW / 2, -fH / 2); }
     if (fPinch !== 1) { fctx.translate(fW / 2, fH / 2); fctx.scale(fPinch, fPinch); fctx.translate(-fW / 2, -fH / 2); }
     var c = vWorld(fcLat, fcLon, fZoom), left = c.x - fW / 2, top = c.y - fH / 2, n = Math.pow(2, fZoom);
-    var tx0 = Math.floor(left / 256), tx1 = Math.floor((left + fW) / 256), ty0 = Math.floor(top / 256), ty1 = Math.floor((top + fH) / 256);
+    // when the map is turned, load extra tiles so the rotated corners stay covered
+    var fEx = window.__mapHead ? Math.ceil((Math.sqrt(fW * fW + fH * fH) - Math.min(fW, fH)) / 2) + 40 : 0;
+    var tx0 = Math.floor((left - fEx) / 256), tx1 = Math.floor((left + fW + fEx) / 256), ty0 = Math.floor((top - fEx) / 256), ty1 = Math.floor((top + fH + fEx) / 256);
     for (var tx = tx0; tx <= tx1; tx++) {
       for (var ty = ty0; ty <= ty1; ty++) {
         if (ty < 0 || ty >= n) continue;
@@ -1584,6 +1587,7 @@ function decorateResults() {
       fctx.beginPath(); fctx.arc(cx, cy, 10, 0, 6.2832); fctx.fillStyle = "#ff3b30"; fctx.fill();
       fctx.lineWidth = 3; fctx.strokeStyle = "#fff"; fctx.stroke();
     }
+    if (window.__drawRadar) window.__drawRadar(fctx, fcLat, fcLon, fZoom, fW, fH, 1, fEx);
     fctx.restore();
   }
   function fHome() { fFollow = true; if (fLat != null) { fcLat = fLat; fcLon = fLon; } fDraw(); }
@@ -1668,6 +1672,7 @@ function decorateResults() {
   }
   function closeFull() { fs.classList.add("hidden"); }
   document.getElementById("fBack").onclick = closeFull;
+  window.__fDraw = fDraw;
 
   // tap the small map (not its buttons) to open full screen; dragging still pans it
   var tapStart = null;
@@ -1739,7 +1744,7 @@ function decorateResults() {
   setInterval(syncLive, 300);
 })();
 
-/* ---------- rev 211: weather card text under the icon ---------- */
+/* ---------- rev 211: weather card text under the icon (rev 212 adjusts spacing below) ---------- */
 (function () {
   var wrap = $("wxCard").querySelector(".wx-wrap");
   var wxv = $("wx");
@@ -1766,6 +1771,213 @@ function decorateResults() {
     var longest = t.split(/\s+/).reduce(function (m, w) { return Math.max(m, w.length); }, 0);
     wxv.style.fontSize = longest >= 11 ? "15px" : longest >= 9 ? "17px" : "19px";
   }, 400);
+})();
+
+/* ---------- rev 212: weather card spacing + city label; heading-up maps; wind ring + radar overlays ---------- */
+(function () {
+  // ===== 1. Weather card: condition text tight under the icon, city name on the bottom label =====
+  var wxv = $("wx"), icon = $("wxIcon"), wrapEl = $("wxCard").querySelector(".wx-wrap"), place = $("wxPlace");
+  if (icon) { icon.style.fontSize = "40px"; icon.style.lineHeight = "1"; icon.style.marginBottom = "-2px"; }
+  if (wrapEl) { wrapEl.style.gap = "0"; wrapEl.style.marginTop = "-4px"; }
+  if (wxv) { wxv.style.marginTop = "0"; wxv.style.lineHeight = "1"; }
+  if (place) place.style.maxWidth = "120px";
+  function placeSync() {
+    if (!place) return;
+    var t = wxLive ? "Current location" : ($("wCity").textContent || "").trim();
+    if (place.textContent !== t) place.textContent = t;
+  }
+  placeSync();
+  setInterval(placeSync, 300);
+
+  // ===== 2. Shared state for the map overlays =====
+  var headUp = localStorage.getItem("vdHeadUp") === "1";
+  var radarOn = localStorage.getItem("vdRadar") === "1";
+  var mapHead = 0;          // smoothed heading used for rotation
+  var rawHead = null;       // latest heading reading
+  var windFromDeg = null, windMphTxt = "--";
+
+  function readWindNow() {
+    var m = ($("wind").textContent || "").match(/from\s+([NESW]+)\s+(\d+)/);
+    if (!m) return;
+    var i = DIRS.indexOf(m[1]);
+    if (i < 0) return;
+    windFromDeg = i * 22.5; windMphTxt = m[2] + " mph";
+  }
+
+  // heading source: piggyback on showHeading (compass or GPS heading)
+  var prevShowH = showHeading;
+  showHeading = function (deg) {
+    prevShowH(deg);
+    if (deg != null && !isNaN(deg)) rawHead = (deg + 360) % 360;
+  };
+
+  // ease mapHead toward rawHead the short way around, redraw maps while rotating
+  function angTo(a, b) { var d = ((b - a + 540) % 360) - 180; return d; }
+  setInterval(function () {
+    var target = (headUp && rawHead != null) ? rawHead : 0;
+    var d = angTo(mapHead, target);
+    if (Math.abs(d) < 0.3) { if (mapHead !== target) { mapHead = target; window.__mapHead = mapHead; redrawBoth(); } updateOverlays(); return; }
+    mapHead = (mapHead + d * 0.25 + 360) % 360;
+    window.__mapHead = mapHead;
+    redrawBoth();
+    updateOverlays();
+  }, 120);
+
+  function redrawBoth() {
+    try { vDraw(); } catch (e) {}
+    try { if (window.__fDraw && !document.getElementById("fullMap").classList.contains("hidden")) window.__fDraw(); } catch (e) {}
+  }
+
+  // ===== 3. Rotate the small map: wrap vDraw =====
+  // Draw the normal map onto an offscreen canvas of the same size, then paint it rotated about the center.
+  var vOff = document.createElement("canvas"), vOffCtx = vOff.getContext("2d");
+  var vInner = vDraw;
+  vDraw = function () {
+    if (!vW || !vH) return;
+    if (mapHead === 0 && !radarOn) { vInner(); return; }
+    var dpr = window.devicePixelRatio || 1;
+    var S = Math.ceil(Math.sqrt(vW * vW + vH * vH)); // big enough that rotated corners stay filled
+    // temporarily point the drawing at an oversized offscreen canvas
+    var realCtx = vctx, realW = vW, realH = vH;
+    vOff.width = Math.round(S * dpr); vOff.height = Math.round(S * dpr);
+    vOffCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    vctx = vOffCtx; vW = S; vH = S;
+    try { vInner(); } catch (e) {}
+    try { drawRadar(vOffCtx, vLat, vLon, vZoom, S, S, 1, 0); } catch (e) {}
+    vctx = realCtx; vW = realW; vH = realH;
+    realCtx.fillStyle = "#1a222c"; realCtx.fillRect(0, 0, vW, vH);
+    realCtx.save();
+    realCtx.translate(vW / 2, vH / 2);
+    realCtx.rotate(-mapHead * Math.PI / 180);
+    realCtx.drawImage(vOff, -S / 2, -S / 2, S, S);
+    realCtx.restore();
+  };
+
+  // ===== 4. Radar tiles (RainViewer) =====
+  var radarPath = null, radarHost = "https://tilecache.rainviewer.com", radarFetched = 0;
+  var radarTiles = {};
+  function loadRadarIndex() {
+    var now = Date.now();
+    if (now - radarFetched < 300000) return;
+    radarFetched = now;
+    fetch("https://api.rainviewer.com/public/weather-maps.json").then(function (r) { return r.json(); }).then(function (j) {
+      var past = j && j.radar && j.radar.past;
+      if (past && past.length) {
+        var latest = past[past.length - 1].path;
+        if (latest !== radarPath) { radarPath = latest; radarTiles = {}; if (j.host) radarHost = j.host; redrawBoth(); }
+      }
+    }).catch(function () {});
+  }
+  function drawRadar(ctx, lat, lon, z, W, H, pinch, extra) {
+    if (!radarOn || !radarPath || lat == null) return;
+    var rz = Math.max(3, Math.min(z, 7)); // radar tiles only exist at coarse zooms; scale up
+    var scale = Math.pow(2, z - rz);
+    var c = vWorld(lat, lon, rz);
+    var left = c.x - (W / 2) / scale, top = c.y - (H / 2) / scale;
+    var n = Math.pow(2, rz);
+    var ex = (extra || 0) / scale;
+    var tx0 = Math.floor((left - ex) / 256), tx1 = Math.floor((left + W / scale + ex) / 256);
+    var ty0 = Math.floor((top - ex) / 256), ty1 = Math.floor((top + H / scale + ex) / 256);
+    ctx.save();
+    ctx.globalAlpha = 0.6;
+    if (pinch && pinch !== 1) { ctx.translate(W / 2, H / 2); ctx.scale(pinch, pinch); ctx.translate(-W / 2, -H / 2); }
+    for (var tx = tx0; tx <= tx1; tx++) {
+      for (var ty = ty0; ty <= ty1; ty++) {
+        if (ty < 0 || ty >= n) continue;
+        var wx = ((tx % n) + n) % n;
+        var key = radarPath + "/" + rz + "/" + wx + "/" + ty;
+        var t = radarTiles[key];
+        if (!t) {
+          t = radarTiles[key] = new Image();
+          t.onload = redrawBoth;
+          t.src = radarHost + radarPath + "/256/" + rz + "/" + wx + "/" + ty + "/2/1_1.png";
+        }
+        if (t.complete && t.naturalWidth) ctx.drawImage(t, (tx * 256 - left) * scale, (ty * 256 - top) * scale, 256 * scale, 256 * scale);
+      }
+    }
+    ctx.restore();
+  }
+
+  // ===== 5. Overlay widgets (wind ring + buttons) on both maps =====
+  function ringSvg() {
+    return '<svg viewBox="0 0 100 100" style="width:46px;height:46px;display:block;margin:0 auto">' +
+      '<g class="mwRing" style="transform-origin:50px 50px">' +
+      '<circle cx="50" cy="50" r="46" fill="rgba(21,28,37,0.85)" stroke="#ffffff" stroke-width="3"/>' +
+      '<text x="50" y="22" text-anchor="middle" font-size="16" font-weight="700" fill="#e53935">N</text>' +
+      '<g class="mwArrow" style="transform-origin:50px 50px">' +
+      '<path d="M50 80 L50 30" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+      '<path d="M33 47 L50 28 L67 47" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' +
+      '</g></g></svg>' +
+      '<div class="mwSpd" style="font-size:11px;color:#cfd8e3;text-align:center;margin-top:2px;line-height:1">--</div>';
+  }
+  var btnCss = "width:40px;height:40px;margin:0;padding:0;font-size:11px;font-weight:700;line-height:1;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px;color:#fff";
+
+  function buildOverlay(host, isFull) {
+    var wrap = document.createElement("div");
+    wrap.className = "mapOv";
+    wrap.style.cssText = "position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:5;" +
+      (isFull ? "left:12px;top:calc(env(safe-area-inset-top) + 64px)" : "left:8px;top:54px");
+    var rot = document.createElement("button");
+    rot.className = "mapRot"; rot.style.cssText = btnCss;
+    var rad = document.createElement("button");
+    rad.className = "mapRad"; rad.style.cssText = btnCss;
+    var wnd = document.createElement("div");
+    wnd.className = "mapWind";
+    wnd.style.cssText = "padding:4px 4px 3px;background:rgba(21,28,37,0.80);border-radius:12px";
+    wnd.innerHTML = ringSvg();
+    wrap.appendChild(rot); wrap.appendChild(rad); wrap.appendChild(wnd);
+    host.appendChild(wrap);
+    function stop(e) { e.stopPropagation(); }
+    [rot, rad, wnd].forEach(function (el) {
+      el.addEventListener("pointerdown", stop);
+      el.addEventListener("pointerup", stop);
+    });
+    rot.onclick = function (e) {
+      e.stopPropagation();
+      headUp = !headUp; localStorage.setItem("vdHeadUp", headUp ? "1" : "0");
+      updateOverlays(); redrawBoth();
+    };
+    rad.onclick = function (e) {
+      e.stopPropagation();
+      radarOn = !radarOn; localStorage.setItem("vdRadar", radarOn ? "1" : "0");
+      if (radarOn) loadRadarIndex();
+      updateOverlays(); redrawBoth();
+    };
+  }
+  buildOverlay($("vmap"), false);
+  buildOverlay(document.getElementById("fullMap"), true);
+
+  function updateOverlays() {
+    readWindNow();
+    document.querySelectorAll(".mapRot").forEach(function (b) {
+      b.textContent = headUp ? "HDG" : "N";
+      b.style.borderColor = headUp ? "#ff8a2b" : "#8a96a6";
+      b.style.color = headUp ? "#ff8a2b" : "#fff";
+    });
+    document.querySelectorAll(".mapRad").forEach(function (b) {
+      b.textContent = "RAD";
+      b.style.borderColor = radarOn ? "#ff8a2b" : "#8a96a6";
+      b.style.color = radarOn ? "#ff8a2b" : "#fff";
+    });
+    document.querySelectorAll(".mapWind").forEach(function (w) {
+      var ring = w.querySelector(".mwRing"), arr = w.querySelector(".mwArrow"), sp = w.querySelector(".mwSpd");
+      // ring shows compass directions relative to the way the map is turned
+      ring.style.transform = "rotate(" + (-mapHead) + "deg)";
+      if (windFromDeg != null) arr.style.transform = "rotate(" + ((windFromDeg + 180) % 360) + "deg)";
+      sp.textContent = windMphTxt;
+    });
+  }
+  updateOverlays();
+  if (radarOn) loadRadarIndex();
+  setInterval(function () { if (radarOn) loadRadarIndex(); }, 300000);
+
+  // ===== 6. Rotate the full-screen map =====
+  // fDraw lives inside the rev 207 closure, so the full-screen map is patched through its canvas context.
+  // The full-screen draw routine (rev 207 block) rotates itself using window.__mapHead and paints radar via window.__drawRadar.
+  window.__drawRadar = drawRadar;
+  // first-load safety: if the heading never arrives, the maps simply stay north-up (the original behavior)
+
+
 })();
 </script>
 </body>
