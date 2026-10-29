@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 215 -->
+<!-- Van Dash rev 216 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r215</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r216</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1475,9 +1475,9 @@ function decorateResults() {
   var recOn = localStorage.getItem("vdRec") === "1";
   function addCrumb(lat, lon, acc) {
     if (!recOn) return;
-    if (acc != null && acc > 50) return;
+    if (acc != null && acc > 65) return; // rev 216: a little more forgiving for walking/hiking
     var last = crumbs[crumbs.length - 1];
-    if (last && distMeters({ latitude: last[0], longitude: last[1] }, { latitude: lat, longitude: lon }) < 15) return;
+    if (last && distMeters({ latitude: last[0], longitude: last[1] }, { latitude: lat, longitude: lon }) < 4) return; // rev 216: 4 meters so slow walking and hiking leave a trail
     crumbs.push([+lat.toFixed(6), +lon.toFixed(6)]);
     if (crumbs.length > 20000) crumbs.shift();
     var now = Date.now();
@@ -1618,7 +1618,7 @@ function decorateResults() {
     document.getElementById("fStart").textContent = recOn ? "Recording" : "Start trail";
     document.getElementById("fStop").style.opacity = recOn ? "1" : "0.5";
   }
-  document.getElementById("fStart").onclick = function () { recOn = true; localStorage.setItem("vdRec", "1"); recSet(); };
+  document.getElementById("fStart").onclick = function () { recOn = true; localStorage.setItem("vdRec", "1"); recSet(); if (fLat != null) { addCrumb(fLat, fLon, null); saveCrumbs(); fDraw(); } };
   document.getElementById("fStop").onclick = function () { recOn = false; localStorage.setItem("vdRec", "0"); saveCrumbs(); recSet(); };
   recSet();
 
