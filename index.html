@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 213 -->
+<!-- Van Dash rev 214 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r213</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r214</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1789,6 +1789,11 @@ function decorateResults() {
   placeSync();
   setInterval(placeSync, 300);
 
+  // rev 214: center the icon and condition text in the space left of the wind ring
+  if (wrapEl) { wrapEl.style.alignItems = "center"; wrapEl.style.textAlign = "center"; }
+  if (wxv) { wxv.style.textAlign = "center"; wxv.style.maxWidth = "100%"; }
+  if (icon) { icon.style.textAlign = "center"; }
+
   // ===== 2. Shared state for the map overlays =====
   var headUp = localStorage.getItem("vdHeadUp") === "1";
   var radarOn = localStorage.getItem("vdRadar") === "1";
@@ -1797,7 +1802,12 @@ function decorateResults() {
   var windFromDeg = null, windMphTxt = "--";
 
   function readWindNow() {
+    // rev 214: read the wind from the visible weather-page value too, so the map ring never depends on the hidden card text alone
     var m = ($("wind").textContent || "").match(/from\s+([NESW]+)\s+(\d+)/);
+    if (!m) {
+      var m2 = ($("wWind").textContent || "").trim().match(/^(\d+)\s+([NESW]+)$/);
+      if (m2) m = [m2[0], m2[2], m2[1]];
+    }
     if (!m) return;
     var i = DIRS.indexOf(m[1]);
     if (i < 0) return;
@@ -1967,7 +1977,8 @@ function decorateResults() {
       var ring = w.querySelector(".mwRing"), arr = w.querySelector(".mwArrow"), sp = w.querySelector(".mwSpd");
       // ring shows compass directions relative to the way the map is turned
       ring.style.transform = "rotate(" + (-mapHead) + "deg)";
-      if (windFromDeg != null) arr.style.transform = "rotate(" + ((windFromDeg + 180) % 360) + "deg)";
+      // rev 214: arrow is always set from the wind direction (north-up shows the true direction, heading-up turns with the map)
+      arr.style.transform = "rotate(" + (((windFromDeg == null ? 0 : windFromDeg) + 180) % 360) + "deg)";
       sp.textContent = windMphTxt;
     });
   }
