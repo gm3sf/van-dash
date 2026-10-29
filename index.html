@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 209 -->
+<!-- Van Dash rev 210 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r209</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r210</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1544,7 +1544,7 @@ function decorateResults() {
     fctx.fillStyle = "#1a222c"; fctx.fillRect(0, 0, fW, fH);
     var tm = 0;
     for (var q = 1; q < crumbs.length; q++) tm += distMeters({ latitude: crumbs[q - 1][0], longitude: crumbs[q - 1][1] }, { latitude: crumbs[q][0], longitude: crumbs[q][1] });
-    document.getElementById("fCount").textContent = (tm * M_TO_MI).toFixed(2) + " mi \u2022 " + crumbs.length + " pts";
+    document.getElementById("fCount").textContent = (tm * M_TO_MI).toFixed(2) + " mi";
     if (fcLat == null) {
       fctx.fillStyle = "#7f8fa3"; fctx.font = "15px sans-serif"; fctx.textAlign = "center";
       fctx.fillText("Waiting for GPS...", fW / 2, fH / 2);
@@ -1679,6 +1679,64 @@ function decorateResults() {
     tapStart = null;
   });
   window.addEventListener("resize", function () { if (!fs.classList.contains("hidden")) fResize(); });
+})();
+
+/* ---------- rev 210: speed color near limit + current-location indicator on weather page ---------- */
+(function () {
+  // --- Speedometer number: orange -> deep red within 5 mph of the limit ---
+  var spdEl = $("speed");
+  function mix(a, b, t) { return Math.round(a + (b - a) * t); }
+  function spdColor() {
+    var lim = (typeof limShown !== "undefined") ? limShown : null;
+    var mph = (typeof gpsMph !== "undefined") ? gpsMph : 0;
+    if (lim == null) return "";
+    var t = (mph - (lim - 5)) / 5;
+    if (t <= 0) return "";
+    if (t > 1) t = 1;
+    // orange (255,138,43) -> deep red (200,0,0)
+    return "rgb(" + mix(255, 200, t) + "," + mix(138, 0, t) + "," + mix(43, 0, t) + ")";
+  }
+  var lastC = null;
+  setInterval(function () {
+    var c = spdColor();
+    if (c !== lastC) { lastC = c; spdEl.style.color = c; }
+  }, 300);
+
+  // --- Weather page: "Current location" label above the city + arrow indicator by the magnifier ---
+  var topTitle = $("wCity");
+  var lbl = document.createElement("div");
+  lbl.id = "wLiveLbl";
+  lbl.textContent = "Current location";
+  lbl.style.cssText = "font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ff8a2b;line-height:1;margin-bottom:3px";
+  topTitle.insertBefore(lbl, topTitle.firstChild);
+
+  // wCity text gets overwritten by the app, which would wipe the label; keep it in a wrapper instead
+  var wrapper = document.createElement("div");
+  wrapper.style.cssText = "flex:1;text-align:center;min-width:0";
+  var nameEl = document.createElement("div");
+  nameEl.id = "wCityName";
+  nameEl.style.cssText = "font-size:20px;font-weight:600";
+  topTitle.removeChild(lbl);
+  topTitle.parentNode.insertBefore(wrapper, topTitle);
+  wrapper.appendChild(lbl);
+  wrapper.appendChild(topTitle);
+  topTitle.style.flex = "none";
+
+  // location arrow indicator next to the magnifying glass
+  var s2 = $("srchBtn2");
+  var arrow = document.createElement("div");
+  arrow.id = "wLiveArrow";
+  arrow.style.cssText = "position:absolute;right:62px;top:10px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;pointer-events:none";
+  arrow.innerHTML = '<svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:currentColor;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round"><path d="M3 11 21 3l-8 18-2-8z"/></svg>';
+  if (s2) s2.parentNode.appendChild(arrow);
+
+  function syncLive() {
+    var live = (typeof wxLive !== "undefined") ? wxLive : true;
+    lbl.style.visibility = live ? "visible" : "hidden";
+    arrow.style.color = live ? "#ff8a2b" : "#3a4555";
+  }
+  syncLive();
+  setInterval(syncLive, 300);
 })();
 </script>
 </body>
