@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 210 -->
+<!-- Van Dash rev 211 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r210</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r211</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1319,7 +1319,7 @@ function decorateResults() {
     $("wBoxGust").textContent = $("wGust").textContent;
     var w = ($("wWind").textContent || "").trim().match(/^(\d+)\s+([NESW]+)$/);
     if (w) {
-      $("wBoxWind").textContent = w[1] + " mph from the " + (FULL[w[2]] || w[2]);
+      $("wBoxWind").textContent = w[1] + " mph from " + w[2];
       var i = DIRS.indexOf(w[2]);
       if (i >= 0) { wFrom = i * 22.5; drawBox(); }
     }
@@ -1737,6 +1737,35 @@ function decorateResults() {
   }
   syncLive();
   setInterval(syncLive, 300);
+})();
+
+/* ---------- rev 211: weather card text under the icon ---------- */
+(function () {
+  var wrap = $("wxCard").querySelector(".wx-wrap");
+  var wxv = $("wx");
+  var icon = $("wxIcon");
+  if (!wrap || !wxv || !icon) return;
+  // stack: icon on top, condition text centered underneath
+  wrap.style.flexDirection = "column";
+  wrap.style.alignItems = "flex-start";
+  wrap.style.gap = "2px";
+  wrap.style.marginLeft = "0";
+  wrap.style.marginTop = "0";
+  wrap.style.maxWidth = "calc(100% - 92px)";
+  icon.style.fontSize = "44px";
+  icon.style.lineHeight = "1";
+  wxv.style.maxWidth = "100%";
+  wxv.style.whiteSpace = "normal";
+  wxv.style.lineHeight = "1.1";
+  // resize text by length so it never crowds the wind ring (checked every 400ms, same idea as before)
+  var lastTxt = null;
+  setInterval(function () {
+    var t = (wxv.textContent || "").trim();
+    if (t === lastTxt) return;
+    lastTxt = t;
+    var longest = t.split(/\s+/).reduce(function (m, w) { return Math.max(m, w.length); }, 0);
+    wxv.style.fontSize = longest >= 11 ? "15px" : longest >= 9 ? "17px" : "19px";
+  }, 400);
 })();
 </script>
 </body>
