@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 216 -->
+<!-- Van Dash rev 217 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r216</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r217</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1679,7 +1679,14 @@ function decorateResults() {
   };
   if (navigator.geolocation) {
     navigator.geolocation.watchPosition(function (p) {
-      try { window.__fFollowTick(p.coords.latitude, p.coords.longitude); } catch (e) {}
+      try {
+        var c = p.coords;
+        window.__fFollowTick(c.latitude, c.longitude);
+        // rev 217: this watcher also feeds the big-map speed and the trail
+        var mph2 = c.speed != null && c.speed >= 0 ? c.speed * MS_TO_MPH : 0;
+        fSpd.textContent = mph2 < 1 ? "0" : Math.round(mph2);
+        addCrumb(c.latitude, c.longitude, c.accuracy);
+      } catch (e) {}
     }, function () {}, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
   }
   document.getElementById("fBack").onclick = closeFull;
