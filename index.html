@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 212 -->
+<!-- Van Dash rev 213 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r212</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r213</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1773,7 +1773,7 @@ function decorateResults() {
   }, 400);
 })();
 
-/* ---------- rev 212: weather card spacing + city label; heading-up maps; wind ring + radar overlays ---------- */
+/* ---------- rev 212: weather card spacing + city label; heading-up maps; wind ring + radar overlays (rev 213: small map back to original, full-map compass button) ---------- */
 (function () {
   // ===== 1. Weather card: condition text tight under the icon, city name on the bottom label =====
   var wxv = $("wx"), icon = $("wxIcon"), wrapEl = $("wxCard").querySelector(".wx-wrap"), place = $("wxPlace");
@@ -1834,7 +1834,7 @@ function decorateResults() {
   var vInner = vDraw;
   vDraw = function () {
     if (!vW || !vH) return;
-    if (mapHead === 0 && !radarOn) { vInner(); return; }
+    if (true) { vInner(); return; } // rev 213: small map stays north-up, no radar (original behavior)
     var dpr = window.devicePixelRatio || 1;
     var S = Math.ceil(Math.sqrt(vW * vW + vH * vH)); // big enough that rotated corners stay filled
     // temporarily point the drawing at an oversized offscreen canvas
@@ -1919,6 +1919,8 @@ function decorateResults() {
       (isFull ? "left:12px;top:calc(env(safe-area-inset-top) + 64px)" : "left:8px;top:54px");
     var rot = document.createElement("button");
     rot.className = "mapRot"; rot.style.cssText = btnCss;
+    // rev 213: compass-style button (needle points north, turns with the map)
+    rot.innerHTML = '<svg viewBox="0 0 100 100" style="width:32px;height:32px;display:block;margin:0 auto"><circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="5"/><g class="mcNeedle" style="transform-origin:50px 50px"><path d="M50 14 L63 52 L37 52 Z" fill="#e53935"/><path d="M50 86 L63 52 L37 52 Z" fill="currentColor"/></g></svg>';
     var rad = document.createElement("button");
     rad.className = "mapRad"; rad.style.cssText = btnCss;
     var wnd = document.createElement("div");
@@ -1944,15 +1946,17 @@ function decorateResults() {
       updateOverlays(); redrawBoth();
     };
   }
-  buildOverlay($("vmap"), false);
+  // rev 213: small map gets no overlay (no N/RAD buttons, no wind ring)
   buildOverlay(document.getElementById("fullMap"), true);
 
   function updateOverlays() {
     readWindNow();
     document.querySelectorAll(".mapRot").forEach(function (b) {
-      b.textContent = headUp ? "HDG" : "N";
-      b.style.borderColor = headUp ? "#ff8a2b" : "#8a96a6";
-      b.style.color = headUp ? "#ff8a2b" : "#fff";
+      // rev 213: grayed out when north-up, orange when heading-up; needle shows where north is
+      b.style.borderColor = headUp ? "#ff8a2b" : "#4a5565";
+      b.style.color = headUp ? "#ff8a2b" : "#7f8fa3";
+      var nd = b.querySelector(".mcNeedle");
+      if (nd) nd.style.transform = "rotate(" + (-mapHead) + "deg)";
     });
     document.querySelectorAll(".mapRad").forEach(function (b) {
       b.textContent = "RAD";
