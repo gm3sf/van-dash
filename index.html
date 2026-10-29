@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 217 -->
+<!-- Van Dash rev 218 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r217</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r218</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1473,6 +1473,26 @@ function decorateResults() {
   var lastSave = 0;
   function saveCrumbs() { try { localStorage.setItem("vdCrumbs", JSON.stringify(crumbs)); } catch (e) {} }
   var recOn = localStorage.getItem("vdRec") === "1";
+  // rev 218: trail stats (start time, max speed) saved on the phone
+  var tStart = parseFloat(localStorage.getItem("vdTStart") || "0") || 0;
+  var tMax = parseFloat(localStorage.getItem("vdTMax") || "0") || 0;
+  var tEnd = parseFloat(localStorage.getItem("vdTEnd") || "0") || 0;
+  function fShowStats(tm) {
+    var mi = tm * M_TO_MI;
+    var end = recOn ? Date.now() : (tEnd || Date.now());
+    var secs = tStart ? Math.max(0, (end - tStart) / 1000) : 0;
+    var h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60), s = Math.floor(secs % 60);
+    var tt = h > 0 ? h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s : m + ":" + (s < 10 ? "0" : "") + s;
+    var avg = secs > 30 && mi > 0.01 ? (mi / (secs / 3600)).toFixed(1) + " mph" : "--";
+    document.getElementById("fsDist").textContent = mi.toFixed(2) + " mi";
+    document.getElementById("fsTime").textContent = tStart ? tt : "0:00";
+    document.getElementById("fsAvg").textContent = avg;
+    document.getElementById("fsMax").textContent = tMax > 0 ? Math.round(tMax) + " mph" : "--";
+  }
+  function noteSpeed(mph) {
+    if (!recOn || mph == null || isNaN(mph)) return;
+    if (mph > tMax) { tMax = mph; try { localStorage.setItem("vdTMax", String(tMax)); } catch (e) {} }
+  }
   function addCrumb(lat, lon, acc) {
     if (!recOn) return;
     if (acc != null && acc > 65) return; // rev 216: a little more forgiving for walking/hiking
@@ -1517,7 +1537,7 @@ function decorateResults() {
       '<button id="fSat" style="width:46px;height:46px;margin:0;padding:0;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6"><svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:#ff8a2b;stroke-width:1.8"><path d="M12 3 2 8l10 5 10-5z"/><path d="M2 12l10 5 10-5"/><path d="M2 16l10 5 10-5"/></svg></button>' +
     '</div>' +
     '<div style="position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);display:flex;gap:8px;align-items:center">' +
-      '<div id="fCount" style="padding:8px 12px;font-size:13px;color:#cfd8e3;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px">0 pts</div>' +
+      '<div id="fStats" style="flex:1 1 100%;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 8px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px;text-align:center"><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Dist</div><div id="fsDist" style="font-size:15px;font-weight:600;color:#fff">0.00 mi</div></div><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Time</div><div id="fsTime" style="font-size:15px;font-weight:600;color:#fff">0:00</div></div><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Avg</div><div id="fsAvg" style="font-size:15px;font-weight:600;color:#fff">--</div></div><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Max</div><div id="fsMax" style="font-size:15px;font-weight:600;color:#fff">--</div></div></div>' +
       '<button id="fStart" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Start trail</button>' +
       '<button id="fStop" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Stop trail</button>' +
       '<button id="fClr" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Clear trail</button>' +
@@ -1544,7 +1564,7 @@ function decorateResults() {
     fctx.fillStyle = "#1a222c"; fctx.fillRect(0, 0, fW, fH);
     var tm = 0;
     for (var q = 1; q < crumbs.length; q++) tm += distMeters({ latitude: crumbs[q - 1][0], longitude: crumbs[q - 1][1] }, { latitude: crumbs[q][0], longitude: crumbs[q][1] });
-    document.getElementById("fCount").textContent = (tm * M_TO_MI).toFixed(2) + " mi";
+    fShowStats(tm);
     if (fcLat == null) {
       fctx.fillStyle = "#7f8fa3"; fctx.font = "15px sans-serif"; fctx.textAlign = "center";
       fctx.fillText("Waiting for GPS...", fW / 2, fH / 2);
@@ -1609,7 +1629,7 @@ function decorateResults() {
   function fSatSet() { document.getElementById("fSat").style.borderColor = fSatOn ? "#ff8a2b" : ""; fDraw(); }
   document.getElementById("fSat").onclick = function () { fSatOn = !fSatOn; fSatSet(); };
   document.getElementById("fClr").onclick = function () {
-    if (crumbs.length && confirm("Clear the trail (" + crumbs.length + " points)?")) { crumbs = []; saveCrumbs(); fDraw(); }
+    if (crumbs.length && confirm("Clear the trail (" + crumbs.length + " points)?")) { crumbs = []; saveCrumbs(); tStart = recOn ? Date.now() : 0; tEnd = 0; tMax = 0; localStorage.setItem("vdTStart", String(tStart)); localStorage.setItem("vdTEnd", "0"); localStorage.setItem("vdTMax", "0"); fDraw(); }
   };
 
   function recSet() {
@@ -1618,8 +1638,9 @@ function decorateResults() {
     document.getElementById("fStart").textContent = recOn ? "Recording" : "Start trail";
     document.getElementById("fStop").style.opacity = recOn ? "1" : "0.5";
   }
-  document.getElementById("fStart").onclick = function () { recOn = true; localStorage.setItem("vdRec", "1"); recSet(); if (fLat != null) { addCrumb(fLat, fLon, null); saveCrumbs(); fDraw(); } };
-  document.getElementById("fStop").onclick = function () { recOn = false; localStorage.setItem("vdRec", "0"); saveCrumbs(); recSet(); };
+  document.getElementById("fStart").onclick = function () { if (!recOn) { if (!tStart || !crumbs.length) { tStart = Date.now(); tMax = 0; localStorage.setItem("vdTMax", "0"); } else if (tEnd) { tStart += Date.now() - tEnd; } tEnd = 0; localStorage.setItem("vdTStart", String(tStart)); localStorage.setItem("vdTEnd", "0"); } recOn = true; localStorage.setItem("vdRec", "1"); recSet(); if (fLat != null) { addCrumb(fLat, fLon, null); saveCrumbs(); fDraw(); } };
+  document.getElementById("fStop").onclick = function () { if (recOn) { tEnd = Date.now(); localStorage.setItem("vdTEnd", String(tEnd)); } recOn = false; localStorage.setItem("vdRec", "0"); saveCrumbs(); recSet(); fDraw(); };
+  setInterval(function () { if (recOn && !fs.classList.contains("hidden")) fDraw(); }, 1000);
   recSet();
 
   // ----- pinch to zoom (both maps) -----
@@ -1686,6 +1707,7 @@ function decorateResults() {
         var mph2 = c.speed != null && c.speed >= 0 ? c.speed * MS_TO_MPH : 0;
         fSpd.textContent = mph2 < 1 ? "0" : Math.round(mph2);
         addCrumb(c.latitude, c.longitude, c.accuracy);
+        if (c.speed != null && c.speed >= 0) noteSpeed(c.speed * MS_TO_MPH);
       } catch (e) {}
     }, function () {}, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
   }
