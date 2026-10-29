@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 214 -->
+<!-- Van Dash rev 215 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r214</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r215</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1671,8 +1671,32 @@ function decorateResults() {
     fResize();
   }
   function closeFull() { fs.classList.add("hidden"); }
+  // rev 215: big map follows GPS reliably (own watcher, independent of the small map handler)
+  window.__fFollowTick = function (lat, lon) {
+    fLat = lat; fLon = lon;
+    if (fFollow) { fcLat = lat; fcLon = lon; }
+    if (!fs.classList.contains("hidden")) fDraw();
+  };
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(function (p) {
+      try { window.__fFollowTick(p.coords.latitude, p.coords.longitude); } catch (e) {}
+    }, function () {}, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+  }
   document.getElementById("fBack").onclick = closeFull;
   window.__fDraw = fDraw;
+  window.__fSetCenter = function (lat, lon) { fFollow = false; fcLat = lat; fcLon = lon; fDraw(); clearTimeout(fTimer); fTimer = setTimeout(fHome, 60000); };
+  window.__fSetZoom = function (z) { fZoom = z; };
+  window.__fGetZoom = function () { return fZoom; };
+  // rev 215: double-tap to zoom in one level
+  var lastTap = 0, lastTapXY = null;
+  fCanvas.addEventListener("pointerup", function (e) {
+    var now = Date.now();
+    if (e.isPrimary === false) { lastTap = 0; return; }
+    if (now - lastTap < 300 && lastTapXY && Math.abs(e.clientX - lastTapXY.x) + Math.abs(e.clientY - lastTapXY.y) < 30) {
+      if (fZoom < 18) { fZoom++; fDraw(); }
+      lastTap = 0;
+    } else { lastTap = now; lastTapXY = { x: e.clientX, y: e.clientY }; }
+  });
 
   // tap the small map (not its buttons) to open full screen; dragging still pans it
   var tapStart = null;
@@ -1790,9 +1814,10 @@ function decorateResults() {
   setInterval(placeSync, 300);
 
   // rev 214: center the icon and condition text in the space left of the wind ring
-  if (wrapEl) { wrapEl.style.alignItems = "center"; wrapEl.style.textAlign = "center"; }
-  if (wxv) { wxv.style.textAlign = "center"; wxv.style.maxWidth = "100%"; }
-  if (icon) { icon.style.textAlign = "center"; }
+  // rev 215: left-justified again, and nudged down a bit from the Weather label
+  if (wrapEl) { wrapEl.style.alignItems = "flex-start"; wrapEl.style.textAlign = "left"; wrapEl.style.marginTop = "6px"; }
+  if (wxv) { wxv.style.textAlign = "left"; wxv.style.maxWidth = "100%"; }
+  if (icon) { icon.style.textAlign = "left"; }
 
   // ===== 2. Shared state for the map overlays =====
   var headUp = localStorage.getItem("vdHeadUp") === "1";
@@ -1958,6 +1983,125 @@ function decorateResults() {
   }
   // rev 213: small map gets no overlay (no N/RAD buttons, no wind ring)
   buildOverlay(document.getElementById("fullMap"), true);
+
+  // ===== rev 215: big-map control layout =====
+  (function () {
+    var fsEl = document.getElementById("fullMap");
+    var ov = fsEl.querySelector(".mapOv");
+    var back = document.getElementById("fBack");
+    var backW = back ? Math.round(back.getBoundingClientRect().width) : 0;
+    if (!backW || backW < 60) backW = 82;
+
+    // wind ring: same look as the main page (WIND label on top, ring, mph under), as wide as the Back button, under it on the left
+    var wnd = ov.querySelector(".mapWind");
+    var ringHost = wnd;
+    wnd.innerHTML =
+      '<div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3;text-align:center;line-height:1;margin-bottom:3px">Wind</div>' +
+      ringSvg().replace('style="width:46px;height:46px;display:block;margin:0 auto"', 'style="width:' + (backW - 14) + 'px;height:' + (backW - 14) + 'px;display:block;margin:0 auto"').replace('font-size:11px;color:#cfd8e3', 'font-size:13px;color:#cfd8e3');
+    var nTxt = wnd.querySelector("text"); if (nTxt) nTxt.remove();
+    wnd.style.width = backW + "px";
+    wnd.style.boxSizing = "border-box";
+    wnd.style.padding = "6px 6px 5px";
+    wnd.style.border = "0.5px solid #8a96a6";
+    wnd.style.background = "rgba(21,28,37,0.92)";
+    wnd.style.borderRadius = "12px";
+    // left column: just the wind ring under the Back button
+    ov.removeChild(ov.querySelector(".mapRot"));
+    ov.removeChild(ov.querySelector(".mapRad"));
+    ov.style.alignItems = "stretch";
+    ov.style.top = "calc(env(safe-area-inset-top) + 64px)";
+
+    // right column: search, compass, radar (top right)
+    var right = fsEl.querySelector('div[style*="right:12px"]');
+    var rot = document.createElement("button");
+    rot.className = "mapRot"; rot.style.cssText = btnCss + ";width:46px;height:46px";
+    rot.innerHTML = '<svg viewBox="0 0 100 100" style="width:32px;height:32px;display:block;margin:0 auto"><circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="5"/><g class="mcNeedle" style="transform-origin:50px 50px"><path d="M50 14 L63 52 L37 52 Z" fill="#e53935"/><path d="M50 86 L63 52 L37 52 Z" fill="currentColor"/></g></svg>';
+    var rad = document.createElement("button");
+    rad.className = "mapRad"; rad.style.cssText = btnCss + ";width:46px;height:46px";
+    var srch = document.createElement("button");
+    srch.id = "fSrch"; srch.setAttribute("aria-label", "Search");
+    srch.style.cssText = btnCss + ";width:46px;height:46px";
+    srch.innerHTML = '<svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round;display:block;margin:0 auto"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>';
+
+    // move the old +/-/center/satellite buttons to the bottom right
+    var fIn = document.getElementById("fIn"), fOut = document.getElementById("fOut"), fCtr = document.getElementById("fCtr"), fSat = document.getElementById("fSat");
+    var bottomRight = document.createElement("div");
+    bottomRight.style.cssText = "position:absolute;right:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);display:flex;flex-direction:column;gap:8px;z-index:5";
+    bottomRight.appendChild(fIn); bottomRight.appendChild(fOut); bottomRight.appendChild(fCtr);
+    fsEl.appendChild(bottomRight);
+    // top right: search, compass, radar, satellite
+    right.innerHTML = "";
+    right.appendChild(srch); right.appendChild(rot); right.appendChild(rad); right.appendChild(fSat);
+    [rot, rad, srch].forEach(function (el) {
+      el.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+      el.addEventListener("pointerup", function (e) { e.stopPropagation(); });
+    });
+    rot.onclick = function (e) {
+      e.stopPropagation();
+      headUp = !headUp; localStorage.setItem("vdHeadUp", headUp ? "1" : "0");
+      updateOverlays(); redrawBoth();
+    };
+    rad.onclick = function (e) {
+      e.stopPropagation();
+      radarOn = !radarOn; localStorage.setItem("vdRadar", radarOn ? "1" : "0");
+      if (radarOn) loadRadarIndex();
+      updateOverlays(); redrawBoth();
+    };
+
+    // ----- city search on the big map -----
+    var sBar = document.createElement("div");
+    sBar.id = "fSrchBar";
+    sBar.style.cssText = "position:absolute;left:12px;right:12px;top:calc(env(safe-area-inset-top) + 64px);z-index:8;display:none";
+    sBar.innerHTML =
+      '<div style="display:flex;gap:8px"><input id="fSrchIn" type="text" placeholder="City or zip" autocomplete="off" autocorrect="off" style="flex:1;font-size:17px;padding:12px;border-radius:10px;border:0.5px solid #8a96a6;background:rgba(21,28,37,0.96);color:#fff">' +
+      '<button id="fSrchGo" style="margin:0;padding:0 16px;font-size:16px;background:rgba(21,28,37,0.96);border:0.5px solid #ff8a2b;color:#ff8a2b">Go</button></div>' +
+      '<div id="fSrchList" style="margin-top:6px;background:rgba(21,28,37,0.96);border:0.5px solid #8a96a6;border-radius:10px;display:none;overflow:hidden"></div>';
+    fsEl.appendChild(sBar);
+    var sIn = document.getElementById("fSrchIn"), sList = document.getElementById("fSrchList");
+    function closeSrch() { sBar.style.display = "none"; sList.style.display = "none"; sIn.blur(); }
+    srch.onclick = function (e) {
+      e.stopPropagation();
+      if (sBar.style.display === "block") { closeSrch(); return; }
+      sBar.style.display = "block"; sIn.value = ""; sList.style.display = "none"; sList.innerHTML = "";
+      setTimeout(function () { sIn.focus(); }, 50);
+    };
+    function jump(r) {
+      window.__fSetCenter(r.latitude, r.longitude);
+      if (window.__fGetZoom() < 11) { window.__fSetZoom(11); window.__fDraw(); }
+      closeSrch();
+    }
+    async function doSearch() {
+      var q = (sIn.value || "").trim();
+      if (!q) return;
+      sList.style.display = "block"; sList.innerHTML = '<div style="padding:12px;color:#7f8fa3">Searching...</div>';
+      try {
+        var res = [];
+        if (/^\d{5}$/.test(q)) {
+          var zr = await fetch("https://api.zippopotam.us/us/" + q);
+          if (zr.ok) { var zj = await zr.json(); var pl = zj.places[0]; res = [{ name: pl["place name"], admin1: pl.state, country: "United States", latitude: +pl.latitude, longitude: +pl.longitude }]; }
+        } else {
+          var gr = await fetch("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(q) + "&count=6&language=en&format=json");
+          var gj = await gr.json(); res = gj.results || [];
+        }
+        if (!res.length) { sList.innerHTML = '<div style="padding:12px;color:#7f8fa3">No match</div>'; return; }
+        sList.innerHTML = "";
+        res.forEach(function (r) {
+          var s = STATE_ABBR[r.admin1] || r.admin1 || "";
+          var d = document.createElement("div");
+          d.style.cssText = "padding:12px 14px;font-size:16px;color:#fff;border-bottom:0.5px solid #2a3442";
+          d.textContent = r.country === "United States" && s ? r.name + ", " + s : r.name + (r.country ? ", " + r.country : "");
+          d.onclick = function () { jump(r); };
+          sList.appendChild(d);
+        });
+      } catch (er) { sList.innerHTML = '<div style="padding:12px;color:#7f8fa3">Search failed</div>'; }
+    }
+    document.getElementById("fSrchGo").onclick = doSearch;
+    sIn.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); doSearch(); } });
+    [sBar].forEach(function (el) {
+      el.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+      el.addEventListener("pointerup", function (e) { e.stopPropagation(); });
+    });
+  })();
 
   function updateOverlays() {
     readWindNow();
