@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 225 -->
+<!-- Van Dash rev 226 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r225</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r226</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2201,6 +2201,108 @@ function decorateResults() {
 
 })();
 /* ===== Part 3 (rev 225): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ---- Spotify now-playing bar (rev 226) ---- */
+(function () {
+  var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state';
+  var sb = document.getElementById('spotBtn'), row = sb && sb.parentNode;
+  if (!row) return;
+  var tok = null, playing = false;
+  try { tok = JSON.parse(localStorage.getItem('vdSp') || 'null'); } catch (e) { tok = null; }
+  function sv(o) { tok = o; try { localStorage.setItem('vdSp', JSON.stringify(o)); } catch (e) {} }
+  function ic(d) { return '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:auto">' + d + '</svg>'; }
+  var bs = 'margin:0;padding:0;width:36px;height:36px;background:none;border:0;flex:none';
+  var bar = document.createElement('div');
+  bar.style.cssText = 'display:flex;align-items:center;gap:8px;height:40px;margin:8px 0 0;padding:0 8px;background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;overflow:hidden';
+  bar.innerHTML = '<img id="spArt" style="width:28px;height:28px;border-radius:6px;flex:none;display:none">' +
+    '<div style="flex:1;min-width:0"><div id="spT" style="font-size:13px;font-weight:600;color:#e8eef5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>' +
+    '<div id="spA" style="font-size:11px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div></div>' +
+    '<span id="spCtl" style="display:none;align-items:center;flex:none">' +
+    '<button id="spPrev" style="' + bs + '">' + ic('<path d="M6 5v14M19 5L9 12l10 7z"/>') + '</button>' +
+    '<button id="spPlay" style="' + bs + '"></button>' +
+    '<button id="spNext" style="' + bs + '">' + ic('<path d="M18 5v14M5 5l10 7-10 7z"/>') + '</button></span>';
+  row.parentNode.insertBefore(bar, row.nextSibling);
+  var T = document.getElementById('spT'), A = document.getElementById('spA'), art = document.getElementById('spArt'), ctl = document.getElementById('spCtl'), pl = document.getElementById('spPlay');
+  // make room: the map gives up the height the bar takes
+  var vm = document.querySelector('.vmap');
+  if (vm) {
+    vm.style.setProperty('height', Math.max(110, vm.offsetHeight - bar.offsetHeight - 8) + 'px', 'important');
+    setTimeout(function () { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }, 60);
+  }
+  function say(t, a) { T.textContent = t; A.textContent = a || ''; }
+  function icons() {
+    pl.innerHTML = ic(playing ? '<path d="M8 5v14M16 5v14"/>' : '<path d="M7 4.5v15l12-7.5z"/>');
+    ctl.style.display = tok ? 'flex' : 'none';
+  }
+  function idle(t, a) { playing = false; art.style.display = 'none'; say(t, a); icons(); }
+  if (!tok) idle('Connect Spotify', 'Tap here to log in'); else idle('Spotify', 'Connecting...');
+
+  function b64u(buf) {
+    var s = '', u = new Uint8Array(buf);
+    for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]);
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  async function login() {
+    try {
+      var v = b64u(crypto.getRandomValues(new Uint8Array(48)));
+      localStorage.setItem('vdSpV', v);
+      var ch = b64u(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v)));
+      location.href = 'https://accounts.spotify.com/authorize?response_type=code&client_id=' + CID + '&scope=' + encodeURIComponent(SC) + '&redirect_uri=' + encodeURIComponent(RED) + '&code_challenge_method=S256&code_challenge=' + ch;
+    } catch (e) { say('Login failed', 'Tap to try again'); }
+  }
+  async function tokenReq(p) {
+    p.client_id = CID;
+    var r = await fetch('https://accounts.spotify.com/api/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(p).toString() });
+    if (!r.ok) throw new Error('token ' + r.status);
+    var j = await r.json();
+    sv({ a: j.access_token, r: j.refresh_token || (tok && tok.r), x: Date.now() + (j.expires_in - 60) * 1000 });
+  }
+  async function api(method, path) {
+    if (!tok) return null;
+    if (Date.now() > tok.x) {
+      try { await tokenReq({ grant_type: 'refresh_token', refresh_token: tok.r }); }
+      catch (e) { sv(null); idle('Connect Spotify', 'Tap here to log in'); return null; }
+    }
+    try { return await fetch('https://api.spotify.com/v1/me/player' + path, { method: method, headers: { Authorization: 'Bearer ' + tok.a } }); }
+    catch (e) { return null; }
+  }
+  async function poll() {
+    if (!tok || document.hidden) return;
+    var r = await api('GET', '');
+    if (!r) return;
+    if (r.status === 401) { sv(null); idle('Connect Spotify', 'Tap here to log in'); return; }
+    if (r.status === 204) { idle('Nothing playing', 'Start Spotify on this phone'); return; }
+    if (!r.ok) return;
+    var j = await r.json(), it = j.item;
+    if (!it) { idle('Nothing playing', ''); return; }
+    playing = !!j.is_playing;
+    say(it.name, it.artists ? it.artists.map(function (x) { return x.name; }).join(', ') : (it.show ? it.show.name : ''));
+    var im = (it.album && it.album.images) || it.images || [];
+    if (im.length) { art.src = im[im.length - 1].url; art.style.display = 'block'; } else art.style.display = 'none';
+    icons();
+  }
+  async function act(m, p) {
+    var r = await api(m, p);
+    if (r && r.status === 404) say('No active Spotify', 'Open Spotify and play something');
+    else if (r && r.status === 403) say('Premium needed', 'Spotify blocked that control');
+    setTimeout(poll, 600);
+  }
+  document.getElementById('spPrev').onclick = function () { act('POST', '/previous'); };
+  document.getElementById('spNext').onclick = function () { act('POST', '/next'); };
+  pl.onclick = function () { act('PUT', playing ? '/pause' : '/play'); };
+  bar.onclick = function (e) { if (!tok && !(e.target.closest && e.target.closest('button'))) login(); };
+
+  var q = new URLSearchParams(location.search), code = q.get('code');
+  if (code || q.get('error')) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
+  if (code) {
+    idle('Spotify', 'Finishing login...');
+    tokenReq({ grant_type: 'authorization_code', code: code, redirect_uri: RED, code_verifier: localStorage.getItem('vdSpV') || '' })
+      .then(function () { icons(); poll(); })
+      .catch(function () { idle('Login failed', 'Tap here to try again'); });
+  } else if (tok) poll();
+  setInterval(poll, 5000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) poll(); });
+})();
+/* ---- photo spot-log ---- */
 (function () {
   var host = document.getElementById("vCamHost");
   if (!host) return;
