@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 230 -->
+<!-- Van Dash rev 231 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -108,8 +108,8 @@
   #compassRing { transition: transform 0.25s linear; transform-origin: 50px 50px; }
   .temp-wrap { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
   .thermo { width: 26px; height: 74px; flex: none; } .wx-wrap { display: flex; align-items: center; gap: 10px; margin-top: 6px; } .wx-wrap .bigicon { font-size: 44px; line-height: 1; }
-  .sunrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;text-align:center}
-  .sunrow svg { width: 38px; height: 28px; stroke: #ffb84d; fill: none; stroke-width: 1.8; stroke-linecap: round; }  .sunrow .t{font-size:18px;font-weight:600}
+  .sunrow{display:grid;grid-template-columns:1fr 1fr;gap:0 8px;margin-top:6px;text-align:center;line-height:1}
+  .sunrow svg{display:block;margin:0 auto;width:38px;height:28px;stroke:#ffb84d;fill:none;stroke-width:1.8;stroke-linecap:round}  .sunrow .t{font-size:18px;font-weight:600}
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .card { background: #151c25; border-radius: 14px; padding: 8px 12px;
           border: 0.5px solid #8a96a6; }
@@ -156,7 +156,7 @@
   .day .lo { text-align: right; color: #7f8fa3; font-size: 18px; } .day .hi { text-align: left; font-size: 18px; font-weight: 600; }
   .bar { position: relative; height: 5px; border-radius: 3px; background: #2b3542; }  .bar .fill { position: absolute; top: 0; bottom: 0; border-radius: 3px;
                background: linear-gradient(90deg, #5fb8ff, #7fe08a, #ffd34d, #ff9a3c); }
-  .vmap { position: relative; width: 100%; height: 170px; margin-top: 6px; border-radius: 14px; overflow: hidden; background: #1a222c; border: 0.5px solid #8a96a6; }
+  .vmap{position:relative;width:100%;height:270px; margin-top: 6px; border-radius: 14px; overflow: hidden; background: #1a222c; border: 0.5px solid #8a96a6; }
   .vmap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; touch-action: none; }
   .vmap .zbtns { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; }
   #vSat { position: absolute; left: 8px; top: 8px; width: 40px; height: 40px; margin: 0; padding: 0; background: rgba(21,28,37,0.92); border: 0.5px solid #8a96a6; }
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r230</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r231</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2198,7 +2198,7 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 230): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 231): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 /* ---- Spotify player on the Spotify page (rev 230) ---- */
 (function () {
   var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state';
@@ -2306,6 +2306,25 @@ function decorateResults() {
   document.getElementById('spFwd').onclick = function () { skip(15000); };
   pl.onclick = function () { act('PUT', playing ? '/pause' : '/play'); };
   card.onclick = function (e) { if (!tok && !(e.target.closest && e.target.closest('button'))) login(); };
+  // rev 231: tapping a playlist plays it right here (falls back to opening Spotify if not connected)
+  list.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a.plrow');
+    if (!a || !tok) return;
+    var m = (a.getAttribute('href') || '').match(/open\.spotify\.com\/(playlist|artist|album)\/([A-Za-z0-9]+)/);
+    if (!m) return;
+    e.preventDefault();
+    say('Starting...', a.textContent.trim());
+    (async function () {
+      if (Date.now() > tok.x) { try { await tokenReq({ grant_type: 'refresh_token', refresh_token: tok.r }); } catch (er) { say('Connect Spotify', 'Tap here to log in'); return; } }
+      var body = JSON.stringify({ context_uri: 'spotify:' + m[1] + ':' + m[2] });
+      try {
+        var rr = await fetch('https://api.spotify.com/v1/me/player/play', { method: 'PUT', headers: { Authorization: 'Bearer ' + tok.a, 'Content-Type': 'application/json' }, body: body });
+        if (rr.status === 404) { say('Open Spotify first', 'Wake it up, then tap again'); window.location.href = a.href; return; }
+        if (rr.status === 403) say('Premium needed', 'Spotify blocked that control');
+      } catch (err) { say('Couldn\'t start', 'Check your connection'); }
+      setTimeout(poll, 800);
+    })();
+  });
 
   var q = new URLSearchParams(location.search), code = q.get('code');
   if (code || q.get('error')) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
