@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 223 -->
+<!-- Van Dash rev 225 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r223</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r225</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2200,7 +2200,7 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 223): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 225): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 (function () {
   var host = document.getElementById("vCamHost");
   if (!host) return;
@@ -2257,8 +2257,8 @@ function decorateResults() {
       // rev 223: stamp place, coordinates, date and time along the bottom of the photo
       try {
         if (info) {
-          var g = c.getContext("2d"), fs = Math.max(14, Math.round(c.width / 38)), pad = Math.round(fs * 0.6);
-          var l0 = "VAN DASH GEO PHOTOS", l1 = info.place || "", l2 = info.coords, l3 = info.when;
+          var g = c.getContext("2d"), fs = Math.max(9, Math.round(c.width / 63)), pad = Math.round(fs * 0.6);
+          var l0 = "VAN-DASH APP GEOTAGGED PHOTOS", l1 = info.place || "", l2 = info.coords, l3 = info.when;
           var lines = [l0, l1, l2, l3].filter(function (x) { return x; });
           var bh = lines.length * Math.round(fs * 1.25) + pad * 2;
           g.fillStyle = "rgba(0,0,0,0.6)"; g.fillRect(0, c.height - bh, c.width, bh);
