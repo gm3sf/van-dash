@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 222 -->
+<!-- Van Dash rev 223 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r222</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r223</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2200,7 +2200,7 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 222): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 223): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 (function () {
   var host = document.getElementById("vCamHost");
   if (!host) return;
@@ -2234,7 +2234,7 @@ function decorateResults() {
   }
   function fileName(s) {
     var d = new Date(s.t), z = function (n) { return (n < 10 ? "0" : "") + n; };
-    return "spot-" + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + "-" + z(d.getHours()) + z(d.getMinutes()) + z(d.getSeconds()) + ".jpg";
+    return "vandash-geo-photos-" + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + "-" + z(d.getHours()) + z(d.getMinutes()) + z(d.getSeconds()) + ".jpg";
   }
   function mapLink(s) {
     return s.lat == null ? "no GPS fix" : s.lat.toFixed(5) + ", " + s.lon.toFixed(5) + " https://maps.google.com/?q=" + s.lat.toFixed(5) + "," + s.lon.toFixed(5);
@@ -2246,7 +2246,7 @@ function decorateResults() {
   }
 
   // shrink the photo so a bunch of them fit in the phone's storage
-  function shrink(file, cb) {
+  function shrink(file, cb, info) {
     var url = URL.createObjectURL(file), im = new Image();
     im.onload = function () {
       var sc = Math.min(1, 1280 / Math.max(im.naturalWidth, im.naturalHeight));
@@ -2254,6 +2254,21 @@ function decorateResults() {
       c.width = Math.round(im.naturalWidth * sc); c.height = Math.round(im.naturalHeight * sc);
       c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
       URL.revokeObjectURL(url);
+      // rev 223: stamp place, coordinates, date and time along the bottom of the photo
+      try {
+        if (info) {
+          var g = c.getContext("2d"), fs = Math.max(14, Math.round(c.width / 38)), pad = Math.round(fs * 0.6);
+          var l0 = "VAN DASH GEO PHOTOS", l1 = info.place || "", l2 = info.coords, l3 = info.when;
+          var lines = [l0, l1, l2, l3].filter(function (x) { return x; });
+          var bh = lines.length * Math.round(fs * 1.25) + pad * 2;
+          g.fillStyle = "rgba(0,0,0,0.6)"; g.fillRect(0, c.height - bh, c.width, bh);
+          g.fillStyle = "#fff"; g.textBaseline = "top";
+          lines.forEach(function (tx, i) {
+            g.font = (i <= 1 ? "700 " : "400 ") + fs + "px -apple-system, Helvetica, sans-serif";
+            g.fillText(tx, pad, c.height - bh + pad + i * Math.round(fs * 1.25));
+          });
+        }
+      } catch (e) {}
       cb(c.toDataURL("image/jpeg", 0.72));
     };
     im.onerror = function () { URL.revokeObjectURL(url); cb(null); };
@@ -2274,7 +2289,7 @@ function decorateResults() {
       shots.push({ t: t, lat: la, lon: lo, acc: ac, img: data });
       if (!saveShots()) { shots.pop(); alert("Phone storage for photos is full. Send or clear the queued ones first."); }
       sync();
-    });
+    }, { place: (typeof cityName !== "undefined" && cityName) ? cityName : "", coords: la == null ? "No GPS fix" : la.toFixed(5) + ", " + lo.toFixed(5), when: stamp(t) });
   };
 
   // ----- review / send list -----
