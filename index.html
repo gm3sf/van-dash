@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 218 -->
+<!-- Van Dash rev 220 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r218</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r220</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1536,11 +1536,11 @@ function decorateResults() {
       '<button id="fCtr" style="width:46px;height:46px;margin:0;padding:0;font-size:24px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">&#9678;</button>' +
       '<button id="fSat" style="width:46px;height:46px;margin:0;padding:0;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6"><svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:#ff8a2b;stroke-width:1.8"><path d="M12 3 2 8l10 5 10-5z"/><path d="M2 12l10 5 10-5"/><path d="M2 16l10 5 10-5"/></svg></button>' +
     '</div>' +
-    '<div style="position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);display:flex;gap:8px;align-items:center">' +
+    '<div style="position:absolute;left:12px;right:70px;bottom:calc(env(safe-area-inset-bottom) + 14px);display:flex;flex-wrap:wrap;gap:8px;align-items:center">' +
       '<div id="fStats" style="flex:1 1 100%;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 8px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px;text-align:center"><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Dist</div><div id="fsDist" style="font-size:15px;font-weight:600;color:#fff">0.00 mi</div></div><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Time</div><div id="fsTime" style="font-size:15px;font-weight:600;color:#fff">0:00</div></div><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Avg</div><div id="fsAvg" style="font-size:15px;font-weight:600;color:#fff">--</div></div><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Max</div><div id="fsMax" style="font-size:15px;font-weight:600;color:#fff">--</div></div></div>' +
-      '<button id="fStart" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Start trail</button>' +
-      '<button id="fStop" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Stop trail</button>' +
-      '<button id="fClr" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Clear trail</button>' +
+      '<button id="fStart" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Start track</button>' +
+      '<button id="fStop" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Stop track</button>' +
+      '<button id="fClr" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Clear track</button>' +
     '</div>';
   document.body.appendChild(fs);
 
@@ -1629,13 +1629,13 @@ function decorateResults() {
   function fSatSet() { document.getElementById("fSat").style.borderColor = fSatOn ? "#ff8a2b" : ""; fDraw(); }
   document.getElementById("fSat").onclick = function () { fSatOn = !fSatOn; fSatSet(); };
   document.getElementById("fClr").onclick = function () {
-    if (crumbs.length && confirm("Clear the trail (" + crumbs.length + " points)?")) { crumbs = []; saveCrumbs(); tStart = recOn ? Date.now() : 0; tEnd = 0; tMax = 0; localStorage.setItem("vdTStart", String(tStart)); localStorage.setItem("vdTEnd", "0"); localStorage.setItem("vdTMax", "0"); fDraw(); }
+    if (!crumbs.length || confirm("Clear the track?")) { crumbs = []; saveCrumbs(); tStart = recOn ? Date.now() : 0; tEnd = 0; tMax = 0; localStorage.setItem("vdTStart", String(tStart)); localStorage.setItem("vdTEnd", "0"); localStorage.setItem("vdTMax", "0"); fDraw(); }
   };
 
   function recSet() {
     document.getElementById("fStart").style.borderColor = recOn ? "#4cd964" : "#8a96a6";
     document.getElementById("fStart").style.color = recOn ? "#4cd964" : "#fff";
-    document.getElementById("fStart").textContent = recOn ? "Recording" : "Start trail";
+    document.getElementById("fStart").textContent = recOn ? "Recording" : "Start track";
     document.getElementById("fStop").style.opacity = recOn ? "1" : "0.5";
   }
   document.getElementById("fStart").onclick = function () { if (!recOn) { if (!tStart || !crumbs.length) { tStart = Date.now(); tMax = 0; localStorage.setItem("vdTMax", "0"); } else if (tEnd) { tStart += Date.now() - tEnd; } tEnd = 0; localStorage.setItem("vdTStart", String(tStart)); localStorage.setItem("vdTEnd", "0"); } recOn = true; localStorage.setItem("vdRec", "1"); recSet(); if (fLat != null) { addCrumb(fLat, fLon, null); saveCrumbs(); fDraw(); } };
