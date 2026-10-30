@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 227 -->
+<!-- Van Dash rev 228 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -69,10 +69,9 @@
   }
   html { overscroll-behavior: none; overscroll-behavior-y: none; background: #000000; height: 100%; }
   .hidden { display: none !important; }
-.locrow { display: flex; align-items: center; gap: 12px; padding: 6px 14px; }
-  .locrow .pin { width: 20px; height: 27px; flex: none; } .locrow .loctext { flex: 1; min-width: 0; }
-  .locrow .loclabel { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; }
-  .locrow #city { font-size: 20px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.locrow { display: flex; align-items: center; gap: 12px; padding:3px 14px}.locrow .pin{width:16px;height:22px;flex:none} .locrow .loctext { flex: 1; min-width: 0; }
+  .locrow .loclabel{font-size:12px;color:#7f8fa3}
+  .locrow .locline{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.locrow #city{font-size:22px;font-weight:600;margin-left:4px}
   
   .tripcard .tripbody { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
   .tripcard .tripbody .value, .tripcard .tripbody .sub { margin-top: 0; }
@@ -105,17 +104,17 @@
   .speed .unit { font-size: 22px; color: #7f8fa3; margin-top: 2px; }
   .ico { width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; stroke: #ff8a2b; fill: none;
          stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .compass-wrap { display: flex; align-items: center; gap: 12px; margin-top: 6px; } .compass-wrap svg { width: 64px; height: 64px; flex: none; }
+  .compass-wrap{display:flex;align-items:center;gap:12px;margin-top:2px} .compass-wrap svg { width: 64px; height: 64px; flex: none; }
   #compassRing { transition: transform 0.25s linear; transform-origin: 50px 50px; }
   .temp-wrap { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
   .thermo { width: 26px; height: 74px; flex: none; } .wx-wrap { display: flex; align-items: center; gap: 10px; margin-top: 6px; } .wx-wrap .bigicon { font-size: 44px; line-height: 1; }
-  .sunrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; text-align: center; }
-  .sunrow svg { width: 38px; height: 28px; stroke: #ffb84d; fill: none; stroke-width: 1.8; stroke-linecap: round; }  .sunrow .t { font-size: 18px; font-weight: 600; margin-top: 2px; }
+  .sunrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px;text-align:center}
+  .sunrow svg { width: 38px; height: 28px; stroke: #ffb84d; fill: none; stroke-width: 1.8; stroke-linecap: round; }  .sunrow .t{font-size:18px;font-weight:600}
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .card { background: #151c25; border-radius: 14px; padding: 8px 12px;
           border: 0.5px solid #8a96a6; }
   .card .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; }
-  .card .value { font-size: 30px; font-weight: 600; margin-top: 6px; } .card .sub { font-size: 13px; color: #9fb0c3; margin-top: 4px; }
+  .card .value{font-size:30px;font-weight:600;margin-top:2px} .card .sub { font-size: 13px; color: #9fb0c3; margin-top: 4px; }
   .hint { font-size: 11px; color: #ff8a2b; margin-top: 3px; }
   button {
     background: #c9651a; color: white; border: none; border-radius: 10px;
@@ -131,7 +130,7 @@
   .stat { background: #151c25; border-radius: 12px; padding: 10px; text-align: center;
           border: 0.5px solid #8a96a6; box-shadow: none; }
   .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; } .stat .v { font-size: 20px; font-weight: 600; margin-top: 4px; }
-  .card.wide { grid-column: 1 / -1; } .grid > .card:not(.wide) { min-height: 96px; } .battcard { padding: 6px 12px 8px; }
+  .card.wide { grid-column: 1 / -1; } .grid > .card:not(.wide) { min-height: 96px; } .battcard{padding:6px 12px 8px;position:relative}
   .battcard .bhead { display: flex; align-items: center; justify-content: space-between; } .battcard .bhead .label { display: flex; align-items: center; }
   .batt-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
   .batt-row .bamp { flex: none; width: 78px; justify-content: flex-end; }
@@ -142,7 +141,7 @@
   .batt-row .v { font-size: 20px; font-weight: 700; line-height: 1; } .batt-row .u { font-size: 11px; color: #7f8fa3; margin-left: 1px; }
   .socbar { flex: none; width: 56px; height: 8px; border-radius: 4px; background: #2b3542; overflow: hidden; }
   .socbar .fill { height: 100%; width: 0%; border-radius: 3px; background: #7f8fa3; transition: width 0.4s, background 0.4s; }
-  .battcard .bstat { font-size: 11px; color: #7f8fa3; text-align: center; margin-top: 3px; }
+  .battcard .bstat{font-size:11px;color:#7f8fa3;text-align:right;margin-top:0;position:absolute;right:12px;top:6px}
   input.field { width: 100%; background: #151c25; color: #e8eef5; border: 1px solid #2a3a4e;
                 border-radius: 10px; padding: 12px; font-size: 16px; margin-top: 6px; }
   .fieldlabel { font-size: 13px; color: #9fb0c3; margin-top: 14px; }
@@ -193,8 +192,7 @@
     <div class="card wide locrow" style="order:2">
       <svg class="pin" viewBox="0 0 24 32"><path d="M12 1C6.2 1 1.5 5.7 1.5 11.5c0 7.6 10.5 19 10.5 19s10.5-11.4 10.5-19C22.5 5.7 17.8 1 12 1z" fill="#ff8a2b"/><circle cx="12" cy="11.5" r="4" fill="#000000"/></svg>
       <div class="loctext">
-        <div class="loclabel">Current city</div>
-        <div id="city">Finding location...</div>
+        <div class="locline"><span class="loclabel">You're currently in</span> <span id="city">Finding...</span></div>
       </div>
       <button id="cityRef" style="margin:0;padding:0;width:44px;height:44px;background:none;line-height:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round"><path d="M20 12a8 8 0 1 1-6-7.7M20 3v5h-5"/></svg></button><div id="updated" class="hidden">&nbsp;</div>
     </div>
@@ -320,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r227</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r228</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -952,8 +950,1256 @@ async function checkForUpdate() {
 }
 checkForUpdate();
 document.addEventListener("visibilitychange", () => { if (!document.hidden) checkForUpdate(); });
+/* ===== Part 2: speed limit + weather favorites ===== */
+
+/* ---------- Speed limit sign ---------- */
+(function () {
+  var unit = document.querySelector(".speed .unit");
+  if (!unit) return;
+  var sign = document.createElement("div");
+  sign.id = "limSign";
+  sign.style.cssText = "position:absolute;right:22px;bottom:34px;width:34px;height:42px;background:#fff;border:2px solid #111;border-radius:5px;color:#111;font-weight:800;text-align:center;line-height:1;display:none;z-index:3";
+  sign.innerHTML = '<div style="font-size:7px;margin-top:3px">SPEED<br>LIMIT</div><div id="limNum" style="font-size:17px;margin-top:2px">--</div>';
+  document.querySelector(".speed").appendChild(sign);
+})();
+
+var limShown = null, limCand = null, limCount = 0, limLastT = 0, limBusy = false, limHead = null;
+
+function setRedZone(lim) {
+  var stops = document.querySelectorAll("#arcG stop");
+  if (stops.length < 3) return;
+  var f = Math.max(0.3, Math.min(0.98, lim / 75));
+  stops[2].setAttribute("offset", String(f));
+  stops[1].setAttribute("offset", String(f * 0.57));
+}
+
+function showLimit(lim) {
+  limShown = lim;
+  var s = document.getElementById("limSign");
+  if (lim == null) { if (s) s.style.display = "none"; return; }
+  s.style.display = "block";
+  document.getElementById("limNum").textContent = lim;
+  setRedZone(lim);
+  if (typeof setArc === "function" && !revT) setArc(gpsMph);
+}
+
+function parseMaxspeed(v) {
+  if (!v) return null;
+  var m = String(v).match(/^(\d+)\s*(mph)?$/i);
+  if (!m) return null;
+  var n = parseInt(m[1], 10);
+  if (!m[2]) n = Math.round(n * 0.621371);
+  return n >= 5 && n <= 85 ? n : null;
+}
+
+function angDiff(a, b) {
+  var d = Math.abs(a - b) % 360;
+  return d > 180 ? 360 - d : d;
+}
+
+function bearing(lat1, lon1, lat2, lon2) {
+  var r = Math.PI / 180, y = Math.sin((lon2 - lon1) * r) * Math.cos(lat2 * r);
+  var x = Math.cos(lat1 * r) * Math.sin(lat2 * r) - Math.sin(lat1 * r) * Math.cos(lat2 * r) * Math.cos((lon2 - lon1) * r);
+  return (Math.atan2(y, x) / r + 360) % 360;
+}
+
+async function lookupLimit(lat, lon, heading) {
+  if (limBusy) return;
+  limBusy = true;
+  try {
+    var q = "[out:json][timeout:8];way(around:25," + lat + "," + lon + ")[highway][maxspeed];out geom tags;";
+    var res = await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: "data=" + encodeURIComponent(q) });
+    var data = await res.json();
+    var best = null, bestScore = 1e9;
+    (data.elements || []).forEach(function (w) {
+      var lim = parseMaxspeed(w.tags && w.tags.maxspeed);
+      if (lim == null || !w.geometry || w.geometry.length < 2) return;
+      var hw = w.tags.highway || "";
+      if (/_link$/.test(hw)) return;
+      var g = w.geometry, minD = 1e9, segB = 0;
+      for (var i = 0; i < g.length - 1; i++) {
+        var mx = (g[i].lat + g[i + 1].lat) / 2, my = (g[i].lon + g[i + 1].lon) / 2;
+        var d = distMeters({ latitude: lat, longitude: lon }, { latitude: mx, longitude: my });
+        if (d < minD) { minD = d; segB = bearing(g[i].lat, g[i].lon, g[i + 1].lat, g[i + 1].lon); }
+      }
+      var diff = Math.min(angDiff(heading, segB), angDiff(heading, (segB + 180) % 360));
+      if (diff > 30) return;
+      var score = minD + diff;
+      if (score < bestScore) { bestScore = score; best = lim; }
+    });
+    if (best == null) { limCand = null; limCount = 0; return; }
+    if (best === limShown) { limCand = null; limCount = 0; return; }
+    if (best === limCand) limCount++; else { limCand = best; limCount = 1; }
+    if (limCount >= 3 || limShown == null && limCount >= 2) { showLimit(best); limCand = null; limCount = 0; }
+  } catch (e) {}
+  finally { limBusy = false; }
+}
+
+(function () {
+  var orig = onPosition;
+  onPosition = function (p) {
+    orig(p);
+    try {
+      var c = p.coords, now = Date.now();
+      if (c.heading != null && !isNaN(c.heading) && c.speed != null && c.speed * MS_TO_MPH > 5) limHead = c.heading;
+      if (limHead != null && c.speed != null && c.speed * MS_TO_MPH > 5 && now - limLastT > 10000) {
+        limLastT = now;
+        lookupLimit(c.latitude, c.longitude, limHead);
+      }
+    } catch (e) {}
+  };
+})();
+
+/* ---------- Weather favorites ---------- */
+var favs = [];
+try { favs = JSON.parse(localStorage.getItem("wxFavs") || "[]"); } catch (e) { favs = []; }
+function saveFavs() { try { localStorage.setItem("wxFavs", JSON.stringify(favs)); } catch (e) {} }
+
+function openFav(f) {
+  wxLive = false;
+  $("wCity").textContent = f.label;
+  updateWeather(f.lat, f.lon, true);
+  $("srchScreen").classList.add("hidden");
+  $("weatherScreen").classList.remove("hidden");
+  window.scrollTo(0, 0);
+}
+
+function renderFavs() {
+  var box = $("favBox");
+  if (!box) return;
+  if (!favs.length) { box.innerHTML = ""; box.style.display = "none"; return; }
+  box.style.display = "block";
+  box.innerHTML = '<div class="section-title" style="margin-top:14px">Saved places</div>' + favs.map(function (f, i) {
+    return '<div style="display:flex;align-items:center;gap:8px;margin-top:6px">' +
+      '<button class="alt" data-go="' + i + '" style="flex:1;margin:0;padding:12px;font-size:16px;text-align:left">' + f.label + '</button>' +
+      '<button class="alt" data-del="' + i + '" style="margin:0;padding:12px 14px;font-size:16px;color:#ff8a2b">\u2715</button></div>';
+  }).join("");
+  box.querySelectorAll("[data-go]").forEach(function (b) { b.onclick = function () { openFav(favs[+b.dataset.go]); }; });
+  box.querySelectorAll("[data-del]").forEach(function (b) { b.onclick = function () { favs.splice(+b.dataset.del, 1); saveFavs(); renderFavs(); decorateResults(); }; });
+}
+
+function favKey(lat, lon) { return lat.toFixed(2) + "," + lon.toFixed(2); }
+
+function decorateResults() {
+  var list = $("srchList");
+  if (!list || !window.lastSrchRes) return;
+  list.querySelectorAll(".sres").forEach(function (a) {
+    var c = window.lastSrchRes[+a.dataset.i];
+    if (!c || a.querySelector(".fstar")) { if (a.querySelector(".fstar")) a.querySelector(".fstar").remove(); if (!c) return; }
+    var saved = favs.some(function (f) { return favKey(f.lat, f.lon) === favKey(c.latitude, c.longitude); });
+    var st = document.createElement("span");
+    st.className = "fstar";
+    st.textContent = saved ? "\u2605" : "\u2606";
+    st.style.cssText = "float:right;font-size:26px;color:#ff8a2b;padding:0 6px;line-height:1";
+    st.onclick = function (ev) {
+      ev.preventDefault(); ev.stopPropagation();
+      var key = favKey(c.latitude, c.longitude), idx = favs.findIndex(function (f) { return favKey(f.lat, f.lon) === key; });
+      if (idx >= 0) favs.splice(idx, 1);
+      else {
+        var s = STATE_ABBR[c.admin1] || c.admin1 || "";
+        favs.push({ label: c.country === "United States" && s ? c.name + ", " + s : c.name, lat: c.latitude, lon: c.longitude });
+        if (favs.length > 15) favs.shift();
+      }
+      saveFavs(); renderFavs(); decorateResults();
+    };
+    a.insertBefore(st, a.firstChild);
+  });
+}
+
+(function () {
+  var field = $("srchIn");
+  var box = document.createElement("div");
+  box.id = "favBox";
+  box.style.display = "none";
+  field.parentNode.insertBefore(box, $("srchMsg").nextSibling);
+
+  var origFetch = window.fetch;
+  window.fetch = function (u) {
+    var p = origFetch.apply(this, arguments);
+    if (typeof u === "string" && (u.indexOf("geocoding-api.open-meteo.com") >= 0 || u.indexOf("zippopotam.us") >= 0)) {
+      p.then(function (r) { return r.clone().json(); }).then(function (j) {
+        var res = [];
+        if (j.results) res = j.results;
+        else if (j.places) { var pl = j.places[0]; res = [{ name: pl["place name"], admin1: pl.state, country: "United States", latitude: +pl.latitude, longitude: +pl.longitude }]; }
+        window.lastSrchRes = res;
+        setTimeout(decorateResults, 80);
+      }).catch(function () {});
+    }
+    return p;
+  };
+
+  $("srchBtn").addEventListener("click", function () { renderFavs(); });
+  renderFavs();
+})();
+
+/* ---------- Refresh arrow with gap ---------- */
+(function () {
+  var b = document.getElementById("cityRef");
+  if (!b) return;
+  b.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M19 12a7 7 0 1 1-2.3-5.2"/><path d="M19.5 2.5v4.5h-4.5"/></svg>';
+})();
+
+/* ---------- Clear X in search box ---------- */
+(function () {
+  var inp = $("srchIn");
+  var wrap = document.createElement("div");
+  wrap.style.cssText = "position:relative";
+  inp.parentNode.insertBefore(wrap, inp);
+  wrap.appendChild(inp);
+  inp.style.paddingRight = "44px";
+  var x = document.createElement("button");
+  x.id = "srchClr";
+  x.textContent = "\u2715";
+  x.style.cssText = "position:absolute;right:6px;top:50%;margin:3px 0 0;transform:translateY(-50%);width:36px;height:36px;padding:0;background:none;color:#7f8fa3;font-size:20px;display:none";
+  wrap.appendChild(x);
+  function sync() { x.style.display = inp.value ? "block" : "none"; }
+  inp.addEventListener("input", sync);
+  $("srchBtn").addEventListener("click", function () { setTimeout(sync, 0); });
+  x.onclick = function (e) {
+    e.preventDefault();
+    inp.value = "";
+    $("srchList").classList.add("hidden");
+    $("srchMsg").innerHTML = "&nbsp;";
+    sync();
+    inp.focus();
+  };
+})();
+
+/* ---------- Place label in Weather card ---------- */
+(function () {
+  var wind = $("wind");
+  var lbl = document.createElement("div");
+  lbl.id = "wxPlace";
+  lbl.style.cssText = "font-size:12px;color:#ff8a2b;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
+  wind.parentNode.insertBefore(lbl, wind.nextSibling);
+  function upd() {
+    var t = wxLive ? "Current location" : $("wCity").textContent;
+    if (lbl.textContent !== t) lbl.textContent = t;
+  }
+  upd();
+  setInterval(upd, 500);
+})();
+
+/* ---------- Wind ring in Weather card ---------- */
+(function () {
+  var card = $("wxCard");
+  var wrap = card.querySelector(".wx-wrap");
+  var hint = card.querySelector(".hint");
+  if (hint) hint.style.display = "none";
+  $("wind").style.display = "none";
+
+  var box = document.createElement("div");
+  box.id = "wxWind";
+  box.style.cssText = "position:absolute;right:10px;bottom:8px;width:60px;text-align:center;line-height:1";
+  box.innerHTML = '<div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Wind</div>' +
+    '<svg viewBox="0 0 100 100" style="width:46px;height:46px;display:block;margin:2px auto 0">' +
+    '<g id="wxWindRing" style="transform-origin:50px 50px;transition:transform 0.25s linear">' +
+    '<circle cx="50" cy="50" r="46" fill="none" stroke="#ffffff" stroke-width="3"/>' +
+    '<text x="50" y="20" text-anchor="middle" font-size="15" font-weight="700" fill="#e53935">N</text>' +
+    '<g id="wxWindArrow" style="transform-origin:50px 50px">' +
+    '<path d="M50 80 L50 30" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+    '<path d="M33 47 L50 28 L67 47" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' +
+    '</g></g></svg>' +
+    '<div id="wxWindSpd" style="font-size:12px;color:#9fb0c3;margin-top:3px">--</div>';
+  card.appendChild(box);
+
+  var windFrom = null, windMph = null, heading = 0;
+
+  function draw() {
+    if (windFrom == null) return;
+    // ring rotates like the compass; arrow points the way the wind is blowing toward
+    $("wxWindRing").style.transform = "rotate(" + (-heading) + "deg)";
+    $("wxWindArrow").style.transform = "rotate(" + ((windFrom + 180) % 360) + "deg)";
+    $("wxWindSpd").textContent = windMph + " mph";
+  }
+
+  function readWind() {
+    var m = ($("wind").textContent || "").match(/from\s+([NESW]+)\s+(\d+)/);
+    if (!m) return;
+    var i = DIRS.indexOf(m[1]);
+    if (i < 0) return;
+    windFrom = i * 22.5; windMph = m[2];
+    draw();
+  }
+  new MutationObserver(readWind).observe($("wind"), { childList: true, characterData: true, subtree: true });
+  readWind();
+
+  var origShow = showHeading;
+  showHeading = function (deg) {
+    origShow(deg);
+    if (deg != null && !isNaN(deg)) { heading = (deg + 360) % 360; draw(); }
+  };
+})();
+
+/* ---------- rev 201: weather card cleanup + weather page boxes ---------- */
+(function () {
+  // --- Card: take N out of the small ring, tidy layout ---
+  var ring = $("wxWindRing");
+  if (ring) { var n = ring.querySelector("text"); if (n) n.remove(); }
+  var sb = $("srchBtn");
+  if (sb) { sb.style.top = "-4px"; sb.style.right = "-2px"; }
+  var wrap = $("wxCard").querySelector(".wx-wrap");
+  if (wrap) { wrap.style.gap = "4px"; wrap.style.marginLeft = "-2px"; }
+  var wxv = $("wx");
+  if (wxv) wxv.style.fontSize = "18px";
+  var box = $("wxWind");
+  if (box) { box.style.right = "12px"; box.style.bottom = "10px"; box.style.width = "64px"; }
+
+  // --- Weather page: two wide boxes ---
+  var scr = $("weatherScreen");
+  var statRow = scr.querySelector(".stat-row");
+  var big = $("wTemp").parentNode;
+  var descEl = $("wDesc");
+  if (descEl) descEl.style.display = "none";
+  statRow.style.display = "none";
+
+  var boxCss = "background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;padding:14px;margin-bottom:10px";
+  var lblCss = "font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#7f8fa3";
+
+  var b1 = document.createElement("div");
+  b1.id = "wBox1";
+  b1.style.cssText = boxCss + ";display:flex;align-items:center;gap:14px";
+  b1.innerHTML =
+    '<div style="flex:none;text-align:center;width:96px">' +
+      '<div id="wBoxIcon" style="font-size:54px;line-height:1">--</div>' +
+      '<div id="wBoxDesc" style="font-size:15px;font-weight:600;margin-top:6px">--</div>' +
+    '</div>' +
+    '<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px 10px">' +
+      '<div><div style="' + lblCss + '">High</div><div id="wBoxHigh" style="font-size:22px;font-weight:600;margin-top:3px">--</div></div>' +
+      '<div><div style="' + lblCss + '">Low</div><div id="wBoxLow" style="font-size:22px;font-weight:600;margin-top:3px">--</div></div>' +
+      '<div><div style="' + lblCss + '">Feels like</div><div id="wBoxFeels" style="font-size:22px;font-weight:600;margin-top:3px">--</div></div>' +
+      '<div><div style="' + lblCss + '">Rain today</div><div id="wBoxRain" style="font-size:22px;font-weight:600;margin-top:3px">--</div></div>' +
+    '</div>';
+
+  var b2 = document.createElement("div");
+  b2.id = "wBox2";
+  b2.style.cssText = boxCss + ";display:flex;align-items:center;justify-content:space-between;gap:12px";
+  b2.innerHTML =
+    '<div style="flex:1;min-width:0">' +
+      '<div style="' + lblCss + '">Wind from</div>' +
+      '<div id="wBoxWind" style="font-size:22px;font-weight:600;margin-top:4px">--</div>' +
+      '<div style="' + lblCss + ';margin-top:12px">Gusts</div>' +
+      '<div id="wBoxGust" style="font-size:22px;font-weight:600;margin-top:3px">--</div>' +
+    '</div>' +
+    '<svg viewBox="0 0 100 100" style="width:84px;height:84px;flex:none">' +
+      '<g id="wBoxRing" style="transform-origin:50px 50px;transition:transform 0.25s linear">' +
+        '<circle cx="50" cy="50" r="46" fill="none" stroke="#ffffff" stroke-width="3"/>' +
+        '<g id="wBoxArrow" style="transform-origin:50px 50px">' +
+          '<path d="M50 80 L50 30" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+          '<path d="M33 47 L50 28 L67 47" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' +
+        '</g>' +
+      '</g>' +
+    '</svg>';
+
+  big.parentNode.insertBefore(b1, statRow);
+  big.parentNode.insertBefore(b2, statRow);
+
+  var FULL = { N: "north", NNE: "north-northeast", NE: "northeast", ENE: "east-northeast", E: "east", ESE: "east-southeast", SE: "southeast", SSE: "south-southeast", S: "south", SSW: "south-southwest", SW: "southwest", WSW: "west-southwest", W: "west", WNW: "west-northwest", NW: "northwest", NNW: "north-northwest" };
+  var wFrom = null, hd = 0;
+
+  function drawBox() {
+    if (wFrom == null) return;
+    $("wBoxRing").style.transform = "rotate(" + (-hd) + "deg)";
+    $("wBoxArrow").style.transform = "rotate(" + ((wFrom + 180) % 360) + "deg)";
+  }
+
+  function sync() {
+    var d = ($("wDesc").textContent || "").trim();
+    var sp = d.indexOf(" ");
+    if (sp > 0) {
+      $("wBoxIcon").textContent = d.slice(0, sp);
+      $("wBoxDesc").textContent = d.slice(sp + 1);
+    }
+    $("wBoxHigh").textContent = $("wHigh").textContent;
+    $("wBoxLow").textContent = $("wLow").textContent;
+    $("wBoxFeels").textContent = $("wFeels").textContent;
+    $("wBoxRain").textContent = $("wRain").textContent;
+    $("wBoxGust").textContent = $("wGust").textContent;
+    var w = ($("wWind").textContent || "").trim().match(/^(\d+)\s+([NESW]+)$/);
+    if (w) {
+      $("wBoxWind").textContent = w[1] + " mph from " + w[2];
+      var i = DIRS.indexOf(w[2]);
+      if (i >= 0) { wFrom = i * 22.5; drawBox(); }
+    }
+  }
+  sync();
+  setInterval(sync, 500);
+
+  var prevShow = showHeading;
+  showHeading = function (deg) {
+    prevShow(deg);
+    if (deg != null && !isNaN(deg)) { hd = (deg + 360) % 360; drawBox(); }
+  };
+})();
+
+/* ---------- rev 202: layout tweaks ---------- */
+(function () {
+  // --- Weather card on main page ---
+  var card = $("wxCard");
+  var sb = $("srchBtn");
+  var place = $("wxPlace");
+  var box = $("wxWind");
+  var wrap = card.querySelector(".wx-wrap");
+  var wxv = $("wx");
+  var icon = $("wxIcon");
+
+  // magnifying glass leaves the card (moves to weather page below)
+  if (sb) sb.style.display = "none";
+
+  // bigger sun + Clear
+  if (icon) icon.style.fontSize = "54px";
+  if (wxv) wxv.style.fontSize = "22px";
+  if (wrap) { wrap.style.gap = "8px"; wrap.style.marginLeft = "-2px"; wrap.style.marginTop = "2px"; }
+
+  // Current location sits at the bottom, lined up with the mph text
+  if (place) {
+    place.style.cssText = "position:absolute;left:12px;bottom:12px;font-size:12px;color:#ff8a2b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;line-height:1";
+  }
+
+  // bigger wind ring, moved left
+  if (box) {
+    box.style.right = "22px";
+    box.style.bottom = "10px";
+    box.style.width = "72px";
+    var svg = box.querySelector("svg");
+    if (svg) { svg.style.width = "58px"; svg.style.height = "58px"; }
+    var spd = $("wxWindSpd");
+    if (spd) { spd.style.lineHeight = "1"; spd.style.marginTop = "4px"; }
+  }
+
+  // rev 203: wind unit centered vertically in the card (below the title), nudged right
+  if (box) {
+    box.style.bottom = "auto";
+    box.style.top = "12px";
+    box.style.transform = "none";
+    box.style.right = "12px";
+    box.style.display = "flex";
+    box.style.flexDirection = "column";
+    box.style.alignItems = "center";
+    var wl0 = box.firstElementChild;
+    var sv0 = box.querySelector("svg");
+    var sp0 = $("wxWindSpd");
+    if (wl0 && sv0) {
+      sv0.style.margin = "0";
+      wl0.style.marginTop = "3px";
+      box.insertBefore(sv0, wl0);
+    }
+    if (sp0) sp0.style.marginTop = "3px";
+  }
+  // rev 204: wind unit as one piece, no box
+  if (box) {
+    box.style.border = "none";
+    box.style.background = "none";
+    box.style.padding = "0";
+    box.style.width = "72px";
+    box.style.right = "8px";
+    var sv = box.querySelector("svg");
+    if (sv) { sv.style.width = "58px"; sv.style.height = "58px"; }
+  }
+  // long conditions: stack words on two lines, shrink a single long word
+  if (wxv) {
+    wxv.style.maxWidth = "88px"; wxv.style.lineHeight = "1.1"; wxv.style.whiteSpace = "normal";
+    var lastTxt = null;
+    setInterval(function () {
+      var t = (wxv.textContent || "").trim();
+      if (t === lastTxt) return;
+      lastTxt = t;
+      var longest = t.split(/\s+/).reduce(function (m, w) { return Math.max(m, w.length); }, 0);
+      wxv.style.fontSize = longest >= 11 ? "14px" : longest >= 9 ? "17px" : "22px";
+    }, 400);
+  }
+
+  // --- Weather page: search icon next to the big temperature ---
+  var scr = $("weatherScreen");
+  var nl = $("wTemp").parentNode;
+  nl.style.position = "relative";
+  var s2 = document.createElement("button");
+  s2.id = "srchBtn2";
+  s2.setAttribute("aria-label", "Search");
+  s2.style.cssText = "position:absolute;right:6px;top:10px;width:56px;height:56px;margin:0;padding:0;background:none;display:flex;align-items:center;justify-content:center";
+  s2.innerHTML = '<svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>';
+  nl.appendChild(s2);
+  s2.onclick = function (e) {
+    e.stopPropagation();
+    $("weatherScreen").classList.add("hidden");
+    $("srchScreen").classList.remove("hidden");
+    $("srchIn").value = "";
+    $("srchList").classList.add("hidden");
+    $("srchMsg").innerHTML = "&nbsp;";
+    try { renderFavs(); } catch (er) {}
+    var clr = $("srchClr"); if (clr) clr.style.display = "none";
+    window.scrollTo(0, 0);
+    setTimeout(function () { $("srchIn").focus(); }, 50);
+  };
+
+  // search Back button should return to wherever you came from
+  $("srchBack").addEventListener("click", function () {
+    // original handler already shows mainScreen; if we came from weather page, go back there
+    if (window.__fromWeather) {
+      $("mainScreen").classList.add("hidden");
+      $("weatherScreen").classList.remove("hidden");
+    }
+  });
+  s2.addEventListener("click", function () { window.__fromWeather = true; });
+  $("srchBtn").addEventListener("click", function () { window.__fromWeather = false; });
+
+  // --- Weather page: wind sentence always abbreviated, ring closer to center ---
+  var w2 = $("wBox2");
+  if (w2) {
+    w2.style.justifyContent = "flex-start";
+    var ringSvg = w2.querySelector("svg");
+    if (ringSvg) { ringSvg.style.width = "92px"; ringSvg.style.height = "92px"; ringSvg.style.marginLeft = "auto"; ringSvg.style.marginRight = "26px"; }
+  }
+  var wl = $("wBoxWind");
+  if (wl) wl.style.fontSize = "20px";
+  setInterval(function () {
+    var el = $("wBoxWind");
+    if (!el) return;
+    var m = ($("wWind").textContent || "").trim().match(/^(\d+)\s+([NESW]+)$/);
+    if (m) {
+      var t = m[1] + " mph from " + m[2];
+      if (el.textContent !== t) el.textContent = t;
+    }
+  }, 200);
+})();
+
+/* ---------- rev 207: full-screen map + speed overlay + breadcrumbs ---------- */
+(function () {
+  // ----- breadcrumb recording (runs always, saved on the phone) -----
+  var crumbs = [];
+  try { crumbs = JSON.parse(localStorage.getItem("vdCrumbs") || "[]"); } catch (e) { crumbs = []; }
+  var lastSave = 0;
+  function saveCrumbs() { try { localStorage.setItem("vdCrumbs", JSON.stringify(crumbs)); } catch (e) {} }
+  var recOn = localStorage.getItem("vdRec") === "1";
+  var trkHide = localStorage.getItem("vdTrkHide") === "1"; // rev 221
+  // rev 218: trail stats (start time, max speed) saved on the phone
+  var tStart = parseFloat(localStorage.getItem("vdTStart") || "0") || 0;
+  var tMax = parseFloat(localStorage.getItem("vdTMax") || "0") || 0;
+  var tEnd = parseFloat(localStorage.getItem("vdTEnd") || "0") || 0;
+  function fShowStats(tm) {
+    var mi = tm * M_TO_MI;
+    var end = recOn ? Date.now() : (tEnd || Date.now());
+    var secs = tStart ? Math.max(0, (end - tStart) / 1000) : 0;
+    var h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60), s = Math.floor(secs % 60);
+    var tt = h > 0 ? h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s : m + ":" + (s < 10 ? "0" : "") + s;
+    var avg = secs > 30 && mi > 0.01 ? (mi / (secs / 3600)).toFixed(1) + " mph" : "--";
+    document.getElementById("fsDist").textContent = mi.toFixed(2) + " mi";
+    document.getElementById("fsTime").textContent = tStart ? tt : "0:00";
+    document.getElementById("fsAvg").textContent = avg;
+    document.getElementById("fsMax").textContent = tMax > 0 ? Math.round(tMax) + " mph" : "--";
+  }
+  function noteSpeed(mph) {
+    if (!recOn || mph == null || isNaN(mph)) return;
+    if (mph > tMax) { tMax = mph; try { localStorage.setItem("vdTMax", String(tMax)); } catch (e) {} }
+  }
+  function addCrumb(lat, lon, acc) {
+    if (!recOn) return;
+    if (acc != null && acc > 65) return; // rev 216: a little more forgiving for walking/hiking
+    var last = crumbs[crumbs.length - 1];
+    if (last && distMeters({ latitude: last[0], longitude: last[1] }, { latitude: lat, longitude: lon }) < 4) return; // rev 216: 4 meters so slow walking and hiking leave a trail
+    crumbs.push([+lat.toFixed(6), +lon.toFixed(6)]);
+    if (crumbs.length > 20000) crumbs.shift();
+    var now = Date.now();
+    if (now - lastSave > 10000) { lastSave = now; saveCrumbs(); }
+    if (!fs.classList.contains("hidden")) fDraw();
+  }
+  var prevPos = onPosition;
+  onPosition = function (p) {
+    prevPos(p);
+    try {
+      var c = p.coords;
+      addCrumb(c.latitude, c.longitude, c.accuracy);
+      fLat = c.latitude; fLon = c.longitude;
+      var mph = c.speed != null && c.speed >= 0 ? c.speed * MS_TO_MPH : 0;
+      fSpd.textContent = mph < 1 ? "0" : Math.round(mph);
+      if (!fs.classList.contains("hidden")) { if (fFollow) { fcLat = fLat; fcLon = fLon; } fDraw(); }
+    } catch (e) {}
+  };
+  window.addEventListener("pagehide", saveCrumbs);
+  document.addEventListener("visibilitychange", function () { if (document.hidden) saveCrumbs(); });
+
+  // ----- full-screen layer -----
+  var fs = document.createElement("div");
+  fs.id = "fullMap";
+  fs.className = "hidden";
+  fs.style.cssText = "position:fixed;left:0;top:0;right:0;bottom:0;background:#1a222c;z-index:50;touch-action:none";
+  fs.innerHTML =
+    '<canvas id="fCanvas" style="position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none"></canvas>' +
+    '<button id="fBack" style="position:absolute;left:12px;top:calc(env(safe-area-inset-top) + 10px);margin:0;padding:10px 16px;font-size:16px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">&lsaquo; Back</button>' +
+    '<div id="fSpdBox" style="position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 8px);min-width:96px;padding:6px 16px 8px;text-align:center;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:16px">' +
+      '<div id="fSpd" style="font-size:46px;font-weight:700;line-height:1;color:#fff">0</div>' +
+      '<div style="font-size:13px;color:#7f8fa3;margin-top:2px">mph</div></div>' +
+    '<div style="position:absolute;right:12px;top:calc(env(safe-area-inset-top) + 10px);display:flex;flex-direction:column;gap:8px">' +
+      '<button id="fIn" style="width:46px;height:46px;margin:0;padding:0;font-size:26px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">+</button>' +
+      '<button id="fOut" style="width:46px;height:46px;margin:0;padding:0;font-size:26px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">&minus;</button>' +
+      '<button id="fCtr" style="width:46px;height:46px;margin:0;padding:0;font-size:24px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">&#9678;</button>' +
+      '<button id="fSat" style="width:46px;height:46px;margin:0;padding:0;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6"><svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:#ff8a2b;stroke-width:1.8"><path d="M12 3 2 8l10 5 10-5z"/><path d="M2 12l10 5 10-5"/><path d="M2 16l10 5 10-5"/></svg></button>' +
+    '</div>' +
+    '<div style="position:absolute;left:12px;right:70px;bottom:calc(env(safe-area-inset-bottom) + 14px);display:flex;flex-wrap:wrap;gap:8px;align-items:center">' +
+      '<div id="fStats" style="flex:1 1 100%;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 8px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px;text-align:center"><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Dist</div><div id="fsDist" style="font-size:15px;font-weight:600;color:#fff">0.00 mi</div></div><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Time</div><div id="fsTime" style="font-size:15px;font-weight:600;color:#fff">0:00</div></div><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Avg</div><div id="fsAvg" style="font-size:15px;font-weight:600;color:#fff">--</div></div><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3">Max</div><div id="fsMax" style="font-size:15px;font-weight:600;color:#fff">--</div></div></div>' +
+      '<button id="fStart" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Start track</button>' +
+      '<button id="fStop" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Stop track</button>' +
+      '<button id="fClr" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Clear track</button>' +
+      '<button id="fHide" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Hide track</button>' +
+    '</div>';
+  document.body.appendChild(fs);
+
+  var fCanvas = document.getElementById("fCanvas"), fctx = fCanvas.getContext("2d");
+  var fSpd = document.getElementById("fSpd");
+  var fPinch = 1, vPinch = 1;
+  var fLat = null, fLon = null, fcLat = null, fcLon = null, fFollow = true, fZoom = 15, fW = 0, fH = 0, fDrag = null, fTimer = 0;
+  var fSatOn = localStorage.getItem("vSat") === "1";
+  var fTiles = {};
+
+  function fResize() {
+    var r = fs.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    fW = r.width; fH = r.height;
+    if (!fW || !fH) return;
+    fCanvas.width = Math.round(fW * dpr); fCanvas.height = Math.round(fH * dpr);
+    fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    fDraw();
+  }
+  function fDraw() {
+    if (!fW || !fH) return;
+    fctx.fillStyle = "#1a222c"; fctx.fillRect(0, 0, fW, fH);
+    var tm = 0;
+    for (var q = 1; q < crumbs.length; q++) tm += distMeters({ latitude: crumbs[q - 1][0], longitude: crumbs[q - 1][1] }, { latitude: crumbs[q][0], longitude: crumbs[q][1] });
+    fShowStats(tm);
+    if (fcLat == null) {
+      fctx.fillStyle = "#7f8fa3"; fctx.font = "15px sans-serif"; fctx.textAlign = "center";
+      fctx.fillText("Waiting for GPS...", fW / 2, fH / 2);
+      return;
+    }
+    fctx.save();
+    if (window.__mapHead) { fctx.translate(fW / 2, fH / 2); fctx.rotate(-window.__mapHead * Math.PI / 180); fctx.translate(-fW / 2, -fH / 2); }
+    if (fPinch !== 1) { fctx.translate(fW / 2, fH / 2); fctx.scale(fPinch, fPinch); fctx.translate(-fW / 2, -fH / 2); }
+    var c = vWorld(fcLat, fcLon, fZoom), left = c.x - fW / 2, top = c.y - fH / 2, n = Math.pow(2, fZoom);
+    // when the map is turned, load extra tiles so the rotated corners stay covered
+    var fEx = window.__mapHead ? Math.ceil((Math.sqrt(fW * fW + fH * fH) - Math.min(fW, fH)) / 2) + 40 : 0;
+    var tx0 = Math.floor((left - fEx) / 256), tx1 = Math.floor((left + fW + fEx) / 256), ty0 = Math.floor((top - fEx) / 256), ty1 = Math.floor((top + fH + fEx) / 256);
+    for (var tx = tx0; tx <= tx1; tx++) {
+      for (var ty = ty0; ty <= ty1; ty++) {
+        if (ty < 0 || ty >= n) continue;
+        var wx = ((tx % n) + n) % n, key = fSatOn + "/" + fZoom + "/" + wx + "/" + ty, t = fTiles[key];
+        if (!t) {
+          t = fTiles[key] = new Image();
+          t.onload = fDraw;
+          t.src = fSatOn ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + fZoom + "/" + ty + "/" + wx : "https://tile.openstreetmap.org/" + fZoom + "/" + wx + "/" + ty + ".png";
+        }
+        if (t.complete && t.naturalWidth) fctx.drawImage(t, tx * 256 - left, ty * 256 - top, 256, 256);
+      }
+    }
+    // breadcrumb trail (rev 221: can be hidden without stopping the recording)
+    if (crumbs.length > 1 && !trkHide) {
+      fctx.lineJoin = "round"; fctx.lineCap = "round";
+      fctx.beginPath();
+      for (var i = 0; i < crumbs.length; i++) {
+        var w = vWorld(crumbs[i][0], crumbs[i][1], fZoom), x = w.x - left, y = w.y - top;
+        if (i === 0) fctx.moveTo(x, y); else fctx.lineTo(x, y);
+      }
+      fctx.strokeStyle = "rgba(0,0,0,0.55)"; fctx.lineWidth = 8; fctx.stroke();
+      fctx.strokeStyle = "#ff8a2b"; fctx.lineWidth = 5; fctx.stroke();
+    }
+    // your position
+    if (fLat != null) {
+      var g = vWorld(fLat, fLon, fZoom), cx = g.x - left, cy = g.y - top;
+      fctx.beginPath(); fctx.arc(cx, cy, 18, 0, 6.2832); fctx.fillStyle = "rgba(255,59,48,0.30)"; fctx.fill();
+      fctx.beginPath(); fctx.arc(cx, cy, 10, 0, 6.2832); fctx.fillStyle = "#ff3b30"; fctx.fill();
+      fctx.lineWidth = 3; fctx.strokeStyle = "#fff"; fctx.stroke();
+    }
+    if (window.__drawRadar) window.__drawRadar(fctx, fcLat, fcLon, fZoom, fW, fH, 1, fEx);
+    fctx.restore();
+  }
+  function fHome() { fFollow = true; if (fLat != null) { fcLat = fLat; fcLon = fLon; } fDraw(); }
+
+  fCanvas.onpointerdown = function (e) { fDrag = { x: e.clientX, y: e.clientY }; fCanvas.setPointerCapture(e.pointerId); };
+  fCanvas.onpointermove = function (e) {
+    if (!fDrag || fcLat == null) return;
+    var c = vWorld(fcLat, fcLon, fZoom), n = Math.pow(2, fZoom) * 256;
+    var dx = e.clientX - fDrag.x, dy = e.clientY - fDrag.y;
+    if (window.__mapHead) { var ra = window.__mapHead * Math.PI / 180, cs = Math.cos(ra), sn = Math.sin(ra); var rdx = dx * cs - dy * sn, rdy = dx * sn + dy * cs; dx = rdx; dy = rdy; } // rev 221: turn the swipe by the map rotation so it drags the right way
+    var x = c.x - dx, y = c.y - dy;
+    fDrag = { x: e.clientX, y: e.clientY }; fFollow = false;
+    fcLon = x / n * 360 - 180; fcLat = Math.atan(Math.sinh(Math.PI * (1 - 2 * y / n))) * 180 / Math.PI;
+    fDraw(); clearTimeout(fTimer); fTimer = setTimeout(fHome, 30000);
+  };
+  fCanvas.onpointerup = fCanvas.onpointercancel = function () { fDrag = null; };
+
+  document.getElementById("fIn").onclick = function () { if (fZoom < 18) { fZoom++; fDraw(); } };
+  document.getElementById("fOut").onclick = function () { if (fZoom > 3) { fZoom--; fDraw(); } };
+  document.getElementById("fCtr").onclick = fHome;
+  function fSatSet() { document.getElementById("fSat").style.borderColor = fSatOn ? "#ff8a2b" : ""; fDraw(); }
+  document.getElementById("fSat").onclick = function () { fSatOn = !fSatOn; fSatSet(); };
+  document.getElementById("fClr").onclick = function () {
+    if (!crumbs.length || confirm("Clear the track?")) { crumbs = []; saveCrumbs(); tStart = recOn ? Date.now() : 0; tEnd = 0; tMax = 0; localStorage.setItem("vdTStart", String(tStart)); localStorage.setItem("vdTEnd", "0"); localStorage.setItem("vdTMax", "0"); fDraw(); }
+  };
+
+  function recSet() {
+    document.getElementById("fStart").style.borderColor = recOn ? "#4cd964" : "#8a96a6";
+    document.getElementById("fStart").style.color = recOn ? "#4cd964" : "#fff";
+    document.getElementById("fStart").textContent = recOn ? "Recording" : "Start track";
+    document.getElementById("fStop").style.opacity = recOn ? "1" : "0.5";
+  }
+  document.getElementById("fStart").onclick = function () { if (!recOn) { if (!tStart || !crumbs.length) { tStart = Date.now(); tMax = 0; localStorage.setItem("vdTMax", "0"); } else if (tEnd) { tStart += Date.now() - tEnd; } tEnd = 0; localStorage.setItem("vdTStart", String(tStart)); localStorage.setItem("vdTEnd", "0"); } recOn = true; localStorage.setItem("vdRec", "1"); recSet(); if (fLat != null) { addCrumb(fLat, fLon, null); saveCrumbs(); fDraw(); } };
+  document.getElementById("fStop").onclick = function () { if (recOn) { tEnd = Date.now(); localStorage.setItem("vdTEnd", String(tEnd)); } recOn = false; localStorage.setItem("vdRec", "0"); saveCrumbs(); recSet(); fDraw(); };
+  setInterval(function () { if (recOn && !fs.classList.contains("hidden")) fDraw(); }, 1000);
+  recSet();
+  // rev 221: show/hide the track line
+  function hideSet() {
+    var hb = document.getElementById("fHide");
+    hb.textContent = trkHide ? "Show track" : "Hide track";
+    hb.style.borderColor = trkHide ? "#ff8a2b" : "#8a96a6";
+    hb.style.color = trkHide ? "#ff8a2b" : "#fff";
+  }
+  document.getElementById("fHide").onclick = function () { trkHide = !trkHide; localStorage.setItem("vdTrkHide", trkHide ? "1" : "0"); hideSet(); fDraw(); };
+  hideSet();
+
+  // ----- pinch to zoom (both maps) -----
+  function pinchify(canvas, getZoom, setZoom, minZ, maxZ, setScale) {
+    var pts = {}, startDist = 0, startZoom = 0, pinching = false;
+    function cnt() { return Object.keys(pts).length; }
+    function dist() { var k = Object.keys(pts); if (k.length < 2) return 0; var a = pts[k[0]], b = pts[k[1]]; return Math.hypot(a.x - b.x, a.y - b.y); }
+    canvas.addEventListener("pointerdown", function (e) {
+      pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (cnt() === 2) { pinching = true; startDist = dist(); startZoom = getZoom(); }
+    }, true);
+    canvas.addEventListener("pointermove", function (e) {
+      if (!pts[e.pointerId]) return;
+      pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (pinching && cnt() >= 2 && startDist > 0) {
+        e.stopImmediatePropagation();
+        var zf = startZoom + Math.log(dist() / startDist) / Math.LN2;
+        zf = Math.max(minZ, Math.min(maxZ, zf));
+        var base = Math.round(zf);
+        if (base !== getZoom()) { setZoom(base); }
+        setScale(Math.pow(2, zf - getZoom()));
+      }
+    }, true);
+    function up(e) {
+      delete pts[e.pointerId];
+      if (cnt() < 2) { if (pinching) setScale(1); pinching = false; }
+    }
+    canvas.addEventListener("pointerup", up, true);
+    canvas.addEventListener("pointercancel", up, true);
+  }
+  pinchify(fCanvas, function () { return fZoom; }, function (z) { fZoom = z; }, 3, 18, function (s) { fPinch = s; fDraw(); });
+  var origVDraw = vDraw;
+  vDraw = function () {
+    if (vPinch === 1 || !vW || !vH) { origVDraw(); return; }
+    vctx.save();
+    vctx.translate(vW / 2, vH / 2); vctx.scale(vPinch, vPinch); vctx.translate(-vW / 2, -vH / 2);
+    origVDraw();
+    vctx.restore();
+  };
+  pinchify(vCanvas, function () { return vZoom; }, function (z) { vZoom = z; }, 3, 18, function (s) { vPinch = s; vDraw(); });
+
+  function openFull() {
+    fSatOn = localStorage.getItem("vSat") === "1";
+    fSatSet();
+    fs.classList.remove("hidden");
+    if (vGLat != null) { fLat = vGLat; fLon = vGLon; }
+    fFollow = true; fcLat = fLat; fcLon = fLon;
+    fSpd.textContent = $("speed").textContent;
+    fResize();
+  }
+  function closeFull() { fs.classList.add("hidden"); }
+  // rev 215: big map follows GPS reliably (own watcher, independent of the small map handler)
+  window.__fFollowTick = function (lat, lon) {
+    fLat = lat; fLon = lon;
+    if (fFollow) { fcLat = lat; fcLon = lon; }
+    if (!fs.classList.contains("hidden")) fDraw();
+  };
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(function (p) {
+      try {
+        var c = p.coords;
+        window.__fFollowTick(c.latitude, c.longitude);
+        // rev 217: this watcher also feeds the big-map speed and the trail
+        var mph2 = c.speed != null && c.speed >= 0 ? c.speed * MS_TO_MPH : 0;
+        fSpd.textContent = mph2 < 1 ? "0" : Math.round(mph2);
+        addCrumb(c.latitude, c.longitude, c.accuracy);
+        if (c.speed != null && c.speed >= 0) noteSpeed(c.speed * MS_TO_MPH);
+      } catch (e) {}
+    }, function () {}, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+  }
+  document.getElementById("fBack").onclick = closeFull;
+  window.__fDraw = fDraw;
+  window.__fSetCenter = function (lat, lon) { fFollow = false; fcLat = lat; fcLon = lon; fDraw(); clearTimeout(fTimer); fTimer = setTimeout(fHome, 60000); };
+  window.__fSetZoom = function (z) { fZoom = z; };
+  window.__fGetZoom = function () { return fZoom; };
+  // rev 215: double-tap to zoom in one level
+  var lastTap = 0, lastTapXY = null;
+  fCanvas.addEventListener("pointerup", function (e) {
+    var now = Date.now();
+    if (e.isPrimary === false) { lastTap = 0; return; }
+    if (now - lastTap < 300 && lastTapXY && Math.abs(e.clientX - lastTapXY.x) + Math.abs(e.clientY - lastTapXY.y) < 30) {
+      if (fZoom < 18) { fZoom++; fDraw(); }
+      lastTap = 0;
+    } else { lastTap = now; lastTapXY = { x: e.clientX, y: e.clientY }; }
+  });
+
+  // tap the small map (not its buttons) to open full screen; dragging still pans it
+  var tapStart = null;
+  vCanvas.addEventListener("pointerdown", function (e) { tapStart = { x: e.clientX, y: e.clientY, t: Date.now() }; });
+  vCanvas.addEventListener("pointerup", function (e) {
+    if (!tapStart) return;
+    var d = Math.abs(e.clientX - tapStart.x) + Math.abs(e.clientY - tapStart.y);
+    if (d < 8 && Date.now() - tapStart.t < 400) openFull();
+    tapStart = null;
+  });
+  window.addEventListener("resize", function () { if (!fs.classList.contains("hidden")) fResize(); });
+})();
+
+/* ---------- rev 210: speed color near limit + current-location indicator on weather page ---------- */
+(function () {
+  // --- Speedometer number: orange -> deep red within 5 mph of the limit ---
+  var spdEl = $("speed");
+  function mix(a, b, t) { return Math.round(a + (b - a) * t); }
+  function spdColor() {
+    var lim = (typeof limShown !== "undefined") ? limShown : null;
+    var mph = (typeof gpsMph !== "undefined") ? gpsMph : 0;
+    if (lim == null) return "";
+    var t = (mph - (lim - 5)) / 5;
+    if (t <= 0) return "";
+    if (t > 1) t = 1;
+    // orange (255,138,43) -> deep red (200,0,0)
+    return "rgb(" + mix(255, 200, t) + "," + mix(138, 0, t) + "," + mix(43, 0, t) + ")";
+  }
+  var lastC = null;
+  setInterval(function () {
+    var c = spdColor();
+    if (c !== lastC) { lastC = c; spdEl.style.color = c; }
+  }, 300);
+
+  // --- Weather page: "Current location" label above the city + arrow indicator by the magnifier ---
+  var topTitle = $("wCity");
+  var lbl = document.createElement("div");
+  lbl.id = "wLiveLbl";
+  lbl.textContent = "Current location";
+  lbl.style.cssText = "font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ff8a2b;line-height:1;margin-bottom:3px";
+  topTitle.insertBefore(lbl, topTitle.firstChild);
+
+  // wCity text gets overwritten by the app, which would wipe the label; keep it in a wrapper instead
+  var wrapper = document.createElement("div");
+  wrapper.style.cssText = "flex:1;text-align:center;min-width:0";
+  var nameEl = document.createElement("div");
+  nameEl.id = "wCityName";
+  nameEl.style.cssText = "font-size:20px;font-weight:600";
+  topTitle.removeChild(lbl);
+  topTitle.parentNode.insertBefore(wrapper, topTitle);
+  wrapper.appendChild(lbl);
+  wrapper.appendChild(topTitle);
+  topTitle.style.flex = "none";
+
+  // location arrow indicator next to the magnifying glass
+  var s2 = $("srchBtn2");
+  var arrow = document.createElement("div");
+  arrow.id = "wLiveArrow";
+  arrow.style.cssText = "position:absolute;right:62px;top:10px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;pointer-events:none";
+  arrow.innerHTML = '<svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:currentColor;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round"><path d="M3 11 21 3l-8 18-2-8z"/></svg>';
+  if (s2) s2.parentNode.appendChild(arrow);
+
+  function syncLive() {
+    var live = (typeof wxLive !== "undefined") ? wxLive : true;
+    lbl.style.visibility = live ? "visible" : "hidden";
+    arrow.style.color = live ? "#ff8a2b" : "#3a4555";
+  }
+  syncLive();
+  setInterval(syncLive, 300);
+})();
+
+/* ---------- rev 211: weather card text under the icon (rev 212 adjusts spacing below) ---------- */
+(function () {
+  var wrap = $("wxCard").querySelector(".wx-wrap");
+  var wxv = $("wx");
+  var icon = $("wxIcon");
+  if (!wrap || !wxv || !icon) return;
+  // stack: icon on top, condition text centered underneath
+  wrap.style.flexDirection = "column";
+  wrap.style.alignItems = "flex-start";
+  wrap.style.gap = "2px";
+  wrap.style.marginLeft = "0";
+  wrap.style.marginTop = "0";
+  wrap.style.maxWidth = "calc(100% - 92px)";
+  icon.style.fontSize = "44px";
+  icon.style.lineHeight = "1";
+  wxv.style.maxWidth = "100%";
+  wxv.style.whiteSpace = "normal";
+  wxv.style.lineHeight = "1.1";
+  // resize text by length so it never crowds the wind ring (checked every 400ms, same idea as before)
+  var lastTxt = null;
+  setInterval(function () {
+    var t = (wxv.textContent || "").trim();
+    if (t === lastTxt) return;
+    lastTxt = t;
+    var longest = t.split(/\s+/).reduce(function (m, w) { return Math.max(m, w.length); }, 0);
+    wxv.style.fontSize = longest >= 11 ? "15px" : longest >= 9 ? "17px" : "19px";
+  }, 400);
+})();
+
+/* ---------- rev 212: weather card spacing + city label; heading-up maps; wind ring + radar overlays (rev 213: small map back to original, full-map compass button) ---------- */
+(function () {
+  // ===== 1. Weather card: condition text tight under the icon, city name on the bottom label =====
+  var wxv = $("wx"), icon = $("wxIcon"), wrapEl = $("wxCard").querySelector(".wx-wrap"), place = $("wxPlace");
+  if (icon) { icon.style.fontSize = "40px"; icon.style.lineHeight = "1"; icon.style.marginBottom = "-2px"; }
+  if (wrapEl) { wrapEl.style.gap = "0"; wrapEl.style.marginTop = "-4px"; }
+  if (wxv) { wxv.style.marginTop = "0"; wxv.style.lineHeight = "1"; }
+  if (place) place.style.maxWidth = "120px";
+  function placeSync() {
+    if (!place) return;
+    var t = wxLive ? "Current location" : ($("wCity").textContent || "").trim();
+    if (place.textContent !== t) place.textContent = t;
+  }
+  placeSync();
+  setInterval(placeSync, 300);
+
+  // rev 214: center the icon and condition text in the space left of the wind ring
+  // rev 215: left-justified again, and nudged down a bit from the Weather label
+  if (wrapEl) { wrapEl.style.alignItems = "flex-start"; wrapEl.style.textAlign = "left"; wrapEl.style.marginTop = "6px"; }
+  if (wxv) { wxv.style.textAlign = "left"; wxv.style.maxWidth = "100%"; }
+  if (icon) { icon.style.textAlign = "left"; }
+
+  // ===== 2. Shared state for the map overlays =====
+  var headUp = localStorage.getItem("vdHeadUp") === "1";
+  var radarOn = localStorage.getItem("vdRadar") === "1";
+  var mapHead = 0;          // smoothed heading used for rotation
+  var rawHead = null;       // latest heading reading
+  var windFromDeg = null, windMphTxt = "--";
+
+  function readWindNow() {
+    // rev 214: read the wind from the visible weather-page value too, so the map ring never depends on the hidden card text alone
+    var m = ($("wind").textContent || "").match(/from\s+([NESW]+)\s+(\d+)/);
+    if (!m) {
+      var m2 = ($("wWind").textContent || "").trim().match(/^(\d+)\s+([NESW]+)$/);
+      if (m2) m = [m2[0], m2[2], m2[1]];
+    }
+    if (!m) return;
+    var i = DIRS.indexOf(m[1]);
+    if (i < 0) return;
+    windFromDeg = i * 22.5; windMphTxt = m[2] + " mph";
+  }
+
+  // heading source: piggyback on showHeading (compass or GPS heading)
+  var prevShowH = showHeading;
+  showHeading = function (deg) {
+    prevShowH(deg);
+    if (deg != null && !isNaN(deg)) rawHead = (deg + 360) % 360;
+  };
+
+  // ease mapHead toward rawHead the short way around, redraw maps while rotating
+  function angTo(a, b) { var d = ((b - a + 540) % 360) - 180; return d; }
+  setInterval(function () {
+    var target = (headUp && rawHead != null) ? rawHead : 0;
+    var d = angTo(mapHead, target);
+    if (Math.abs(d) < 0.3) { if (mapHead !== target) { mapHead = target; window.__mapHead = mapHead; redrawBoth(); } updateOverlays(); return; }
+    mapHead = (mapHead + d * 0.25 + 360) % 360;
+    window.__mapHead = mapHead;
+    redrawBoth();
+    updateOverlays();
+  }, 120);
+
+  function redrawBoth() {
+    try { vDraw(); } catch (e) {}
+    try { if (window.__fDraw && !document.getElementById("fullMap").classList.contains("hidden")) window.__fDraw(); } catch (e) {}
+  }
+
+  // ===== 3. Rotate the small map: wrap vDraw =====
+  // Draw the normal map onto an offscreen canvas of the same size, then paint it rotated about the center.
+  var vOff = document.createElement("canvas"), vOffCtx = vOff.getContext("2d");
+  var vInner = vDraw;
+  vDraw = function () {
+    if (!vW || !vH) return;
+    if (true) { vInner(); return; } // rev 213: small map stays north-up, no radar (original behavior)
+    var dpr = window.devicePixelRatio || 1;
+    var S = Math.ceil(Math.sqrt(vW * vW + vH * vH)); // big enough that rotated corners stay filled
+    // temporarily point the drawing at an oversized offscreen canvas
+    var realCtx = vctx, realW = vW, realH = vH;
+    vOff.width = Math.round(S * dpr); vOff.height = Math.round(S * dpr);
+    vOffCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    vctx = vOffCtx; vW = S; vH = S;
+    try { vInner(); } catch (e) {}
+    try { drawRadar(vOffCtx, vLat, vLon, vZoom, S, S, 1, 0); } catch (e) {}
+    vctx = realCtx; vW = realW; vH = realH;
+    realCtx.fillStyle = "#1a222c"; realCtx.fillRect(0, 0, vW, vH);
+    realCtx.save();
+    realCtx.translate(vW / 2, vH / 2);
+    realCtx.rotate(-mapHead * Math.PI / 180);
+    realCtx.drawImage(vOff, -S / 2, -S / 2, S, S);
+    realCtx.restore();
+  };
+
+  // ===== 4. Radar tiles (RainViewer) =====
+  var radarPath = null, radarHost = "https://tilecache.rainviewer.com", radarFetched = 0;
+  var radarTiles = {};
+  function loadRadarIndex() {
+    var now = Date.now();
+    if (now - radarFetched < 300000) return;
+    radarFetched = now;
+    fetch("https://api.rainviewer.com/public/weather-maps.json").then(function (r) { return r.json(); }).then(function (j) {
+      var past = j && j.radar && j.radar.past;
+      if (past && past.length) {
+        var latest = past[past.length - 1].path;
+        if (latest !== radarPath) { radarPath = latest; radarTiles = {}; if (j.host) radarHost = j.host; redrawBoth(); }
+      }
+    }).catch(function () {});
+  }
+  function drawRadar(ctx, lat, lon, z, W, H, pinch, extra) {
+    if (!radarOn || !radarPath || lat == null) return;
+    var rz = Math.max(3, Math.min(z, 7)); // radar tiles only exist at coarse zooms; scale up
+    var scale = Math.pow(2, z - rz);
+    var c = vWorld(lat, lon, rz);
+    var left = c.x - (W / 2) / scale, top = c.y - (H / 2) / scale;
+    var n = Math.pow(2, rz);
+    var ex = (extra || 0) / scale;
+    var tx0 = Math.floor((left - ex) / 256), tx1 = Math.floor((left + W / scale + ex) / 256);
+    var ty0 = Math.floor((top - ex) / 256), ty1 = Math.floor((top + H / scale + ex) / 256);
+    ctx.save();
+    ctx.globalAlpha = 0.6;
+    if (pinch && pinch !== 1) { ctx.translate(W / 2, H / 2); ctx.scale(pinch, pinch); ctx.translate(-W / 2, -H / 2); }
+    for (var tx = tx0; tx <= tx1; tx++) {
+      for (var ty = ty0; ty <= ty1; ty++) {
+        if (ty < 0 || ty >= n) continue;
+        var wx = ((tx % n) + n) % n;
+        var key = radarPath + "/" + rz + "/" + wx + "/" + ty;
+        var t = radarTiles[key];
+        if (!t) {
+          t = radarTiles[key] = new Image();
+          t.onload = redrawBoth;
+          t.src = radarHost + radarPath + "/256/" + rz + "/" + wx + "/" + ty + "/2/1_1.png";
+        }
+        if (t.complete && t.naturalWidth) ctx.drawImage(t, (tx * 256 - left) * scale, (ty * 256 - top) * scale, 256 * scale, 256 * scale);
+      }
+    }
+    ctx.restore();
+  }
+
+  // ===== 5. Overlay widgets (wind ring + buttons) on both maps =====
+  function ringSvg() {
+    return '<svg viewBox="0 0 100 100" style="width:46px;height:46px;display:block;margin:0 auto">' +
+      '<g class="mwRing" style="transform-origin:50px 50px">' +
+      '<circle cx="50" cy="50" r="46" fill="rgba(21,28,37,0.85)" stroke="#ffffff" stroke-width="3"/>' +
+      '<text x="50" y="22" text-anchor="middle" font-size="16" font-weight="700" fill="#e53935">N</text>' +
+      '<g class="mwArrow" style="transform-origin:50px 50px">' +
+      '<path d="M50 80 L50 30" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+      '<path d="M33 47 L50 28 L67 47" stroke="#ff8a2b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' +
+      '</g></g></svg>' +
+      '<div class="mwSpd" style="font-size:11px;color:#cfd8e3;text-align:center;margin-top:2px;line-height:1">--</div>';
+  }
+  var btnCss = "width:40px;height:40px;margin:0;padding:0;font-size:11px;font-weight:700;line-height:1;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px;color:#fff";
+
+  function buildOverlay(host, isFull) {
+    var wrap = document.createElement("div");
+    wrap.className = "mapOv";
+    wrap.style.cssText = "position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:5;" +
+      (isFull ? "left:12px;top:calc(env(safe-area-inset-top) + 64px)" : "left:8px;top:54px");
+    var rot = document.createElement("button");
+    rot.className = "mapRot"; rot.style.cssText = btnCss;
+    // rev 213: compass-style button (needle points north, turns with the map)
+    rot.innerHTML = '<svg viewBox="0 0 100 100" style="width:32px;height:32px;display:block;margin:0 auto"><circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="5"/><g class="mcNeedle" style="transform-origin:50px 50px"><path d="M50 14 L63 52 L37 52 Z" fill="#e53935"/><path d="M50 86 L63 52 L37 52 Z" fill="currentColor"/></g></svg>';
+    var rad = document.createElement("button");
+    rad.className = "mapRad"; rad.style.cssText = btnCss;
+    var wnd = document.createElement("div");
+    wnd.className = "mapWind";
+    wnd.style.cssText = "padding:4px 4px 3px;background:rgba(21,28,37,0.80);border-radius:12px";
+    wnd.innerHTML = ringSvg();
+    wrap.appendChild(rot); wrap.appendChild(rad); wrap.appendChild(wnd);
+    host.appendChild(wrap);
+    function stop(e) { e.stopPropagation(); }
+    [rot, rad, wnd].forEach(function (el) {
+      el.addEventListener("pointerdown", stop);
+      el.addEventListener("pointerup", stop);
+    });
+    rot.onclick = function (e) {
+      e.stopPropagation();
+      headUp = !headUp; localStorage.setItem("vdHeadUp", headUp ? "1" : "0");
+      updateOverlays(); redrawBoth();
+    };
+    rad.onclick = function (e) {
+      e.stopPropagation();
+      radarOn = !radarOn; localStorage.setItem("vdRadar", radarOn ? "1" : "0");
+      if (radarOn) loadRadarIndex();
+      updateOverlays(); redrawBoth();
+    };
+  }
+  // rev 213: small map gets no overlay (no N/RAD buttons, no wind ring)
+  buildOverlay(document.getElementById("fullMap"), true);
+
+  // ===== rev 215: big-map control layout =====
+  (function () {
+    var fsEl = document.getElementById("fullMap");
+    var ov = fsEl.querySelector(".mapOv");
+    var back = document.getElementById("fBack");
+    var backW = back ? Math.round(back.getBoundingClientRect().width) : 0;
+    if (!backW || backW < 60) backW = 82;
+
+    // wind ring: same look as the main page (WIND label on top, ring, mph under), as wide as the Back button, under it on the left
+    var wnd = ov.querySelector(".mapWind");
+    var ringHost = wnd;
+    wnd.innerHTML =
+      '<div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3;text-align:center;line-height:1;margin-bottom:3px">Wind</div>' +
+      ringSvg().replace('style="width:46px;height:46px;display:block;margin:0 auto"', 'style="width:' + (backW - 14) + 'px;height:' + (backW - 14) + 'px;display:block;margin:0 auto"').replace('font-size:11px;color:#cfd8e3', 'font-size:13px;color:#cfd8e3');
+    var nTxt = wnd.querySelector("text"); if (nTxt) nTxt.remove();
+    wnd.style.width = backW + "px";
+    wnd.style.boxSizing = "border-box";
+    wnd.style.padding = "6px 6px 5px";
+    wnd.style.border = "0.5px solid #8a96a6";
+    wnd.style.background = "rgba(21,28,37,0.92)";
+    wnd.style.borderRadius = "12px";
+    // left column: just the wind ring under the Back button
+    ov.removeChild(ov.querySelector(".mapRot"));
+    ov.removeChild(ov.querySelector(".mapRad"));
+    ov.style.alignItems = "stretch";
+    ov.style.top = "calc(env(safe-area-inset-top) + 64px)";
+
+    // right column: search, compass, radar (top right)
+    var right = fsEl.querySelector('div[style*="right:12px"]');
+    var rot = document.createElement("button");
+    rot.className = "mapRot"; rot.style.cssText = btnCss + ";width:46px;height:46px";
+    rot.innerHTML = '<svg viewBox="0 0 100 100" style="width:32px;height:32px;display:block;margin:0 auto"><circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="5"/><g class="mcNeedle" style="transform-origin:50px 50px"><path d="M50 14 L63 52 L37 52 Z" fill="#e53935"/><path d="M50 86 L63 52 L37 52 Z" fill="currentColor"/></g></svg>';
+    var rad = document.createElement("button");
+    rad.className = "mapRad"; rad.style.cssText = btnCss + ";width:46px;height:46px";
+    var srch = document.createElement("button");
+    srch.id = "fSrch"; srch.setAttribute("aria-label", "Search");
+    srch.style.cssText = btnCss + ";width:46px;height:46px";
+    srch.innerHTML = '<svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round;display:block;margin:0 auto"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>';
+
+    // move the old +/-/center/satellite buttons to the bottom right
+    var fIn = document.getElementById("fIn"), fOut = document.getElementById("fOut"), fCtr = document.getElementById("fCtr"), fSat = document.getElementById("fSat");
+    var bottomRight = document.createElement("div");
+    bottomRight.style.cssText = "position:absolute;right:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);display:flex;flex-direction:column;gap:8px;z-index:5";
+    bottomRight.appendChild(fIn); bottomRight.appendChild(fOut); bottomRight.appendChild(fCtr);
+    fsEl.appendChild(bottomRight);
+    // top right: search, compass, radar, satellite
+    right.innerHTML = "";
+    right.appendChild(srch); right.appendChild(rot); right.appendChild(rad); right.appendChild(fSat);
+    [rot, rad, srch].forEach(function (el) {
+      el.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+      el.addEventListener("pointerup", function (e) { e.stopPropagation(); });
+    });
+    rot.onclick = function (e) {
+      e.stopPropagation();
+      headUp = !headUp; localStorage.setItem("vdHeadUp", headUp ? "1" : "0");
+      updateOverlays(); redrawBoth();
+    };
+    rad.onclick = function (e) {
+      e.stopPropagation();
+      radarOn = !radarOn; localStorage.setItem("vdRadar", radarOn ? "1" : "0");
+      if (radarOn) loadRadarIndex();
+      updateOverlays(); redrawBoth();
+    };
+
+    // ----- city search on the big map -----
+    var sBar = document.createElement("div");
+    sBar.id = "fSrchBar";
+    sBar.style.cssText = "position:absolute;left:12px;right:12px;top:calc(env(safe-area-inset-top) + 64px);z-index:8;display:none";
+    sBar.innerHTML =
+      '<div style="display:flex;gap:8px"><input id="fSrchIn" type="text" placeholder="City or zip" autocomplete="off" autocorrect="off" style="flex:1;font-size:17px;padding:12px;border-radius:10px;border:0.5px solid #8a96a6;background:rgba(21,28,37,0.96);color:#fff">' +
+      '<button id="fSrchGo" style="margin:0;padding:0 16px;font-size:16px;background:rgba(21,28,37,0.96);border:0.5px solid #ff8a2b;color:#ff8a2b">Go</button></div>' +
+      '<div id="fSrchList" style="margin-top:6px;background:rgba(21,28,37,0.96);border:0.5px solid #8a96a6;border-radius:10px;display:none;overflow:hidden"></div>';
+    fsEl.appendChild(sBar);
+    var sIn = document.getElementById("fSrchIn"), sList = document.getElementById("fSrchList");
+    function closeSrch() { sBar.style.display = "none"; sList.style.display = "none"; sIn.blur(); }
+    srch.onclick = function (e) {
+      e.stopPropagation();
+      if (sBar.style.display === "block") { closeSrch(); return; }
+      sBar.style.display = "block"; sIn.value = ""; sList.style.display = "none"; sList.innerHTML = ""; var sx0 = document.getElementById("fSrchX"); if (sx0) sx0.style.display = "none";
+      setTimeout(function () { sIn.focus(); }, 50);
+    };
+    function jump(r) {
+      window.__fSetCenter(r.latitude, r.longitude);
+      if (window.__fGetZoom() < 11) { window.__fSetZoom(11); window.__fDraw(); }
+      closeSrch();
+    }
+    async function doSearch() {
+      var q = (sIn.value || "").trim();
+      if (!q) return;
+      sList.style.display = "block"; sList.innerHTML = '<div style="padding:12px;color:#7f8fa3">Searching...</div>';
+      try {
+        var res = [];
+        if (/^\d{5}$/.test(q)) {
+          var zr = await fetch("https://api.zippopotam.us/us/" + q);
+          if (zr.ok) { var zj = await zr.json(); var pl = zj.places[0]; res = [{ name: pl["place name"], admin1: pl.state, country: "United States", latitude: +pl.latitude, longitude: +pl.longitude }]; }
+        } else {
+          var gr = await fetch("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(q) + "&count=6&language=en&format=json");
+          var gj = await gr.json(); res = gj.results || [];
+        }
+        if (!res.length) { sList.innerHTML = '<div style="padding:12px;color:#7f8fa3">No match</div>'; return; }
+        sList.innerHTML = "";
+        res.forEach(function (r) {
+          var s = STATE_ABBR[r.admin1] || r.admin1 || "";
+          var d = document.createElement("div");
+          d.style.cssText = "padding:12px 14px;font-size:16px;color:#fff;border-bottom:0.5px solid #2a3442";
+          d.textContent = r.country === "United States" && s ? r.name + ", " + s : r.name + (r.country ? ", " + r.country : "");
+          d.onclick = function () { jump(r); };
+          sList.appendChild(d);
+        });
+      } catch (er) { sList.innerHTML = '<div style="padding:12px;color:#7f8fa3">Search failed</div>'; }
+    }
+    document.getElementById("fSrchGo").onclick = doSearch;
+    sIn.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); doSearch(); } });
+    // rev 221: suggestions appear as he types, and an X clears the field
+    sIn.style.paddingRight = "40px";
+    var sInWrap = document.createElement("div");
+    sInWrap.style.cssText = "position:relative;flex:1;display:flex";
+    sIn.parentNode.insertBefore(sInWrap, sIn);
+    sInWrap.appendChild(sIn);
+    sIn.style.flex = "1"; sIn.style.minWidth = "0";
+    var sX = document.createElement("button");
+    sX.id = "fSrchX"; sX.textContent = "\u2715";
+    sX.style.cssText = "position:absolute;right:4px;top:50%;transform:translateY(-50%);width:32px;height:32px;margin:0;padding:0;background:none;border:none;color:#7f8fa3;font-size:18px;display:none";
+    sInWrap.appendChild(sX);
+    sX.onclick = function (e) { e.preventDefault(); e.stopPropagation(); sIn.value = ""; sList.style.display = "none"; sList.innerHTML = ""; sX.style.display = "none"; sIn.focus(); };
+    var sTimer = 0;
+    sIn.addEventListener("input", function () {
+      sX.style.display = sIn.value ? "block" : "none";
+      clearTimeout(sTimer);
+      var q = (sIn.value || "").trim();
+      if (q.length < 3) { sList.style.display = "none"; sList.innerHTML = ""; return; }
+      sTimer = setTimeout(doSearch, 350);
+    });
+    [sBar].forEach(function (el) {
+      el.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+      el.addEventListener("pointerup", function (e) { e.stopPropagation(); });
+    });
+  })();
+
+  function updateOverlays() {
+    readWindNow();
+    document.querySelectorAll(".mapRot").forEach(function (b) {
+      // rev 213: grayed out when north-up, orange when heading-up; needle shows where north is
+      b.style.borderColor = headUp ? "#ff8a2b" : "#4a5565";
+      b.style.color = headUp ? "#ff8a2b" : "#7f8fa3";
+      var nd = b.querySelector(".mcNeedle");
+      if (nd) nd.style.transform = "rotate(" + (-mapHead) + "deg)";
+    });
+    document.querySelectorAll(".mapRad").forEach(function (b) {
+      b.textContent = "RAD";
+      b.style.borderColor = radarOn ? "#ff8a2b" : "#8a96a6";
+      b.style.color = radarOn ? "#ff8a2b" : "#fff";
+    });
+    document.querySelectorAll(".mapWind").forEach(function (w) {
+      var ring = w.querySelector(".mwRing"), arr = w.querySelector(".mwArrow"), sp = w.querySelector(".mwSpd");
+      // ring shows compass directions relative to the way the map is turned
+      ring.style.transform = "rotate(" + (-mapHead) + "deg)";
+      // rev 214: arrow is always set from the wind direction (north-up shows the true direction, heading-up turns with the map)
+      arr.style.transform = "rotate(" + (((windFromDeg == null ? 0 : windFromDeg) + 180) % 360) + "deg)";
+      sp.textContent = windMphTxt;
+    });
+  }
+  updateOverlays();
+  if (radarOn) loadRadarIndex();
+  setInterval(function () { if (radarOn) loadRadarIndex(); }, 300000);
+
+  // ===== 6. Rotate the full-screen map =====
+  // fDraw lives inside the rev 207 closure, so the full-screen map is patched through its canvas context.
+  // The full-screen draw routine (rev 207 block) rotates itself using window.__mapHead and paints radar via window.__drawRadar.
+  window.__drawRadar = drawRadar;
+  // first-load safety: if the heading never arrives, the maps simply stay north-up (the original behavior)
+
+
+})();
 /* ===== Part 3 (rev 225): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
-/* ---- Spotify now-playing bar (rev 226) ---- */
+/* ---- Spotify now-playing bar (rev 228) ---- */
 (function () {
   var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state';
   var sb = document.getElementById('spotBtn'), row = sb && sb.parentNode;
@@ -962,12 +2208,12 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) chec
   try { tok = JSON.parse(localStorage.getItem('vdSp') || 'null'); } catch (e) { tok = null; }
   function sv(o) { tok = o; try { localStorage.setItem('vdSp', JSON.stringify(o)); } catch (e) {} }
   function ic(d) { return '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:auto">' + d + '</svg>'; }
-  var bs = 'margin:0;padding:0;width:40px;height:40px;background:none;border:0;flex:none';
+  var bs = 'margin:0;padding:0;width:44px;height:44px;background:none;border:0;flex:none';
   var bar = document.createElement('div');
-  bar.style.cssText = 'display:flex;align-items:center;gap:8px;height:44px;margin:-8px 0 6px;padding:0 8px;background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;overflow:hidden';
-  bar.innerHTML = '<img id="spArt" style="width:32px;height:32px;border-radius:6px;flex:none;display:none">' +
-    '<div style="flex:1;min-width:0"><div id="spT" style="font-size:14px;font-weight:600;color:#e8eef5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>' +
-    '<div id="spA" style="font-size:11px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div></div>' +
+  bar.style.cssText = 'display:flex;align-items:center;gap:8px;height:54px;margin:-8px 0 6px;padding:0 10px;background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;overflow:hidden';
+  bar.innerHTML = '<img id="spArt" style="width:40px;height:40px;border-radius:7px;flex:none;display:none">' +
+    '<div style="flex:1;min-width:0"><div id="spT" style="font-size:15px;font-weight:600;color:#e8eef5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>' +
+    '<div id="spA" style="font-size:12px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div></div>' +
     '<span id="spCtl" style="display:none;align-items:center;flex:none">' +
     '<button id="spPrev" style="' + bs + '">' + ic('<path d="M6 5v14M19 5L9 12l10 7z"/>') + '</button>' +
     '<button id="spPlay" style="' + bs + '"></button>' +
