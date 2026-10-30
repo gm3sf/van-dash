@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 228 -->
+<!-- Van Dash rev 229 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -108,13 +108,13 @@
   #compassRing { transition: transform 0.25s linear; transform-origin: 50px 50px; }
   .temp-wrap { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
   .thermo { width: 26px; height: 74px; flex: none; } .wx-wrap { display: flex; align-items: center; gap: 10px; margin-top: 6px; } .wx-wrap .bigicon { font-size: 44px; line-height: 1; }
-  .sunrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px;text-align:center}
+  .sunrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;text-align:center}
   .sunrow svg { width: 38px; height: 28px; stroke: #ffb84d; fill: none; stroke-width: 1.8; stroke-linecap: round; }  .sunrow .t{font-size:18px;font-weight:600}
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .card { background: #151c25; border-radius: 14px; padding: 8px 12px;
           border: 0.5px solid #8a96a6; }
   .card .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; }
-  .card .value{font-size:30px;font-weight:600;margin-top:2px} .card .sub { font-size: 13px; color: #9fb0c3; margin-top: 4px; }
+  .card .value{font-size:30px;font-weight:600;margin-top:2px} .card .sub{font-size:13px;color:#9fb0c3;margin-top:2px}
   .hint { font-size: 11px; color: #ff8a2b; margin-top: 3px; }
   button {
     background: #c9651a; color: white; border: none; border-radius: 10px;
@@ -130,7 +130,7 @@
   .stat { background: #151c25; border-radius: 12px; padding: 10px; text-align: center;
           border: 0.5px solid #8a96a6; box-shadow: none; }
   .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; } .stat .v { font-size: 20px; font-weight: 600; margin-top: 4px; }
-  .card.wide { grid-column: 1 / -1; } .grid > .card:not(.wide) { min-height: 96px; } .battcard{padding:6px 12px 8px;position:relative}
+  .card.wide { grid-column: 1 / -1; } .grid>.card:not(.wide){min-height:0} .battcard{padding:6px 12px 8px;position:relative}
   .battcard .bhead { display: flex; align-items: center; justify-content: space-between; } .battcard .bhead .label { display: flex; align-items: center; }
   .batt-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
   .batt-row .bamp { flex: none; width: 78px; justify-content: flex-end; }
@@ -194,7 +194,7 @@
       <div class="loctext">
         <div class="locline"><span class="loclabel">You're currently in</span> <span id="city">Finding...</span></div>
       </div>
-      <button id="cityRef" style="margin:0;padding:0;width:44px;height:44px;background:none;line-height:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round"><path d="M20 12a8 8 0 1 1-6-7.7M20 3v5h-5"/></svg></button><div id="updated" class="hidden">&nbsp;</div>
+      <button id="cityRef" style="margin:0;padding:0;width:30px;height:30px;background:none;line-height:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round"><path d="M20 12a8 8 0 1 1-6-7.7M20 3v5h-5"/></svg></button><div id="updated" class="hidden">&nbsp;</div>
     </div>
     <div class="card tap" id="tempCard" style="order:6">
       <div class="label"><svg class="ico" id="tempIco" viewBox="0 0 24 24"><path d="M14 14.76V4a2 2 0 0 0-4 0v10.76a4 4 0 1 0 4 0z"/></svg>Temperature</div>
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r228</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r229</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
