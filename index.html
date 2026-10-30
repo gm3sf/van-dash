@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 229 -->
+<!-- Van Dash rev 230 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -69,9 +69,9 @@
   }
   html { overscroll-behavior: none; overscroll-behavior-y: none; background: #000000; height: 100%; }
   .hidden { display: none !important; }
-.locrow { display: flex; align-items: center; gap: 12px; padding:3px 14px}.locrow .pin{width:16px;height:22px;flex:none} .locrow .loctext { flex: 1; min-width: 0; }
-  .locrow .loclabel{font-size:12px;color:#7f8fa3}
-  .locrow .locline{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.locrow #city{font-size:22px;font-weight:600;margin-left:4px}
+.locrow { display: flex; align-items: center; gap: 12px; padding:5px 14px}.locrow .pin{width:18px;height:24px;flex:none} .locrow .loctext { flex: 1; min-width: 0; }
+  .locrow .loclabel{font-size:11px;color:#7f8fa3}
+  .locrow #city{font-size:20px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   
   .tripcard .tripbody { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
   .tripcard .tripbody .value, .tripcard .tripbody .sub { margin-top: 0; }
@@ -192,7 +192,7 @@
     <div class="card wide locrow" style="order:2">
       <svg class="pin" viewBox="0 0 24 32"><path d="M12 1C6.2 1 1.5 5.7 1.5 11.5c0 7.6 10.5 19 10.5 19s10.5-11.4 10.5-19C22.5 5.7 17.8 1 12 1z" fill="#ff8a2b"/><circle cx="12" cy="11.5" r="4" fill="#000000"/></svg>
       <div class="loctext">
-        <div class="locline"><span class="loclabel">You're currently in</span> <span id="city">Finding...</span></div>
+        <div class="loclabel">You're currently in</div><div id="city">Finding...</div>
       </div>
       <button id="cityRef" style="margin:0;padding:0;width:30px;height:30px;background:none;line-height:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round"><path d="M20 12a8 8 0 1 1-6-7.7M20 3v5h-5"/></svg></button><div id="updated" class="hidden">&nbsp;</div>
     </div>
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r229</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r230</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2198,44 +2198,49 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 225): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
-/* ---- Spotify now-playing bar (rev 228) ---- */
+/* ===== Part 3 (rev 230): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ---- Spotify player on the Spotify page (rev 230) ---- */
 (function () {
   var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state';
-  var sb = document.getElementById('spotBtn'), row = sb && sb.parentNode;
-  if (!row) return;
-  var tok = null, playing = false;
+  var list = document.getElementById('plList');
+  if (!list) return;
+  var tok = null, playing = false, prog = 0, dur = 0, stamp0 = 0;
   try { tok = JSON.parse(localStorage.getItem('vdSp') || 'null'); } catch (e) { tok = null; }
   function sv(o) { tok = o; try { localStorage.setItem('vdSp', JSON.stringify(o)); } catch (e) {} }
-  function ic(d) { return '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:auto">' + d + '</svg>'; }
-  var bs = 'margin:0;padding:0;width:44px;height:44px;background:none;border:0;flex:none';
-  var bar = document.createElement('div');
-  bar.style.cssText = 'display:flex;align-items:center;gap:8px;height:54px;margin:-8px 0 6px;padding:0 10px;background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;overflow:hidden';
-  bar.innerHTML = '<img id="spArt" style="width:40px;height:40px;border-radius:7px;flex:none;display:none">' +
-    '<div style="flex:1;min-width:0"><div id="spT" style="font-size:15px;font-weight:600;color:#e8eef5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>' +
-    '<div id="spA" style="font-size:12px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div></div>' +
-    '<span id="spCtl" style="display:none;align-items:center;flex:none">' +
+  function ic(d, s) { s = s || 26; return '<svg viewBox="0 0 24 24" style="width:' + s + 'px;height:' + s + 'px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:auto">' + d + '</svg>'; }
+  var bs = 'margin:0;padding:0;width:52px;height:52px;background:none;border:0;flex:none;position:relative';
+  var card = document.createElement('div');
+  card.className = 'card';
+  card.style.cssText = 'margin-bottom:10px;padding:16px;text-align:center';
+  card.innerHTML =
+    '<div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3;margin-bottom:12px">Now playing</div>' +
+    '<img id="spArt" style="width:200px;height:200px;border-radius:14px;object-fit:cover;display:none;margin:0 auto 14px;border:0.5px solid #8a96a6">' +
+    '<div id="spT" style="font-size:20px;font-weight:600;color:#e8eef5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>' +
+    '<div id="spA" style="font-size:14px;color:#9fb0c3;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>' +
+    '<div style="margin:16px 4px 0"><div style="height:6px;border-radius:3px;background:#2b3542;overflow:hidden"><div id="spFill" style="height:100%;width:0;background:#ff8a2b"></div></div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:12px;color:#7f8fa3;margin-top:5px"><span id="spCur">0:00</span><span id="spDur">0:00</span></div></div>' +
+    '<div id="spCtl" style="display:none;align-items:center;justify-content:center;gap:4px;margin-top:8px">' +
     '<button id="spPrev" style="' + bs + '">' + ic('<path d="M6 5v14M19 5L9 12l10 7z"/>') + '</button>' +
-    '<button id="spPlay" style="' + bs + '"></button>' +
-    '<button id="spNext" style="' + bs + '">' + ic('<path d="M18 5v14M5 5l10 7-10 7z"/>') + '</button></span>';
-  row.parentNode.insertBefore(bar, row.nextSibling);
+    '<button id="spBack" style="' + bs + '">' + ic('<path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/>', 30) + '<span style="position:absolute;left:0;right:0;top:19px;font-size:10px;font-weight:700;color:#ff8a2b">15</span></button>' +
+    '<button id="spPlay" style="' + bs + ';width:64px;height:64px"></button>' +
+    '<button id="spFwd" style="' + bs + '">' + ic('<path d="M20 12a8 8 0 1 1-3-6.2M20 4v4h-4"/>', 30) + '<span style="position:absolute;left:0;right:0;top:19px;font-size:10px;font-weight:700;color:#ff8a2b">15</span></button>' +
+    '<button id="spNext" style="' + bs + '">' + ic('<path d="M18 5v14M5 5l10 7-10 7z"/>') + '</button></div>';
+  list.parentNode.insertBefore(card, list);
   var T = document.getElementById('spT'), A = document.getElementById('spA'), art = document.getElementById('spArt'), ctl = document.getElementById('spCtl'), pl = document.getElementById('spPlay');
-  // make room: the map gives up the height the bar takes
-  var vm = document.querySelector('.vmap');
-  if (vm) {
-    var gd = document.querySelector('.grid'), stl = document.createElement('style');
-    stl.textContent = '.grid > .card:not(.wide){min-height:112px !important}';
-    document.head.appendChild(stl); var oldH = gd ? gd.offsetHeight : 0; document.head.removeChild(stl);
-    var saved = gd ? Math.max(0, oldH - gd.offsetHeight) : 0;
-    vm.style.setProperty('height', Math.max(100, Math.min(170, 170 - (bar.offsetHeight - 2 - saved))) + 'px', 'important');
-    setTimeout(function () { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }, 60);
-  }
+  var fill = document.getElementById('spFill'), cur = document.getElementById('spCur'), dtx = document.getElementById('spDur');
+  function fmt(ms) { var s = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
   function say(t, a) { T.textContent = t; A.textContent = a || ''; }
   function icons() {
-    pl.innerHTML = ic(playing ? '<path d="M8 5v14M16 5v14"/>' : '<path d="M7 4.5v15l12-7.5z"/>');
+    pl.innerHTML = ic(playing ? '<circle cx="12" cy="12" r="10"/><path d="M10 8v8M14 8v8"/>' : '<circle cx="12" cy="12" r="10"/><path d="M10 8v8l6-4z"/>', 52);
     ctl.style.display = tok ? 'flex' : 'none';
   }
-  function idle(t, a) { playing = false; art.style.display = 'none'; say(t, a); icons(); }
+  function showProg() {
+    var p = prog + (playing ? Date.now() - stamp0 : 0);
+    if (dur && p > dur) p = dur;
+    fill.style.width = dur ? (p / dur * 100) + '%' : '0';
+    cur.textContent = fmt(p); dtx.textContent = fmt(dur);
+  }
+  function idle(t, a) { playing = false; prog = 0; dur = 0; art.style.display = 'none'; say(t, a); icons(); showProg(); }
   if (!tok) idle('Connect Spotify', 'Tap here to log in'); else idle('Spotify', 'Connecting...');
 
   function b64u(buf) {
@@ -2268,7 +2273,7 @@ function decorateResults() {
     catch (e) { return null; }
   }
   async function poll() {
-    if (!tok || document.hidden) return;
+    if (!tok || document.hidden || document.getElementById('spotScreen').classList.contains('hidden')) return;
     var r = await api('GET', '');
     if (!r) return;
     if (r.status === 401) { sv(null); idle('Connect Spotify', 'Tap here to log in'); return; }
@@ -2276,11 +2281,11 @@ function decorateResults() {
     if (!r.ok) return;
     var j = await r.json(), it = j.item;
     if (!it) { idle('Nothing playing', ''); return; }
-    playing = !!j.is_playing;
+    playing = !!j.is_playing; prog = j.progress_ms || 0; dur = it.duration_ms || 0; stamp0 = Date.now();
     say(it.name, it.artists ? it.artists.map(function (x) { return x.name; }).join(', ') : (it.show ? it.show.name : ''));
     var im = (it.album && it.album.images) || it.images || [];
-    if (im.length) { art.src = im[im.length - 1].url; art.style.display = 'block'; } else art.style.display = 'none';
-    icons();
+    if (im.length) { art.src = im[0].url; art.style.display = 'block'; } else art.style.display = 'none';
+    icons(); showProg();
   }
   async function act(m, p) {
     var r = await api(m, p);
@@ -2288,10 +2293,19 @@ function decorateResults() {
     else if (r && r.status === 403) say('Premium needed', 'Spotify blocked that control');
     setTimeout(poll, 600);
   }
+  async function skip(ms) {
+    var p = prog + (playing ? Date.now() - stamp0 : 0) + ms;
+    if (p < 0) p = 0;
+    if (dur && p >= dur - 500) { act('POST', '/next'); return; }
+    prog = p; stamp0 = Date.now(); showProg();
+    act('PUT', '/seek?position_ms=' + Math.round(p));
+  }
   document.getElementById('spPrev').onclick = function () { act('POST', '/previous'); };
   document.getElementById('spNext').onclick = function () { act('POST', '/next'); };
+  document.getElementById('spBack').onclick = function () { skip(-15000); };
+  document.getElementById('spFwd').onclick = function () { skip(15000); };
   pl.onclick = function () { act('PUT', playing ? '/pause' : '/play'); };
-  bar.onclick = function (e) { if (!tok && !(e.target.closest && e.target.closest('button'))) login(); };
+  card.onclick = function (e) { if (!tok && !(e.target.closest && e.target.closest('button'))) login(); };
 
   var q = new URLSearchParams(location.search), code = q.get('code');
   if (code || q.get('error')) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
@@ -2301,7 +2315,10 @@ function decorateResults() {
       .then(function () { icons(); poll(); })
       .catch(function () { idle('Login failed', 'Tap here to try again'); });
   } else if (tok) poll();
-  setInterval(poll, 5000);
+  setInterval(poll, 4000);
+  setInterval(showProg, 500);
+  var sb = document.getElementById('spotBtn');
+  if (sb) sb.addEventListener('click', function () { setTimeout(poll, 200); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) poll(); });
 })();
 /* ---- photo spot-log ---- */
