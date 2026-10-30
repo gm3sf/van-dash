@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 231 -->
+<!-- Van Dash rev 232 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -130,7 +130,7 @@
   .stat { background: #151c25; border-radius: 12px; padding: 10px; text-align: center;
           border: 0.5px solid #8a96a6; box-shadow: none; }
   .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa3; } .stat .v { font-size: 20px; font-weight: 600; margin-top: 4px; }
-  .card.wide { grid-column: 1 / -1; } .grid>.card:not(.wide){min-height:0} .battcard{padding:6px 12px 8px;position:relative}
+  .card.wide { grid-column: 1 / -1; } .grid{align-items:start}.grid>.card:not(.wide){min-height:0} .battcard{padding:6px 12px 8px;position:relative}
   .battcard .bhead { display: flex; align-items: center; justify-content: space-between; } .battcard .bhead .label { display: flex; align-items: center; }
   .batt-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
   .batt-row .bamp { flex: none; width: 78px; justify-content: flex-end; }
@@ -156,7 +156,7 @@
   .day .lo { text-align: right; color: #7f8fa3; font-size: 18px; } .day .hi { text-align: left; font-size: 18px; font-weight: 600; }
   .bar { position: relative; height: 5px; border-radius: 3px; background: #2b3542; }  .bar .fill { position: absolute; top: 0; bottom: 0; border-radius: 3px;
                background: linear-gradient(90deg, #5fb8ff, #7fe08a, #ffd34d, #ff9a3c); }
-  .vmap{position:relative;width:100%;height:270px; margin-top: 6px; border-radius: 14px; overflow: hidden; background: #1a222c; border: 0.5px solid #8a96a6; }
+  .vmap{position:relative;width:100%;height:225px; margin-top: 6px; border-radius: 14px; overflow: hidden; background: #1a222c; border: 0.5px solid #8a96a6; }
   .vmap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; touch-action: none; }
   .vmap .zbtns { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; }
   #vSat { position: absolute; left: 8px; top: 8px; width: 40px; height: 40px; margin: 0; padding: 0; background: rgba(21,28,37,0.92); border: 0.5px solid #8a96a6; }
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r231</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r232</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2198,10 +2198,10 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 231): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 232): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 /* ---- Spotify player on the Spotify page (rev 230) ---- */
 (function () {
-  var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state';
+  var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
   var list = document.getElementById('plList');
   if (!list) return;
   var tok = null, playing = false, prog = 0, dur = 0, stamp0 = 0;
@@ -2226,6 +2226,12 @@ function decorateResults() {
     '<button id="spFwd" style="' + bs + '">' + ic('<path d="M20 12a8 8 0 1 1-3-6.2M20 4v4h-4"/>', 30) + '<span style="position:absolute;left:0;right:0;top:19px;font-size:10px;font-weight:700;color:#ff8a2b">15</span></button>' +
     '<button id="spNext" style="' + bs + '">' + ic('<path d="M18 5v14M5 5l10 7-10 7z"/>') + '</button></div>';
   list.parentNode.insertBefore(card, list);
+  var rc = document.createElement('button');
+  rc.className = 'alt';
+  rc.textContent = 'Reconnect Spotify';
+  rc.style.cssText = 'width:100%;margin:0 0 10px;padding:11px;font-size:15px';
+  rc.onclick = function () { sv(null); login(); };
+  list.parentNode.insertBefore(rc, list);
   var T = document.getElementById('spT'), A = document.getElementById('spA'), art = document.getElementById('spArt'), ctl = document.getElementById('spCtl'), pl = document.getElementById('spPlay');
   var fill = document.getElementById('spFill'), cur = document.getElementById('spCur'), dtx = document.getElementById('spDur');
   function fmt(ms) { var s = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
