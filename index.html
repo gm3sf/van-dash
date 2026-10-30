@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 220 -->
+<!-- Van Dash rev 221 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,7 +320,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r220</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r221</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1473,6 +1473,7 @@ function decorateResults() {
   var lastSave = 0;
   function saveCrumbs() { try { localStorage.setItem("vdCrumbs", JSON.stringify(crumbs)); } catch (e) {} }
   var recOn = localStorage.getItem("vdRec") === "1";
+  var trkHide = localStorage.getItem("vdTrkHide") === "1"; // rev 221
   // rev 218: trail stats (start time, max speed) saved on the phone
   var tStart = parseFloat(localStorage.getItem("vdTStart") || "0") || 0;
   var tMax = parseFloat(localStorage.getItem("vdTMax") || "0") || 0;
@@ -1541,6 +1542,7 @@ function decorateResults() {
       '<button id="fStart" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Start track</button>' +
       '<button id="fStop" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Stop track</button>' +
       '<button id="fClr" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Clear track</button>' +
+      '<button id="fHide" style="margin:0;padding:10px 14px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6">Hide track</button>' +
     '</div>';
   document.body.appendChild(fs);
 
@@ -1589,8 +1591,8 @@ function decorateResults() {
         if (t.complete && t.naturalWidth) fctx.drawImage(t, tx * 256 - left, ty * 256 - top, 256, 256);
       }
     }
-    // breadcrumb trail
-    if (crumbs.length > 1) {
+    // breadcrumb trail (rev 221: can be hidden without stopping the recording)
+    if (crumbs.length > 1 && !trkHide) {
       fctx.lineJoin = "round"; fctx.lineCap = "round";
       fctx.beginPath();
       for (var i = 0; i < crumbs.length; i++) {
@@ -1616,7 +1618,9 @@ function decorateResults() {
   fCanvas.onpointermove = function (e) {
     if (!fDrag || fcLat == null) return;
     var c = vWorld(fcLat, fcLon, fZoom), n = Math.pow(2, fZoom) * 256;
-    var x = c.x - (e.clientX - fDrag.x), y = c.y - (e.clientY - fDrag.y);
+    var dx = e.clientX - fDrag.x, dy = e.clientY - fDrag.y;
+    if (window.__mapHead) { var ra = window.__mapHead * Math.PI / 180, cs = Math.cos(ra), sn = Math.sin(ra); var rdx = dx * cs - dy * sn, rdy = dx * sn + dy * cs; dx = rdx; dy = rdy; } // rev 221: turn the swipe by the map rotation so it drags the right way
+    var x = c.x - dx, y = c.y - dy;
     fDrag = { x: e.clientX, y: e.clientY }; fFollow = false;
     fcLon = x / n * 360 - 180; fcLat = Math.atan(Math.sinh(Math.PI * (1 - 2 * y / n))) * 180 / Math.PI;
     fDraw(); clearTimeout(fTimer); fTimer = setTimeout(fHome, 30000);
@@ -1642,6 +1646,15 @@ function decorateResults() {
   document.getElementById("fStop").onclick = function () { if (recOn) { tEnd = Date.now(); localStorage.setItem("vdTEnd", String(tEnd)); } recOn = false; localStorage.setItem("vdRec", "0"); saveCrumbs(); recSet(); fDraw(); };
   setInterval(function () { if (recOn && !fs.classList.contains("hidden")) fDraw(); }, 1000);
   recSet();
+  // rev 221: show/hide the track line
+  function hideSet() {
+    var hb = document.getElementById("fHide");
+    hb.textContent = trkHide ? "Show track" : "Hide track";
+    hb.style.borderColor = trkHide ? "#ff8a2b" : "#8a96a6";
+    hb.style.color = trkHide ? "#ff8a2b" : "#fff";
+  }
+  document.getElementById("fHide").onclick = function () { trkHide = !trkHide; localStorage.setItem("vdTrkHide", trkHide ? "1" : "0"); hideSet(); fDraw(); };
+  hideSet();
 
   // ----- pinch to zoom (both maps) -----
   function pinchify(canvas, getZoom, setZoom, minZ, maxZ, setScale) {
@@ -2091,7 +2104,7 @@ function decorateResults() {
     srch.onclick = function (e) {
       e.stopPropagation();
       if (sBar.style.display === "block") { closeSrch(); return; }
-      sBar.style.display = "block"; sIn.value = ""; sList.style.display = "none"; sList.innerHTML = "";
+      sBar.style.display = "block"; sIn.value = ""; sList.style.display = "none"; sList.innerHTML = ""; var sx0 = document.getElementById("fSrchX"); if (sx0) sx0.style.display = "none";
       setTimeout(function () { sIn.focus(); }, 50);
     };
     function jump(r) {
@@ -2126,6 +2139,26 @@ function decorateResults() {
     }
     document.getElementById("fSrchGo").onclick = doSearch;
     sIn.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); doSearch(); } });
+    // rev 221: suggestions appear as he types, and an X clears the field
+    sIn.style.paddingRight = "40px";
+    var sInWrap = document.createElement("div");
+    sInWrap.style.cssText = "position:relative;flex:1;display:flex";
+    sIn.parentNode.insertBefore(sInWrap, sIn);
+    sInWrap.appendChild(sIn);
+    sIn.style.flex = "1"; sIn.style.minWidth = "0";
+    var sX = document.createElement("button");
+    sX.id = "fSrchX"; sX.textContent = "\u2715";
+    sX.style.cssText = "position:absolute;right:4px;top:50%;transform:translateY(-50%);width:32px;height:32px;margin:0;padding:0;background:none;border:none;color:#7f8fa3;font-size:18px;display:none";
+    sInWrap.appendChild(sX);
+    sX.onclick = function (e) { e.preventDefault(); e.stopPropagation(); sIn.value = ""; sList.style.display = "none"; sList.innerHTML = ""; sX.style.display = "none"; sIn.focus(); };
+    var sTimer = 0;
+    sIn.addEventListener("input", function () {
+      sX.style.display = sIn.value ? "block" : "none";
+      clearTimeout(sTimer);
+      var q = (sIn.value || "").trim();
+      if (q.length < 3) { sList.style.display = "none"; sList.innerHTML = ""; return; }
+      sTimer = setTimeout(doSearch, 350);
+    });
     [sBar].forEach(function (el) {
       el.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
       el.addEventListener("pointerup", function (e) { e.stopPropagation(); });
