@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 221 -->
+<!-- Van Dash rev 222 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -315,12 +315,12 @@
 
   <div class="vmap" id="vmap">
     <canvas id="vmapCanvas"></canvas>
-    <button id="vSat"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="M2 12l10 5 10-5"/><path d="M2 16l10 5 10-5"/></svg></button>
+    <button id="vSat"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="M2 12l10 5 10-5"/><path d="M2 16l10 5 10-5"/></svg></button><div id="vCamHost"></div>
     <div class="zbtns"><button id="vzIn">+</button><button id="vzOut">&minus;</button><button id="vCtr">&#9678;</button></div>
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r221</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r222</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2199,6 +2199,153 @@ function decorateResults() {
   // first-load safety: if the heading never arrives, the maps simply stay north-up (the original behavior)
 
 
+})();
+/* ===== Part 3 (rev 222): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+(function () {
+  var host = document.getElementById("vCamHost");
+  if (!host) return;
+  var btn = document.createElement("button");
+  btn.id = "vCam"; btn.setAttribute("aria-label", "Photo spot");
+  btn.style.cssText = "position:absolute;left:8px;top:54px;width:40px;height:40px;margin:0;padding:0;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px";
+  btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto"><path d="M3 8a2 2 0 0 1 2-2h2.5l1.5-2h6l1.5 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+  var badge = document.createElement("span");
+  badge.style.cssText = "position:absolute;right:-6px;top:-6px;min-width:20px;height:20px;border-radius:10px;background:#ff8a2b;color:#000;font-size:12px;font-weight:700;line-height:20px;text-align:center;display:none;padding:0 4px";
+  btn.appendChild(badge);
+  var inp = document.createElement("input");
+  inp.type = "file"; inp.accept = "image/*"; inp.setAttribute("capture", "environment"); inp.style.display = "none";
+  host.appendChild(btn); host.appendChild(inp);
+  ["pointerdown", "pointerup"].forEach(function (ev) { btn.addEventListener(ev, function (e) { e.stopPropagation(); }); });
+
+  var shots = [];
+  try { shots = JSON.parse(localStorage.getItem("vdShots") || "[]"); } catch (e) { shots = []; }
+  function saveShots() { try { localStorage.setItem("vdShots", JSON.stringify(shots)); return true; } catch (e) { return false; } }
+  function sync() { badge.textContent = shots.length; badge.style.display = shots.length ? "block" : "none"; }
+  sync();
+
+  // last known position, from a watcher of its own
+  var pLat = null, pLon = null, pAcc = null;
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(function (p) { pLat = p.coords.latitude; pLon = p.coords.longitude; pAcc = p.coords.accuracy; }, function () {}, { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 });
+  }
+
+  function stamp(t) {
+    var d = new Date(t);
+    return d.toLocaleDateString([], { month: "short", day: "numeric" }) + " " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+  function fileName(s) {
+    var d = new Date(s.t), z = function (n) { return (n < 10 ? "0" : "") + n; };
+    return "spot-" + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + "-" + z(d.getHours()) + z(d.getMinutes()) + z(d.getSeconds()) + ".jpg";
+  }
+  function mapLink(s) {
+    return s.lat == null ? "no GPS fix" : s.lat.toFixed(5) + ", " + s.lon.toFixed(5) + " https://maps.google.com/?q=" + s.lat.toFixed(5) + "," + s.lon.toFixed(5);
+  }
+  function toFile(s) {
+    var bin = atob(s.img.split(",")[1]), u = new Uint8Array(bin.length);
+    for (var k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k);
+    return new File([u], fileName(s), { type: "image/jpeg" });
+  }
+
+  // shrink the photo so a bunch of them fit in the phone's storage
+  function shrink(file, cb) {
+    var url = URL.createObjectURL(file), im = new Image();
+    im.onload = function () {
+      var sc = Math.min(1, 1280 / Math.max(im.naturalWidth, im.naturalHeight));
+      var c = document.createElement("canvas");
+      c.width = Math.round(im.naturalWidth * sc); c.height = Math.round(im.naturalHeight * sc);
+      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      cb(c.toDataURL("image/jpeg", 0.72));
+    };
+    im.onerror = function () { URL.revokeObjectURL(url); cb(null); };
+    im.src = url;
+  }
+
+  // tap the camera = take a photo; tap the number badge = review and send
+  btn.onclick = function (e) { e.stopPropagation(); inp.value = ""; inp.click(); };
+  badge.addEventListener("click", function (e) { e.stopPropagation(); e.preventDefault(); openList(); });
+  badge.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+
+  inp.onchange = function () {
+    var f = inp.files && inp.files[0];
+    if (!f) return;
+    var t = Date.now(), la = pLat, lo = pLon, ac = pAcc;
+    shrink(f, function (data) {
+      if (!data) { alert("Couldn't read that photo."); return; }
+      shots.push({ t: t, lat: la, lon: lo, acc: ac, img: data });
+      if (!saveShots()) { shots.pop(); alert("Phone storage for photos is full. Send or clear the queued ones first."); }
+      sync();
+    });
+  };
+
+  // ----- review / send list -----
+  var panel = document.createElement("div");
+  panel.id = "shotPanel";
+  panel.style.cssText = "position:fixed;left:0;top:0;right:0;bottom:0;z-index:90;background:#000;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 24px)";
+  document.body.appendChild(panel);
+  function closeList() { panel.style.display = "none"; }
+  function openList() { panel.style.display = "block"; panel.scrollTop = 0; renderList(); }
+
+  function renderList() {
+    var h = '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 12px">' +
+      '<button id="shBack" style="margin:0;background:#26303c;padding:8px 14px;font-size:15px">&lsaquo; Back</button>' +
+      '<div style="font-size:20px;font-weight:600;color:#e8eef5">Photo spots</div><div style="width:70px"></div></div>';
+    if (!shots.length) {
+      h += '<div style="text-align:center;color:#7f8fa3;padding:30px 0">No photos queued.</div>';
+    } else {
+      h += '<div style="display:flex;gap:8px;margin-bottom:12px">' +
+        '<button id="shSend" style="flex:1;margin:0;padding:13px;font-size:16px;background:#c9651a">Send all (' + shots.length + ')</button>' +
+        '<button id="shClear" class="alt" style="margin:0;padding:13px 16px;font-size:16px">Clear</button></div>';
+      for (var i = shots.length - 1; i >= 0; i--) {
+        var s = shots[i];
+        h += '<div style="display:flex;gap:12px;align-items:center;background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;padding:10px;margin-bottom:8px">' +
+          '<img src="' + s.img + '" style="width:72px;height:72px;object-fit:cover;border-radius:8px;flex:none">' +
+          '<div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:600;color:#e8eef5">' + stamp(s.t) + '</div>' +
+          '<div style="font-size:12px;color:#9fb0c3;margin-top:3px">' + (s.lat == null ? "No GPS fix" : s.lat.toFixed(5) + ", " + s.lon.toFixed(5)) + '</div></div>' +
+          '<button data-del="' + i + '" style="margin:0;background:none;color:#ff8a2b;font-size:20px;padding:6px 10px">\u2715</button></div>';
+      }
+    }
+    h += '<div id="shMsg" style="text-align:center;font-size:13px;color:#7f8fa3;margin-top:10px;min-height:18px"></div>';
+    panel.innerHTML = h;
+    document.getElementById("shBack").onclick = closeList;
+    panel.querySelectorAll("[data-del]").forEach(function (b) {
+      b.onclick = function () {
+        if (confirm("Remove this photo?")) { shots.splice(+b.dataset.del, 1); saveShots(); sync(); renderList(); }
+      };
+    });
+    var sb = document.getElementById("shSend"), cb = document.getElementById("shClear");
+    if (sb) sb.onclick = sendAll;
+    if (cb) cb.onclick = function () { if (confirm("Clear all " + shots.length + " queued photos?")) { shots = []; saveShots(); sync(); renderList(); } };
+  }
+
+  function afterSend(msg) {
+    var m = document.getElementById("shMsg");
+    if (m) m.textContent = msg;
+    setTimeout(function () {
+      if (confirm("Did that send? OK clears these photos from the queue.")) { shots = []; saveShots(); sync(); renderList(); }
+    }, 400);
+  }
+
+  async function sendAll() {
+    var text = shots.map(function (s, i) { return (i + 1) + ". " + stamp(s.t) + " - " + mapLink(s); }).join("\n");
+    var files = shots.map(toFile);
+    var m = document.getElementById("shMsg");
+    try {
+      if (navigator.canShare && navigator.canShare({ files: files })) {
+        await navigator.share({ files: files, title: "Photo spots", text: text });
+        afterSend("Shared with photos.");
+        return;
+      }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    // fallback: this iPhone can't share the photo files, so share the list of spots instead
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Photo spots", text: text });
+        afterSend("Shared the list of spots (this phone can't share the photos from here).");
+        return;
+      }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    if (m) m.textContent = "Sharing isn't available here.";
+  }
 })();
 </script>
 </body>
