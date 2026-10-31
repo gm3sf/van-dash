@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 238 -->
+<!-- Van Dash rev 239 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r238</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r239</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1613,6 +1613,7 @@ function decorateResults() {
   }
   function fHome() { fFollow = true; if (fLat != null) { fcLat = fLat; fcLon = fLon; } fDraw(); }
   window.__fGo = function (a, o, z) { fFollow = false; fcLat = a; fcLon = o; if (z) fZoom = z; fDraw(); };
+  window.__fCen = function (h) { if (h) clearTimeout(fTimer); return [fcLat, fcLon]; };
 
   fCanvas.onpointerdown = function (e) { fDrag = { x: e.clientX, y: e.clientY }; fCanvas.setPointerCapture(e.pointerId); };
   fCanvas.onpointermove = function (e) {
@@ -2201,7 +2202,7 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 238): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 239): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 /* ---- Spotify player on the Spotify page (rev 230) ---- */
 (function () {
   var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
@@ -2767,7 +2768,7 @@ function decorateResults() {
   ['pointerdown', 'pointerup'].forEach(function (ev) { tb.addEventListener(ev, function (e) { e.stopPropagation(); }); });
   tb.onclick = function (e) { e.stopPropagation(); panel.style.display = 'block'; panel.scrollTop = 0; render(); };
   var st2 = document.getElementById('fStats');
-  if (st2) { st2.style.gridTemplateColumns = '40px repeat(4,1fr)'; st2.style.alignItems = 'center'; st2.insertBefore(tb, st2.firstChild); } else ov.appendChild(tb);
+  if (st2) { st2.style.gridTemplateColumns = 'repeat(4,1fr) 40px'; st2.style.alignItems = 'center'; st2.appendChild(tb); } else ov.appendChild(tb);
   mark();
 })();
 /* ---- rev 238: drop pins on the big map ---- */
@@ -2814,6 +2815,7 @@ function decorateResults() {
       '<button id="pnBack" style="margin:0;background:#26303c;padding:8px 14px;font-size:15px">&lsaquo; Back</button>' +
       '<div style="font-size:20px;font-weight:600;color:#e8eef5">Pins</div><div style="width:70px"></div></div>' +
       '<button id="pnDrop" style="width:100%;margin:0 0 8px;padding:13px;font-size:16px;background:#c9651a">Drop a pin at my location</button>' +
+      '<button id="pnPick" style="width:100%;margin:0 0 8px;padding:13px;font-size:16px;background:#26303c">Pick a spot on the map</button>' +
       '<div style="text-align:center;font-size:13px;color:#7f8fa3;min-height:18px;margin-bottom:8px">' + msg + '</div>';
     if (!pins.length) h += '<div style="text-align:center;color:#7f8fa3;padding:30px 0">No pins yet.</div>';
     pins.forEach(function (p, i) {
@@ -2845,6 +2847,7 @@ function decorateResults() {
     if (!b) return;
     if (b.id === 'pnBack') { panel.style.display = 'none'; return; }
     if (b.id === 'pnDrop') { drop(); return; }
+    if (b.id === 'pnPick') { pick(); return; }
     var i = +b.getAttribute('data-i'), a = b.getAttribute('data-a'), p = pins[i];
     if (!p) return;
     if (a === 'go') {
@@ -2860,6 +2863,51 @@ function decorateResults() {
     } else if (a === 'del') {
       if (confirm('Delete "' + p.name + '"?')) { pins.splice(i, 1); persist(); render(); redraw(); }
     }
+  };
+
+  // ---- pick a spot: drag the map under the crosshair, then tap Place pin ----
+  var st = document.getElementById('fStats');
+  var cross = document.createElement('div');
+  cross.style.cssText = 'position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;z-index:4;pointer-events:none;display:none';
+  cross.innerHTML = '<svg viewBox="0 0 44 44" style="width:44px;height:44px;display:block"><g fill="none" stroke-linecap="round"><path d="M22 4v12M22 28v12M4 22h12M28 22h12" stroke="#000" stroke-width="6" opacity="0.55"/><path d="M22 4v12M22 28v12M4 22h12M28 22h12" stroke="#ff8a2b" stroke-width="3"/><circle cx="22" cy="22" r="2.5" fill="#ff8a2b" stroke="#fff" stroke-width="1"/></g></svg>';
+  fm.appendChild(cross);
+  var bar = document.createElement('div');
+  bar.style.cssText = 'position:absolute;left:0;right:0;top:0;z-index:4;display:none;align-items:center;gap:8px;padding:0 8px;box-sizing:border-box;background:rgba(21,28,37,0.97);border:0.5px solid #ff8a2b;border-radius:10px';
+  bar.innerHTML = '<div style="flex:1;min-width:0;font-size:14px;color:#e8eef5">Drag the map to the spot</div>' +
+    '<button id="pnNo" style="margin:0;padding:0 12px;height:34px;font-size:14px;background:#26303c;border:0;border-radius:8px;flex:none">Cancel</button>' +
+    '<button id="pnYes" style="margin:0;padding:0 12px;height:34px;font-size:14px;background:#c9651a;border:0;border-radius:8px;flex:none">Place pin</button>';
+  if (st && st.parentNode) st.parentNode.insertBefore(bar, st); else fm.appendChild(bar);
+  var hold = 0;
+  function endPick() { cross.style.display = 'none'; bar.style.display = 'none'; clearInterval(hold); }
+  function pick() {
+    var a = window.__fCen ? window.__fCen() : null;
+    if (!a || a[0] == null) { msg = 'The map has no location yet.'; render(); return; }
+    panel.style.display = 'none';
+    if (window.__fGo) window.__fGo(a[0], a[1]); // stop following the GPS so the map stays where you put it
+    cross.style.display = 'block'; bar.style.display = 'flex';
+    bar.style.height = Math.max(40, (st && st.offsetHeight) || 0) + 'px';
+    clearInterval(hold);
+    hold = setInterval(function () {
+      if (fm.classList.contains('hidden')) { endPick(); return; }
+      if (window.__fCen) window.__fCen(true); // keep the map from snapping back while you line it up
+    }, 4000);
+  }
+  ['pnNo', 'pnYes'].forEach(function (id) {
+    var b = document.getElementById(id);
+    b.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+    b.addEventListener('pointerup', function (e) { e.stopPropagation(); });
+  });
+  document.getElementById('pnNo').onclick = function (e) { e.stopPropagation(); endPick(); };
+  document.getElementById('pnYes').onclick = function (e) {
+    e.stopPropagation();
+    var a = window.__fCen ? window.__fCen() : null;
+    if (!a || a[0] == null) { endPick(); return; }
+    endPick();
+    var def = 'Pin ' + (pins.length + 1), nm = prompt('Name this pin:', def);
+    if (nm === null) return;
+    pins.unshift({ id: 'p' + Date.now(), name: nm.trim() || def, lat: a[0], lon: a[1], t: Date.now() });
+    if (!persist()) { pins.shift(); persist(); alert('Phone storage is full.'); return; }
+    redraw();
   };
 
   // ---- the pin button, above the zoom buttons on the big map ----
