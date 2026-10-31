@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 236 -->
+<!-- Van Dash rev 238 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r236</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r238</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2201,7 +2201,7 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 236): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 238): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 /* ---- Spotify player on the Spotify page (rev 230) ---- */
 (function () {
   var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
@@ -2761,12 +2761,115 @@ function decorateResults() {
       }
     }
   };
-  tb.textContent = 'Trails';
-  tb.style.cssText = 'margin:0;padding:8px 4px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px;color:#fff';
+  tb.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:auto"><path d="M5 3h11l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M8 3v5h8V3"/><rect x="7" y="13" width="10" height="8"/></svg>';
+  tb.setAttribute('aria-label', 'Saved trails');
+  tb.style.cssText = 'margin:0;padding:0;width:36px;height:34px;background:#26303c;border:0.5px solid #8a96a6;border-radius:8px';
   ['pointerdown', 'pointerup'].forEach(function (ev) { tb.addEventListener(ev, function (e) { e.stopPropagation(); }); });
   tb.onclick = function (e) { e.stopPropagation(); panel.style.display = 'block'; panel.scrollTop = 0; render(); };
-  ov.appendChild(tb);
+  var st2 = document.getElementById('fStats');
+  if (st2) { st2.style.gridTemplateColumns = '40px repeat(4,1fr)'; st2.style.alignItems = 'center'; st2.insertBefore(tb, st2.firstChild); } else ov.appendChild(tb);
   mark();
+})();
+/* ---- rev 238: drop pins on the big map ---- */
+(function () {
+  var fm = document.getElementById('fullMap'), fIn = document.getElementById('fIn');
+  if (!fm || !fIn || !fIn.parentNode) return;
+  var KEY = 'vdPins', pins = [];
+  try { pins = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { pins = []; }
+  function persist() { try { localStorage.setItem(KEY, JSON.stringify(pins)); return true; } catch (e) { return false; } }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function when(t) { var d = new Date(t); return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+  function redraw() { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }
+
+  // ---- draw the pins on the big map (added to the map's own draw) ----
+  var prev = window.__fOver;
+  window.__fOver = function (ctx, left, top, z) {
+    if (prev) prev(ctx, left, top, z);
+    if (!pins.length || typeof vWorld !== 'function') return;
+    var head = window.__mapHead || 0;
+    pins.forEach(function (p) {
+      var w = vWorld(p.lat, p.lon, z), x = w.x - left, y = w.y - top;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(head * Math.PI / 180); // keep the pin and its name upright when the map is turned
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-7, -13); ctx.arc(0, -19, 9, 2.2, 0.94, false); ctx.closePath();
+      ctx.fillStyle = '#ff8a2b'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, -19, 3.5, 0, 6.2832); ctx.fillStyle = '#fff'; ctx.fill();
+      ctx.font = '700 13px -apple-system, Helvetica, sans-serif'; ctx.textBaseline = 'middle';
+      var tw = ctx.measureText(p.name).width;
+      ctx.fillStyle = 'rgba(21,28,37,0.88)';
+      ctx.fillRect(14, -30, tw + 12, 22);
+      ctx.fillStyle = '#fff'; ctx.fillText(p.name, 20, -19);
+      ctx.restore();
+    });
+  };
+
+  // ---- the Pins page ----
+  var panel = document.createElement('div');
+  panel.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:95;background:#000;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 24px)';
+  document.body.appendChild(panel);
+  var msg = '';
+  function render() {
+    var h = '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 12px">' +
+      '<button id="pnBack" style="margin:0;background:#26303c;padding:8px 14px;font-size:15px">&lsaquo; Back</button>' +
+      '<div style="font-size:20px;font-weight:600;color:#e8eef5">Pins</div><div style="width:70px"></div></div>' +
+      '<button id="pnDrop" style="width:100%;margin:0 0 8px;padding:13px;font-size:16px;background:#c9651a">Drop a pin at my location</button>' +
+      '<div style="text-align:center;font-size:13px;color:#7f8fa3;min-height:18px;margin-bottom:8px">' + msg + '</div>';
+    if (!pins.length) h += '<div style="text-align:center;color:#7f8fa3;padding:30px 0">No pins yet.</div>';
+    pins.forEach(function (p, i) {
+      h += '<div style="background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;padding:12px;margin-bottom:8px">' +
+        '<div style="font-size:17px;font-weight:600;color:#e8eef5">' + esc(p.name) + '</div>' +
+        '<div style="font-size:13px;color:#9fb0c3;margin:3px 0 10px">' + when(p.t) + ' &middot; ' + p.lat.toFixed(5) + ', ' + p.lon.toFixed(5) + '</div>' +
+        '<div style="display:flex;gap:8px">' +
+        '<button data-a="go" data-i="' + i + '" style="flex:1;margin:0;padding:10px 6px;font-size:14px;background:#c9651a">Show on map</button>' +
+        '<button data-a="nav" data-i="' + i + '" style="margin:0;padding:10px 12px;font-size:14px;background:#26303c">Directions</button>' +
+        '<button data-a="ren" data-i="' + i + '" style="margin:0;padding:10px 12px;font-size:14px;background:#26303c">Rename</button>' +
+        '<button data-a="del" data-i="' + i + '" style="margin:0;padding:10px 12px;font-size:16px;background:none;color:#ff8a2b">&times;</button></div></div>';
+    });
+    panel.innerHTML = h;
+  }
+  function drop() {
+    if (!navigator.geolocation) { msg = 'This phone has no location.'; render(); return; }
+    msg = 'Getting your location...'; render();
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      var def = 'Pin ' + (pins.length + 1);
+      var nm = prompt('Name this pin:', def);
+      if (nm === null) { msg = ''; render(); return; }
+      pins.unshift({ id: 'p' + Date.now(), name: nm.trim() || def, lat: pos.coords.latitude, lon: pos.coords.longitude, t: Date.now() });
+      if (!persist()) { pins.shift(); persist(); msg = 'Phone storage is full.'; render(); return; }
+      msg = 'Pin saved.'; render(); redraw();
+    }, function () { msg = 'Could not get your location.'; render(); }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 });
+  }
+  panel.onclick = function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    if (b.id === 'pnBack') { panel.style.display = 'none'; return; }
+    if (b.id === 'pnDrop') { drop(); return; }
+    var i = +b.getAttribute('data-i'), a = b.getAttribute('data-a'), p = pins[i];
+    if (!p) return;
+    if (a === 'go') {
+      panel.style.display = 'none';
+      if (window.__fGo) window.__fGo(p.lat, p.lon, 16); else redraw();
+    } else if (a === 'nav') {
+      var l = document.createElement('a');
+      l.href = 'https://maps.google.com/?q=' + p.lat.toFixed(6) + ',' + p.lon.toFixed(6); l.target = '_blank'; l.rel = 'noopener';
+      document.body.appendChild(l); l.click(); l.remove();
+    } else if (a === 'ren') {
+      var nm = prompt('Rename pin:', p.name);
+      if (nm && nm.trim()) { p.name = nm.trim(); persist(); render(); redraw(); }
+    } else if (a === 'del') {
+      if (confirm('Delete "' + p.name + '"?')) { pins.splice(i, 1); persist(); render(); redraw(); }
+    }
+  };
+
+  // ---- the pin button, above the zoom buttons on the big map ----
+  var pb = document.createElement('button');
+  pb.setAttribute('aria-label', 'Pins');
+  pb.style.cssText = 'width:46px;height:46px;margin:0;padding:0;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6';
+  pb.innerHTML = '<svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:auto"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+  ['pointerdown', 'pointerup'].forEach(function (ev) { pb.addEventListener(ev, function (e) { e.stopPropagation(); }); });
+  pb.onclick = function (e) { e.stopPropagation(); msg = ''; panel.style.display = 'block'; panel.scrollTop = 0; render(); };
+  fIn.parentNode.insertBefore(pb, fIn);
 })();
 /* ---- photo spot-log ---- */
 (function () {
