@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 234 -->
+<!-- Van Dash rev 235 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r234</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r235</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1943,6 +1943,7 @@ function decorateResults() {
       }
     }).catch(function () {});
   }
+  window.__vdSetRad = function (p) { radarPath = p; redrawBoth(); };
   function drawRadar(ctx, lat, lon, z, W, H, pinch, extra) {
     if (!radarOn || !radarPath || lat == null) return;
     var rz = Math.max(3, Math.min(z, 7)); // radar tiles only exist at coarse zooms; scale up
@@ -2198,7 +2199,7 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 234): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 235): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 /* ---- Spotify player on the Spotify page (rev 230) ---- */
 (function () {
   var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
@@ -2519,6 +2520,89 @@ function decorateResults() {
       R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
     }
   }, 200);
+})();
+/* ---- rev 235: radar controls on the big map, refresh arrow spin ---- */
+(function () {
+  var fm = document.getElementById('fullMap'), st = document.getElementById('fStats');
+  if (!fm || !st || !st.parentNode) return;
+  var box = document.createElement('div');
+  box.style.cssText = 'position:absolute;left:0;right:0;top:0;z-index:3;display:none;align-items:center;gap:8px;padding:0 8px;box-sizing:border-box;background:rgba(21,28,37,0.97);border:0.5px solid #ff8a2b;border-radius:10px';
+  function ic(d) { return '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:auto">' + d + '</svg>'; }
+  var bs = 'margin:0;padding:0;width:44px;height:34px;background:#26303c;border:0;border-radius:8px;flex:none';
+  box.innerHTML = '<div style="font-size:15px;font-weight:700;color:#ff8a2b;flex:none">Radar:</div>' +
+    '<button id="vdRadB" style="' + bs + '">' + ic('<path d="M6 5v14M19 5L9 12l10 7z"/>') + '</button>' +
+    '<button id="vdRadP" style="' + bs + '"></button>' +
+    '<button id="vdRadF" style="' + bs + '">' + ic('<path d="M18 5v14M5 5l10 7-10 7z"/>') + '</button>' +
+    '<div id="vdRadT" style="flex:1;min-width:0;text-align:right;font-size:13px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading...</div>';
+  st.parentNode.insertBefore(box, st);
+  var pb = document.getElementById('vdRadP'), tt = document.getElementById('vdRadT'), shown = null;
+  var fr = [], idx = 0, play = true, got = 0, tried = 0, lastStep = 0;
+  function setPlay(p) {
+    var k = p ? 'p' : 'q';
+    if (shown === k) return;
+    shown = k;
+    pb.innerHTML = ic(p ? '<path d="M8 5v14M16 5v14"/>' : '<path d="M7 4.5v15l12-7.5z"/>');
+  }
+  function show() {
+    var f = fr[idx];
+    if (!f) return;
+    if (window.__vdSetRad) window.__vdSetRad(f.path);
+    var ago = Math.max(0, Math.round((Date.now() - f.time * 1000) / 60000));
+    tt.textContent = new Date(f.time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + (ago ? ' (' + ago + ' min ago)' : ' (now)');
+  }
+  function step(d) { if (!fr.length) return; idx = (idx + d + fr.length) % fr.length; show(); }
+  function getFrames() {
+    tried = Date.now();
+    fetch('https://api.rainviewer.com/public/weather-maps.json').then(function (r) { return r.json(); }).then(function (j) {
+      var past = (j && j.radar && j.radar.past) || [];
+      if (!past.length) return;
+      fr = past.slice(-7); idx = 0; got = Date.now(); show();
+    }).catch(function () {});
+  }
+  ['vdRadB', 'vdRadP', 'vdRadF'].forEach(function (id) {
+    var b = document.getElementById(id);
+    b.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+    b.addEventListener('pointerup', function (e) { e.stopPropagation(); });
+  });
+  document.getElementById('vdRadB').onclick = function (e) { e.stopPropagation(); play = false; step(-1); };
+  document.getElementById('vdRadF').onclick = function (e) { e.stopPropagation(); play = false; step(1); };
+  pb.onclick = function (e) { e.stopPropagation(); play = !play; };
+  setInterval(function () {
+    var on = false;
+    try { on = localStorage.getItem('vdRadar') === '1'; } catch (e) {}
+    var vis = on && !fm.classList.contains('hidden');
+    box.style.display = vis ? 'flex' : 'none';
+    if (!vis) return;
+    box.style.height = Math.max(40, st.offsetHeight || 0) + 'px';
+    setPlay(play);
+    var now = Date.now();
+    if ((!fr.length || now - got > 300000) && now - tried > 15000) getFrames();
+    if (!fr.length) { tt.textContent = 'Loading...'; return; }
+    if (play && fr.length > 1 && now - lastStep >= (idx === fr.length - 1 ? 1600 : 650)) { lastStep = now; step(1); }
+  }, 200);
+})();
+
+/* ---- refresh arrow: spins while it works, pulses when the city comes back ---- */
+(function () {
+  var b = document.getElementById('cityRef'), c = document.getElementById('city');
+  if (!b || !c || !b.animate) return;
+  var spin = null, t0 = 0, kill = 0, mo = null;
+  function done() {
+    clearTimeout(kill);
+    if (mo) { mo.disconnect(); mo = null; }
+    if (!spin) return;
+    var s = spin; spin = null;
+    s.cancel();
+    b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.35)' }, { transform: 'scale(1)' }], { duration: 400 });
+  }
+  b.addEventListener('click', function () {
+    if (spin) return;
+    t0 = Date.now();
+    spin = b.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], { duration: 700, iterations: Infinity });
+    mo = new MutationObserver(function () { setTimeout(done, Math.max(0, 900 - (Date.now() - t0))); });
+    mo.observe(c, { childList: true, characterData: true, subtree: true });
+    kill = setTimeout(done, 4000);
+  });
 })();
 /* ---- photo spot-log ---- */
 (function () {
