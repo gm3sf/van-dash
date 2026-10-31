@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 235 -->
+<!-- Van Dash rev 236 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r235</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r236</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1608,9 +1608,11 @@ function decorateResults() {
       fctx.lineWidth = 3; fctx.strokeStyle = "#fff"; fctx.stroke();
     }
     if (window.__drawRadar) window.__drawRadar(fctx, fcLat, fcLon, fZoom, fW, fH, 1, fEx);
+    if (window.__fOver) window.__fOver(fctx, left, top, fZoom);
     fctx.restore();
   }
   function fHome() { fFollow = true; if (fLat != null) { fcLat = fLat; fcLon = fLon; } fDraw(); }
+  window.__fGo = function (a, o, z) { fFollow = false; fcLat = a; fcLon = o; if (z) fZoom = z; fDraw(); };
 
   fCanvas.onpointerdown = function (e) { fDrag = { x: e.clientX, y: e.clientY }; fCanvas.setPointerCapture(e.pointerId); };
   fCanvas.onpointermove = function (e) {
@@ -2199,7 +2201,7 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 235): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 236): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 /* ---- Spotify player on the Spotify page (rev 230) ---- */
 (function () {
   var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
@@ -2603,6 +2605,168 @@ function decorateResults() {
     mo.observe(c, { childList: true, characterData: true, subtree: true });
     kill = setTimeout(done, 4000);
   });
+})();
+/* ---- rev 236: saved trails (name, show on map, share as GPX) ---- */
+(function () {
+  var fm = document.getElementById('fullMap'), ov = fm && fm.querySelector('.mapOv');
+  if (!fm || !ov) return;
+  var KEY = 'vdTrails', SK = 'vdTrShown', COLORS = ['#3fa9ff', '#c77dff', '#4cd964', '#ffd60a'];
+  var trails = [], shown = [];
+  try { trails = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { trails = []; }
+  try { shown = JSON.parse(localStorage.getItem(SK) || '[]'); } catch (e) { shown = []; }
+  function persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(trails)); localStorage.setItem(SK, JSON.stringify(shown)); return true; } catch (e) { return false; }
+  }
+  function byId(id) { for (var i = 0; i < trails.length; i++) if (trails[i].id === id) return trails[i]; return null; }
+  function dist(a, b) {
+    var r = Math.PI / 180, dl = (b[0] - a[0]) * r, dn = (b[1] - a[1]) * r;
+    var x = Math.sin(dl / 2) * Math.sin(dl / 2) + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dn / 2) * Math.sin(dn / 2);
+    return 2 * 6371000 * Math.asin(Math.sqrt(x));
+  }
+  function miles(pts) { var m = 0; for (var i = 1; i < pts.length; i++) m += dist(pts[i - 1], pts[i]); return m * 0.000621371; }
+  function dur(s) { s = Math.max(0, Math.round(s)); var h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h ? h + ':' + ('0' + m).slice(-2) + ' hr' : m + ' min'; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function when(t) { var d = new Date(t); return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+  function redraw() { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }
+
+  // what the recorder has right now (it saves to the phone every few seconds and on this event)
+  function peek() {
+    var pts = [];
+    try { pts = JSON.parse(localStorage.getItem('vdCrumbs') || '[]'); } catch (e) { pts = []; }
+    return pts;
+  }
+  function current() {
+    try { window.dispatchEvent(new Event('pagehide')); } catch (e) {}
+    var pts = peek();
+    var ts = parseFloat(localStorage.getItem('vdTStart') || '0') || 0, te = parseFloat(localStorage.getItem('vdTEnd') || '0') || 0, mx = parseFloat(localStorage.getItem('vdTMax') || '0') || 0;
+    var rec = localStorage.getItem('vdRec') === '1', end = rec ? Date.now() : (te || Date.now());
+    return { pts: pts, t0: ts, secs: ts ? Math.max(0, (end - ts) / 1000) : 0, max: mx };
+  }
+  function saveCur() {
+    var c = current();
+    if (c.pts.length < 2) { alert('Nothing recorded yet. Tap Start track first.'); return; }
+    var def = 'Trail ' + when(c.t0 || Date.now());
+    var nm = prompt('Name this trail:', def);
+    if (nm === null) return;
+    nm = nm.trim() || def;
+    var pts = c.pts.map(function (p) { return [+p[0].toFixed(5), +p[1].toFixed(5)]; });
+    trails.unshift({ id: 't' + Date.now(), name: nm, t0: c.t0 || Date.now(), secs: c.secs, max: c.max, mi: miles(pts), pts: pts });
+    if (!persist()) { trails.shift(); persist(); alert('Phone storage is full. Delete a saved trail first.'); return; }
+    render();
+  }
+
+  // ---- drawing the shown trails on the big map (called from the map's own draw) ----
+  function dot(ctx, p, z, left, top, col) {
+    var w = vWorld(p[0], p[1], z);
+    ctx.beginPath(); ctx.arc(w.x - left, w.y - top, 8, 0, 6.2832);
+    ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
+  }
+  window.__fOver = function (ctx, left, top, z) {
+    if (!shown.length || typeof vWorld !== 'function') return;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    shown.forEach(function (id, k) {
+      var tr = byId(id);
+      if (!tr || tr.pts.length < 2) return;
+      var pts = tr.pts, step = Math.max(1, Math.floor(pts.length / 3000)), i, w;
+      ctx.beginPath();
+      for (i = 0; i < pts.length; i += step) {
+        w = vWorld(pts[i][0], pts[i][1], z);
+        if (i === 0) ctx.moveTo(w.x - left, w.y - top); else ctx.lineTo(w.x - left, w.y - top);
+      }
+      w = vWorld(pts[pts.length - 1][0], pts[pts.length - 1][1], z);
+      ctx.lineTo(w.x - left, w.y - top);
+      ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 8; ctx.stroke();
+      ctx.strokeStyle = COLORS[k % COLORS.length]; ctx.lineWidth = 5; ctx.stroke();
+      dot(ctx, pts[0], z, left, top, '#4cd964');
+      dot(ctx, pts[pts.length - 1], z, left, top, '#ff3b30');
+    });
+  };
+  function focus(tr) {
+    var la0 = 90, la1 = -90, lo0 = 180, lo1 = -180, z;
+    tr.pts.forEach(function (p) { if (p[0] < la0) la0 = p[0]; if (p[0] > la1) la1 = p[0]; if (p[1] < lo0) lo0 = p[1]; if (p[1] > lo1) lo1 = p[1]; });
+    var W = window.innerWidth * 0.8, H = window.innerHeight * 0.55;
+    for (z = 17; z > 3; z--) {
+      var a = vWorld(la1, lo0, z), b = vWorld(la0, lo1, z);
+      if (Math.abs(b.x - a.x) <= W && Math.abs(b.y - a.y) <= H) break;
+    }
+    if (window.__fGo) window.__fGo((la0 + la1) / 2, (lo0 + lo1) / 2, z); else redraw();
+  }
+
+  // ---- share as a GPX file (opens in Google Maps, Gaia, Apple Maps and most trail apps) ----
+  function gpx(tr) {
+    var s = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Van Dash" xmlns="http://www.topografix.com/GPX/1/1">\n<trk><name>' + esc(tr.name) + '</name><trkseg>\n';
+    tr.pts.forEach(function (p) { s += '<trkpt lat="' + p[0] + '" lon="' + p[1] + '"/>\n'; });
+    return s + '</trkseg></trk></gpx>\n';
+  }
+  async function share(tr) {
+    var nm = tr.name.replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-') || 'trail';
+    var file = new File([gpx(tr)], 'vandash-' + nm + '.gpx', { type: 'application/gpx+xml' });
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: tr.name }); return; }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    try {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(file); a.download = file.name;
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch (e) { alert('Sharing is not available here.'); }
+  }
+
+  // ---- the Trails page ----
+  var panel = document.createElement('div');
+  panel.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:95;background:#000;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 24px)';
+  document.body.appendChild(panel);
+  var tb = document.createElement('button');
+  function mark() { tb.style.borderColor = shown.length ? '#ff8a2b' : '#8a96a6'; tb.style.color = shown.length ? '#ff8a2b' : '#fff'; }
+  function render() {
+    var pk = peek(), h = '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 12px">' +
+      '<button id="trBack" style="margin:0;background:#26303c;padding:8px 14px;font-size:15px">&lsaquo; Back</button>' +
+      '<div style="font-size:20px;font-weight:600;color:#e8eef5">Trails</div><div style="width:70px"></div></div>' +
+      '<button id="trSave" style="width:100%;margin:0 0 12px;padding:13px;font-size:16px;background:#c9651a">Save current track (' + pk.length + ' points, ' + miles(pk).toFixed(2) + ' mi)</button>';
+    if (!trails.length) h += '<div style="text-align:center;color:#7f8fa3;padding:30px 0">No saved trails yet.<br>Record one with Start track, then save it here.</div>';
+    trails.forEach(function (tr, i) {
+      var on = shown.indexOf(tr.id) >= 0;
+      h += '<div style="background:#151c25;border:0.5px solid ' + (on ? '#ff8a2b' : '#8a96a6') + ';border-radius:14px;padding:12px;margin-bottom:8px">' +
+        '<div style="font-size:17px;font-weight:600;color:#e8eef5">' + esc(tr.name) + '</div>' +
+        '<div style="font-size:13px;color:#9fb0c3;margin:3px 0 10px">' + when(tr.t0) + ' &middot; ' + tr.mi.toFixed(2) + ' mi &middot; ' + dur(tr.secs) + (tr.max ? ' &middot; max ' + Math.round(tr.max) + ' mph' : '') + '</div>' +
+        '<div style="display:flex;gap:8px">' +
+        '<button data-a="show" data-i="' + i + '" style="flex:1;margin:0;padding:10px 6px;font-size:14px;background:' + (on ? '#26303c' : '#c9651a') + '">' + (on ? 'Hide from map' : 'Show on map') + '</button>' +
+        '<button data-a="share" data-i="' + i + '" style="margin:0;padding:10px 12px;font-size:14px;background:#26303c">Share</button>' +
+        '<button data-a="ren" data-i="' + i + '" style="margin:0;padding:10px 12px;font-size:14px;background:#26303c">Rename</button>' +
+        '<button data-a="del" data-i="' + i + '" style="margin:0;padding:10px 12px;font-size:16px;background:none;color:#ff8a2b">&times;</button></div></div>';
+    });
+    panel.innerHTML = h;
+    mark();
+  }
+  panel.onclick = function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    if (b.id === 'trBack') { panel.style.display = 'none'; return; }
+    if (b.id === 'trSave') { saveCur(); return; }
+    var i = +b.getAttribute('data-i'), a = b.getAttribute('data-a'), tr = trails[i], k;
+    if (!tr) return;
+    if (a === 'show') {
+      k = shown.indexOf(tr.id);
+      if (k >= 0) { shown.splice(k, 1); persist(); render(); redraw(); }
+      else { shown.push(tr.id); persist(); mark(); panel.style.display = 'none'; focus(tr); }
+    } else if (a === 'share') {
+      share(tr);
+    } else if (a === 'ren') {
+      var nm = prompt('Rename trail:', tr.name);
+      if (nm && nm.trim()) { tr.name = nm.trim(); persist(); render(); }
+    } else if (a === 'del') {
+      if (confirm('Delete "' + tr.name + '"?')) {
+        trails.splice(i, 1);
+        k = shown.indexOf(tr.id); if (k >= 0) shown.splice(k, 1);
+        persist(); render(); redraw();
+      }
+    }
+  };
+  tb.textContent = 'Trails';
+  tb.style.cssText = 'margin:0;padding:8px 4px;font-size:14px;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px;color:#fff';
+  ['pointerdown', 'pointerup'].forEach(function (ev) { tb.addEventListener(ev, function (e) { e.stopPropagation(); }); });
+  tb.onclick = function (e) { e.stopPropagation(); panel.style.display = 'block'; panel.scrollTop = 0; render(); };
+  ov.appendChild(tb);
+  mark();
 })();
 /* ---- photo spot-log ---- */
 (function () {
