@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 233 -->
+<!-- Van Dash rev 234 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r233</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r234</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2198,7 +2198,7 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 233): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 234): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 /* ---- Spotify player on the Spotify page (rev 230) ---- */
 (function () {
   var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
@@ -2320,6 +2320,205 @@ function decorateResults() {
   var sb = document.getElementById('spotBtn');
   if (sb) sb.addEventListener('click', function () { setTimeout(poll, 200); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) poll(); });
+})();
+/* ---- rev 234: weather extras ---- */
+(function () {
+  var sc = document.getElementById('weatherScreen'), fc = document.getElementById('forecast');
+  if (!sc || !fc) return;
+  var noop = function () {};
+  var DATA = null, DKEY = '', DT = 0, PEND = null, PKEY = '', INFO = null;
+  function pos() { try { return lastWeatherPos || null; } catch (e) { return null; } }
+  function hidden() { return sc.classList.contains('hidden'); }
+
+  // 15-second skip buttons on the Spotify page: put the "15" in the middle of the arrow
+  ['spBack', 'spFwd'].forEach(function (id) {
+    var b = document.getElementById(id), s = b && b.querySelector('span');
+    if (s) { s.style.top = '16px'; s.style.lineHeight = '12px'; s.style.textAlign = 'center'; }
+  });
+
+  // ---- data: hourly + 15-minute rain, one fetch for the spot the weather is showing ----
+  function load(force) {
+    var p = pos();
+    if (!p) return Promise.reject(new Error('no position'));
+    var key = p.latitude.toFixed(2) + ',' + p.longitude.toFixed(2);
+    if (!force && DATA && key === DKEY && Date.now() - DT < 480000) return Promise.resolve(DATA);
+    if (PEND && PKEY === key) return PEND;
+    PKEY = key;
+    PEND = fetch('https://api.open-meteo.com/v1/forecast?latitude=' + p.latitude + '&longitude=' + p.longitude +
+      '&hourly=temperature_2m,weather_code,precipitation_probability&minutely_15=precipitation' +
+      '&forecast_days=7&forecast_minutely_15=16&temperature_unit=fahrenheit&timezone=auto')
+      .then(function (r) { return r.json(); })
+      .then(function (d) { DATA = d; DKEY = key; DT = Date.now(); PEND = null; return d; },
+            function (err) { PEND = null; throw err; });
+    return PEND;
+  }
+
+  // ---- rain line ----
+  var rl = document.createElement('div');
+  rl.style.cssText = 'font-size:17px;font-weight:600;color:#6db3ff;margin:4px 0 10px;min-height:22px';
+  var nl = sc.querySelector('.nowline');
+  if (nl && nl.parentNode) nl.parentNode.insertBefore(rl, nl.nextSibling);
+  function fmtMin(m) { m = Math.max(5, Math.round(m / 5) * 5); return m < 60 ? m + ' min' : (m / 60).toFixed(1).replace('.0', '') + ' hr'; }
+  function rainInfo() {
+    var d = DATA, m = d && d.minutely_15;
+    if (!m || !m.time || !m.precipitation) return null;
+    var off = (d.utc_offset_seconds || 0) * 1000, now = Date.now(), i, s = 0;
+    var ts = m.time.map(function (x) { return Date.parse(x + ':00Z') - off; });
+    while (s < ts.length - 1 && ts[s + 1] <= now) s++;
+    function wet(k) { return (m.precipitation[k] || 0) >= 0.1; }
+    if (wet(s)) {
+      for (i = s; i < ts.length && wet(i); i++) {}
+      if (i < ts.length) return { txt: 'Raining now, easing in ~' + fmtMin((ts[i] - now) / 60000), soon: 'Raining now' };
+      return { txt: 'Raining now, no break in the next 4 hours', soon: 'Raining now' };
+    }
+    for (i = s + 1; i < ts.length; i++) if (wet(i)) break;
+    if (i >= ts.length) return { txt: 'No rain expected in the next 4 hours', soon: null };
+    var mins = (ts[i] - now) / 60000;
+    return { txt: 'Rain in ~' + fmtMin(mins), soon: mins <= 60 ? 'Rain in ~' + fmtMin(mins) : null };
+  }
+  var wp = document.getElementById('wxPlace'), wpOrig = '', wpOn = false;
+  function mainCard() {
+    if (!wp) return;
+    var live = true;
+    try { live = wxLive; } catch (e) {}
+    var t = (live && INFO && INFO.soon) ? INFO.soon : null;
+    if (t) {
+      if (!wpOn) { wpOrig = wp.textContent; wpOn = true; }
+      wp.textContent = t; wp.style.color = '#6db3ff';
+    } else if (wpOn) {
+      wpOn = false; wp.textContent = wpOrig; wp.style.color = '';
+    }
+  }
+  function showRain() {
+    try { INFO = rainInfo(); rl.textContent = INFO ? INFO.txt : ''; mainCard(); } catch (e) {}
+  }
+  function tick() { load(false).then(showRain, noop); }
+  setInterval(tick, 15000);
+  setTimeout(tick, 4000);
+
+  // ---- hourly: tap a day in the 7-day list ----
+  function fill(panel, d, idx) {
+    var h = d.hourly, off = (d.utc_offset_seconds || 0) * 1000, now = Date.now(), s = Math.max(0, idx) * 24, i, out = '';
+    if (idx <= 0) {
+      s = 0;
+      while (s < h.time.length - 1 && Date.parse(h.time[s] + ':00Z') - off < now - 1800000) s++;
+    }
+    var e = Math.min(s + 24, h.time.length);
+    for (i = s; i < e; i++) {
+      var hr = +h.time[i].slice(11, 13), rain = h.precipitation_probability[i] || 0;
+      var lab = hr === 0 ? new Date(h.time[i].slice(0, 10) + 'T12:00:00').toLocaleDateString([], { weekday: 'short' }) : (hr % 12 || 12) + (hr < 12 ? ' AM' : ' PM');
+      out += '<div style="flex:none;width:56px;text-align:center">' +
+        '<div style="font-size:13px;color:#9fb0c3">' + lab + '</div>' +
+        '<div style="font-size:24px;line-height:1.3">' + wxIcon(h.weather_code[i]) + '</div>' +
+        '<div style="font-size:16px;font-weight:600">' + Math.round(h.temperature_2m[i]) + '°</div>' +
+        '<div style="font-size:12px;color:#6db3ff;min-height:15px">' + (rain >= 10 ? rain + '%' : '') + '</div></div>';
+    }
+    panel.innerHTML = out || 'No hourly data';
+  }
+  fc.addEventListener('click', function (e) {
+    var day = e.target && e.target.closest ? e.target.closest('.day') : null;
+    if (!day) return;
+    var nx = day.nextSibling, wasOpen = !!(nx && nx.className === 'vdHr');
+    var old = fc.querySelectorAll('.vdHr');
+    for (var k = 0; k < old.length; k++) old[k].remove();
+    if (wasOpen) return;
+    var panel = document.createElement('div');
+    panel.className = 'vdHr';
+    panel.style.cssText = 'display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:4px;padding:8px 0 10px;border-top:1px solid #26303c;color:#9fb0c3';
+    panel.textContent = 'Loading hourly...';
+    day.parentNode.insertBefore(panel, day.nextSibling);
+    var idx = Array.prototype.indexOf.call(fc.querySelectorAll('.day'), day);
+    load(false).then(function (d) { fill(panel, d, idx); }, function () { panel.textContent = 'Hourly forecast unavailable'; });
+  });
+  var st = sc.querySelector('.section-title');
+  if (st) st.textContent = st.textContent + ' (tap a day for hours)';
+
+  // ---- radar: last hour of rain, looping ----
+  var RZ = 6, DPR = Math.min(2, window.devicePixelRatio || 1);
+  var rbox = document.createElement('div');
+  rbox.className = 'card';
+  rbox.style.cssText = 'margin-top:14px;padding:10px 12px';
+  rbox.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+    '<div style="font-size:15px;letter-spacing:0.12em;text-transform:uppercase;color:#9fb0c3">Radar, last hour</div>' +
+    '<button id="vdRP" style="margin:0;padding:6px 14px;font-size:14px;background:#26303c">Pause</button></div>' +
+    '<canvas id="vdRC" style="width:100%;height:260px;border-radius:10px;background:#0b0f14;display:block"></canvas>' +
+    '<div id="vdRT" style="text-align:center;font-size:13px;color:#7f8fa3;margin-top:6px">Loading radar...</div>';
+  sc.appendChild(rbox);
+  var cv = rbox.querySelector('#vdRC'), rt = rbox.querySelector('#vdRT'), rp = rbox.querySelector('#vdRP');
+  var R = { frames: [], i: 0, play: true, host: '', t: 0, lat: null, lon: null, imgs: {}, last: 0, tried: 0 };
+  function wpx(lat, lon) {
+    var n = 256 * Math.pow(2, RZ), s = Math.sin(lat * Math.PI / 180);
+    return { x: (lon + 180) / 360 * n, y: (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n };
+  }
+  function img(u) {
+    var m = R.imgs[u];
+    if (!m) { m = new Image(); m.onload = function () { this.vdOK = true; if (!hidden()) draw(); }; m.src = u; R.imgs[u] = m; }
+    return m;
+  }
+  function range(W, H) {
+    var c = wpx(R.lat, R.lon), left = c.x - W / 2, top = c.y - H / 2;
+    return { left: left, top: top, x0: Math.floor(left / 256), x1: Math.floor((left + W) / 256), y0: Math.floor(top / 256), y1: Math.floor((top + H) / 256), n: Math.pow(2, RZ) };
+  }
+  function each(g, fn) {
+    for (var y = g.y0; y <= g.y1; y++) {
+      if (y < 0 || y >= g.n) continue;
+      for (var x = g.x0; x <= g.x1; x++) fn(((x % g.n) + g.n) % g.n, y, x);
+    }
+  }
+  function label() {
+    var f = R.frames[R.i];
+    if (!f) return;
+    rt.textContent = new Date(f.time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) +
+      '  (' + Math.max(0, Math.round((Date.now() - f.time * 1000) / 60000)) + ' min ago)';
+  }
+  function draw() {
+    if (R.lat == null || !cv.clientWidth) return;
+    var W = cv.clientWidth, H = cv.clientHeight, ctx = cv.getContext('2d');
+    if (cv.width !== Math.round(W * DPR)) { cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); }
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    var g = range(W, H), f = R.frames[R.i];
+    each(g, function (tx, y, x) {
+      var b = img('https://tile.openstreetmap.org/' + RZ + '/' + tx + '/' + y + '.png');
+      if (b.vdOK) ctx.drawImage(b, x * 256 - g.left, y * 256 - g.top, 256, 256);
+    });
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(0, 0, W, H);
+    if (f) each(g, function (tx, y, x) {
+      var r = img(R.host + f.path + '/256/' + RZ + '/' + tx + '/' + y + '/2/1_1.png');
+      if (r.vdOK) { ctx.globalAlpha = 0.75; ctx.drawImage(r, x * 256 - g.left, y * 256 - g.top, 256, 256); ctx.globalAlpha = 1; }
+    });
+    ctx.beginPath(); ctx.arc(W / 2, H / 2, 6, 0, 6.2832);
+    ctx.fillStyle = '#ff3b30'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+  }
+  function loadRadar() {
+    var p = pos();
+    if (!p) return;
+    R.tried = Date.now();
+    fetch('https://api.rainviewer.com/public/weather-maps.json')
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        var past = (j.radar && j.radar.past) || [];
+        R.lat = p.latitude; R.lon = p.longitude; R.t = Date.now();
+        R.host = j.host || 'https://tilecache.rainviewer.com';
+        R.frames = past.slice(-7); R.i = 0;
+        if (!R.frames.length) { rt.textContent = 'No radar available right now'; return; }
+        var W = cv.clientWidth || 360, H = cv.clientHeight || 260, g = range(W, H);
+        R.frames.forEach(function (f) { each(g, function (tx, y) { img(R.host + f.path + '/256/' + RZ + '/' + tx + '/' + y + '/2/1_1.png'); }); });
+        draw(); label();
+      })
+      .catch(function () { rt.textContent = 'Radar unavailable'; });
+  }
+  rp.onclick = function () { R.play = !R.play; rp.textContent = R.play ? 'Pause' : 'Play'; };
+  setInterval(function () {
+    if (hidden()) return;
+    var now = Date.now(), p = pos();
+    var stale = !R.frames.length || now - R.t > 600000 || (p && R.lat != null && (Math.abs(p.latitude - R.lat) > 0.2 || Math.abs(p.longitude - R.lon) > 0.2));
+    if (stale && now - R.tried > 20000) loadRadar();
+    if (R.play && R.frames.length > 1 && now - R.last >= (R.i === R.frames.length - 1 ? 1600 : 650)) {
+      R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
+    }
+  }, 200);
 })();
 /* ---- photo spot-log ---- */
 (function () {
