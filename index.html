@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 239 -->
+<!-- Van Dash rev 240 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r239</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r240</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2202,7 +2202,7 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 239): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 240): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 /* ---- Spotify player on the Spotify page (rev 230) ---- */
 (function () {
   var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
@@ -2778,6 +2778,7 @@ function decorateResults() {
   var KEY = 'vdPins', pins = [];
   try { pins = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { pins = []; }
   function persist() { try { localStorage.setItem(KEY, JSON.stringify(pins)); return true; } catch (e) { return false; } }
+  window.__vdPins = pins; window.__vdPinSave = persist; window.__vdPinRender = function () { try { render(); } catch (e) {} };
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function when(t) { var d = new Date(t); return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
   function redraw() { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }
@@ -2820,7 +2821,7 @@ function decorateResults() {
     if (!pins.length) h += '<div style="text-align:center;color:#7f8fa3;padding:30px 0">No pins yet.</div>';
     pins.forEach(function (p, i) {
       h += '<div style="background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;padding:12px;margin-bottom:8px">' +
-        '<div style="font-size:17px;font-weight:600;color:#e8eef5">' + esc(p.name) + '</div>' +
+        '<div style="font-size:17px;font-weight:600;color:#e8eef5">' + esc(p.name) + '</div>' + (p.note ? '<div style="font-size:13px;color:#cdd6e0;margin-top:3px;white-space:pre-wrap">' + esc(p.note) + '</div>' : '') +
         '<div style="font-size:13px;color:#9fb0c3;margin:3px 0 10px">' + when(p.t) + ' &middot; ' + p.lat.toFixed(5) + ', ' + p.lon.toFixed(5) + '</div>' +
         '<div style="display:flex;gap:8px">' +
         '<button data-a="go" data-i="' + i + '" style="flex:1;margin:0;padding:10px 6px;font-size:14px;background:#c9651a">Show on map</button>' +
@@ -2918,6 +2919,180 @@ function decorateResults() {
   ['pointerdown', 'pointerup'].forEach(function (ev) { pb.addEventListener(ev, function (e) { e.stopPropagation(); }); });
   pb.onclick = function (e) { e.stopPropagation(); msg = ''; panel.style.display = 'block'; panel.scrollTop = 0; render(); };
   fIn.parentNode.insertBefore(pb, fIn);
+})();
+/* ---- rev 240: measure tool, tap a pin ---- */
+(function () {
+var D = document, W = window, G = '#26303c', O = '#c9651a', fm = D.getElementById('fullMap'), fc = D.getElementById('fCanvas'),
+fs = D.getElementById('fSat'), st = D.getElementById('fStats');
+if (!fm || !fc || !fs || !fs.parentNode || !st || !st.parentNode) return;
+var col = fs.parentNode;
+function redraw() { try { W.dispatchEvent(new Event('resize')); } catch (e) {} }
+function $p() { return D.getElementById('pnYes'); }
+function stp(e) { e.stopPropagation(); }
+function np(b) { ['pointerdown', 'pointerup'].forEach(function (ev) { b.addEventListener(ev, stp); }); }
+function vs(el) { return !!el && el.getClientRects().length > 0; }
+function fmt(m) { var ft = m * 3.28084; return ft < 1000 ? Math.round(ft) + ' ft' : (m * 0.000621371).toFixed(2) + ' mi'; }
+function dist(a, b) {
+var r = Math.PI / 180, dl = (b[0] - a[0]) * r, dn = (b[1] - a[1]) * r, x = Math.sin(dl / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dn / 2) ** 2;
+return 12742000 * Math.asin(Math.min(1, Math.sqrt(x)));
+}
+var pb = fm.querySelector('button[aria-label="Pins"]');
+if (!pb) return;
+var rb = D.createElement('button');
+rb.setAttribute('aria-label', 'Measure');
+rb.style.cssText = pb.style.cssText;
+rb.innerHTML = '<svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:auto"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg>';
+np(rb);
+col.appendChild(pb);
+col.appendChild(rb);
+var meas = false, pts = [];
+var cross = D.createElement('div');
+cross.style.cssText = 'position:fixed;width:44px;height:44px;margin:-22px 0 0 -22px;pointer-events:none;z-index:4;display:none';
+cross.innerHTML = '<svg viewBox="0 0 44 44" style="width:44px;height:44px;display:block;fill:none;stroke-linecap:round;filter:drop-shadow(0 0 1.5px #fff)"><path d="M22 3v13M22 28v13M3 22h13M28 22h13" stroke="#ff8a2b" stroke-width="2.5"/></svg>';
+fm.appendChild(cross);
+var bar = D.createElement('div');
+bar.style.cssText = 'position:absolute;left:0;right:0;top:0;z-index:5;display:none;align-items:center;gap:6px;padding:0 8px;box-sizing:border-box;background:rgba(21,28,37,0.97);border:0.5px solid #ff8a2b;border-radius:10px';
+var bs = 'margin:0;padding:0 10px;height:30px;font-size:13px;border:0;border-radius:8px;flex:none;color:#e8eef5;';
+bar.innerHTML = '<div style="flex:1;min-width:0;line-height:1.2"><div class="msT" style="font-size:16px;font-weight:700;color:#ff8a2b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div class="msS" style="font-size:11px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div></div>' +
+'<button class="msAdd" style="' + bs + 'background:'+O+'">Set start</button>' +
+'<button class="msUndo" style="' + bs + 'background:'+G+'">Undo</button>' +
+'<button class="msDone" style="' + bs + 'background:'+G+'">Done</button>';
+st.parentNode.insertBefore(bar, st);
+var mT = bar.querySelector('.msT'), mS = bar.querySelector('.msS'), mA = bar.querySelector('.msAdd'),
+mU = bar.querySelector('.msUndo'), mD = bar.querySelector('.msDone');
+[mA, mU, mD].forEach(np);
+function cen() { return W.__fCen ? W.__fCen() : null; }
+function paint() {
+var c = cen(), tot = 0, leg = 0, i;
+for (i = 1; i < pts.length; i++) tot += dist(pts[i - 1], pts[i]);
+if (pts.length && c) { leg = dist(pts[pts.length - 1], c); tot += leg; }
+mA.textContent = pts.length ? 'Add' : 'Set start';
+if (!pts.length) { mT.textContent = 'Measure'; mS.textContent = 'Aim the cross, tap Set start'; }
+else { mT.textContent = fmt(tot); mS.textContent = 'Last leg ' + fmt(leg) + ' · ' + pts.length + (pts.length === 1 ? ' point' : ' points'); }
+}
+function sM() {
+if (vs($p())) return;
+cC();
+meas = true; pts = [];
+var c = cen();
+if (c && W.__fGo) W.__fGo(c[0], c[1]);
+cross.style.display = 'block'; bar.style.display = 'flex';
+paint(); redraw();
+}
+function eM() {
+meas = false; pts = [];
+cross.style.display = 'none'; bar.style.display = 'none';
+redraw();
+}
+rb.onclick = function (e) { e.stopPropagation(); if (meas) eM(); else sM(); };
+mA.onclick = function (e) { e.stopPropagation(); var c = cen(); if (c) { pts.push([c[0], c[1]]); paint(); redraw(); } };
+mU.onclick = function (e) { e.stopPropagation(); pts.pop(); paint(); redraw(); };
+mD.onclick = function (e) { e.stopPropagation(); eM(); };
+function dM(ctx, left, top, z) {
+if (!meas || !pts.length || typeof vWorld !== 'function') return;
+var c = cen(), P = pts.map(function (p) { var w = vWorld(p[0], p[1], z); return [w.x - left, w.y - top]; }), i;
+ctx.save();
+ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.shadowColor = '#fff'; ctx.shadowBlur = 5;
+function path(a) { ctx.beginPath(); ctx.moveTo(a[0][0], a[0][1]); for (var j = 1; j < a.length; j++) ctx.lineTo(a[j][0], a[j][1]); }
+if (P.length > 1) {
+path(P); ctx.strokeStyle = '#ff8a2b'; ctx.lineWidth = 3.5; ctx.stroke();
+}
+if (c) {
+var w2 = vWorld(c[0], c[1], z), L = [P[P.length - 1], [w2.x - left, w2.y - top]];
+path(L); ctx.setLineDash([9, 7]); ctx.strokeStyle = '#ff8a2b'; ctx.lineWidth = 3; ctx.stroke(); ctx.setLineDash([]);
+}
+for (i = 0; i < P.length; i++) {
+ctx.beginPath(); ctx.arc(P[i][0], P[i][1], 6, 0, 6.2832);
+ctx.fillStyle = i ? '#ff8a2b' : '#2ecc71'; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = '#fff'; ctx.stroke();
+}
+ctx.restore();
+}
+var hits = [], prev = W.__fOver;
+function rH(ctx, left, top, z) {
+hits = [];
+var ps = W.__vdPins;
+if (!ps || !ps.length || typeof vWorld !== 'function' || !fc.width) return;
+var r = fc.getBoundingClientRect(), f = r.width / fc.width, head = W.__mapHead || 0;
+ps.forEach(function (p) {
+var w = vWorld(p.lat, p.lon, z);
+ctx.save(); ctx.translate(w.x - left, w.y - top); ctx.rotate(head * Math.PI / 180);
+var m = ctx.getTransform();
+ctx.font = '700 13px -apple-system, Helvetica, sans-serif';
+var tw = ctx.measureText(p.name).width;
+ctx.restore();
+var x0 = m.e * f + r.left, y0 = m.f * f + r.top,
+hx = (m.c * -19 + m.e) * f + r.left, hy = (m.d * -19 + m.f) * f + r.top,
+k = Math.hypot(hx - x0, hy - y0) / 19;
+if (k > 0) hits.push({ id: p.id, x: x0, y: y0, k: k, tw: tw });
+});
+}
+W.__fOver = function (ctx, left, top, z) {
+if (prev) prev(ctx, left, top, z);
+try { rH(ctx, left, top, z); } catch (e) { hits = []; }
+dM(ctx, left, top, z);
+};
+function hP(tx, ty) {
+for (var i = hits.length - 1; i >= 0; i--) {
+var h = hits[i], dx = (tx - h.x) / h.k, dy = (ty - h.y) / h.k;
+if (Math.hypot(dx, dy + 19) <= 22 || (dx >= 8 && dx <= h.tw + 34 && dy >= -38 && dy <= -2)) return h.id;
+}
+return null;
+}
+var tap = null;
+fc.addEventListener('pointerdown', function (e) {
+tap = e.isPrimary ? { x: e.clientX, y: e.clientY, t: Date.now() } : null;
+});
+fc.addEventListener('pointerup', function (e) {
+var t = tap; tap = null;
+if (!t || meas || Date.now() - t.t > 500 || Math.abs(e.clientX - t.x) + Math.abs(e.clientY - t.y) > 12) return;
+if (vs($p())) return;
+var id = hP(t.x, t.y);
+if (id) oC(id);
+});
+fc.addEventListener('pointercancel', function () { tap = null; });
+var card = D.createElement('div'), cur = null;
+card.style.cssText = 'position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 12px);z-index:96;display:none;background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;padding:12px;box-shadow:0 6px 24px rgba(0,0,0,.55);box-sizing:border-box';
+var fs2 = 'width:100%;box-sizing:border-box;margin:0;padding:10px;font-size:16px;background:#0b1117;color:#e8eef5;border:0.5px solid #8a96a6;border-radius:10px;font-family:inherit;';
+var cb = 'margin:0;padding:10px 6px;font-size:15px;border:0;border-radius:10px;color:#e8eef5;';
+card.innerHTML = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><input class="cdN" type="text" maxlength="60" style="' + fs2 + 'flex:1;font-weight:600"><button class="cdX" style="' + cb + 'width:40px;flex:none;background:'+G+';font-size:20px">&times;</button></div>' +
+'<textarea class="cdT" rows="3" placeholder="Notes" style="' + fs2 + 'resize:none;display:block"></textarea>' +
+'<div class="cdM" style="font-size:12px;color:#9fb0c3;margin:8px 0"></div>' +
+'<div style="display:flex;gap:8px"><button class="cdS" style="' + cb + 'flex:1;background:'+O+'">Save</button><button class="cdR" style="' + cb + 'flex:1;background:'+G+';color:#ff8a2b">Delete</button></div>';
+D.body.appendChild(card);
+var cN = card.querySelector('.cdN'), cT = card.querySelector('.cdT'), cM = card.querySelector('.cdM');
+function pB(id) { var ps = W.__vdPins || []; for (var i = 0; i < ps.length; i++) if (ps[i].id === id) return ps[i]; return null; }
+function oC(id) {
+var p = pB(id); if (!p) return;
+cur = id; cN.value = p.name; cT.value = p.note || '';
+cM.textContent = p.lat.toFixed(5) + ', ' + p.lon.toFixed(5) + ' · ' + new Date(p.t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+card.style.display = 'block';
+}
+function cC() { cur = null; card.style.display = 'none'; if (D.activeElement && D.activeElement.blur) D.activeElement.blur(); }
+function rf() { if (W.__vdPinRender) W.__vdPinRender(); redraw(); }
+card.querySelector('.cdX').onclick = cC;
+card.querySelector('.cdS').onclick = function () {
+var p = pB(cur); if (!p) { cC(); return; }
+var old = [p.name, p.note];
+p.name = cN.value.trim() || p.name; p.note = cT.value.trim();
+if (W.__vdPinSave && W.__vdPinSave() === false) { p.name = old[0]; p.note = old[1]; cM.textContent = 'Phone storage is full.'; return; }
+cC(); rf();
+};
+card.querySelector('.cdR').onclick = function () {
+var p = pB(cur), ps = W.__vdPins; if (!p || !ps) return;
+if (!confirm('Delete "' + p.name + '"?')) return;
+ps.splice(ps.indexOf(p), 1);
+if (W.__vdPinSave) W.__vdPinSave();
+cC(); rf();
+};
+setInterval(function () {
+if (fm.classList.contains('hidden')) { if (meas) eM(); if (cur) cC(); return; }
+if (!meas) return;
+var r = fc.getBoundingClientRect();
+cross.style.left = (r.left + r.width / 2) + 'px'; cross.style.top = (r.top + r.height / 2) + 'px';
+bar.style.height = Math.max(40, st.offsetHeight || 0) + 'px';
+paint();
+if (W.__fCen) W.__fCen(true);
+}, 200);
 })();
 /* ---- photo spot-log ---- */
 (function () {
