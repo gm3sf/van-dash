@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 243 -->
+<!-- Van Dash rev 244 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r243</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r244</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3258,11 +3258,32 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 243): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 244): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
   if (!pl || !sc) return;
+  // main weather card: the rain line is its own row between the condition and the orange location
+  var wrap = D.querySelector('#wxCard .wx-wrap'), wxv = D.getElementById('wx'), icon = D.getElementById('wxIcon');
+  var rl = D.createElement('div');
+  rl.id = 'vd4Card';
+  rl.style.cssText = 'font-size:13px;font-weight:600;line-height:1.1;margin-top:1px;white-space:nowrap';
+  if (wrap) {
+    wrap.style.marginTop = '-2px';
+    if (icon) { icon.style.fontSize = '36px'; icon.style.marginBottom = '-4px'; }
+    wrap.appendChild(rl);
+  }
+  // the location label goes back to being a plain label: Part 3's swap is stopped by keeping its saved text in step
+  pl.style.cssText += ';position:absolute;left:12px;bottom:10px;color:#ff8a2b';
+  // Part 3 and Part 2 both rewrite this label on timers; make it ignore them and keep showing the place name
+  var PLACE = 'Current location';
+  Object.defineProperty(pl, 'textContent', { get: function () { return PLACE; }, set: function () {} });
+  pl.textContent = pl.textContent;
+  setInterval(function () {
+    var t = '';
+    try { t = wxLive ? 'Current location' : (D.getElementById('wCity').textContent || '').trim(); } catch (e) {}
+    if (t && t !== PLACE) { PLACE = t; pl.firstChild ? (pl.firstChild.nodeValue = t) : pl.appendChild(D.createTextNode(t)); }
+  }, 400);
   var RZ = 6, TS = 256, FR = [], HOST = 'https://tilecache.rainviewer.com', got = 0, tried = 0, imgs = {}, STAT = null;
 
   function pos() { try { return lastWeatherPos || null; } catch (e) { return null; } }
@@ -3311,8 +3332,7 @@ if (W.__fCen) W.__fCen(true);
   }
   function set(t, blue) {
     STAT = t;
-    pl.textContent = t; pl.style.color = blue ? '#6db3ff' : '';
-    var ln = D.getElementById('vd4Rain');
+    rl.textContent = t; rl.style.color = blue ? '#6db3ff' : '#9fb0c3';
     if (ln) { ln.textContent = t; ln.style.color = blue ? '#6db3ff' : '#9fb0c3'; }
   }
   function scan() {
@@ -3382,24 +3402,26 @@ if (W.__fCen) W.__fCen(true);
     return ok > 0 || (bad === 0 && Date.now() - got < 20000);
   }
 
-  // ---- status line on the weather page, under the big temperature ----
+  // the rain line lives in the weather box (under the cloud + condition); a small updated-time sits under the temperature
   var ln = D.createElement('div');
   ln.id = 'vd4Rain';
-  ln.style.cssText = 'text-align:center;font-size:17px;font-weight:600;margin:2px 0 4px;min-height:22px';
-  var nl = sc.querySelector('.nowline');
-  if (nl && nl.parentNode) nl.parentNode.insertBefore(ln, nl.nextSibling);
+  ln.style.cssText = 'font-size:15px;font-weight:600;margin-top:4px;line-height:1.1';
   var up = D.createElement('div');
   up.id = 'vd4Up';
-  up.style.cssText = 'text-align:center;font-size:12px;color:#7f8fa3;margin-bottom:10px';
-  if (nl && nl.parentNode) nl.parentNode.insertBefore(up, ln.nextSibling);
-
-  // keep the card line ours: the older timers rewrite it every 300 ms, so we rewrite it back right after
-  setInterval(function () {
-    if (live() && STAT) {
-      if (pl.textContent !== STAT) pl.textContent = STAT;
-      pl.style.color = STAT === 'Clear' ? '' : '#6db3ff';
+  up.style.cssText = 'text-align:center;font-size:12px;color:#7f8fa3;margin:2px 0 10px';
+  var nl = sc.querySelector('.nowline');
+  if (nl && nl.parentNode) nl.parentNode.insertBefore(up, nl.nextSibling);
+  function putLine() {
+    var d = D.getElementById('wBoxDesc');
+    if (d && ln.parentNode !== d.parentNode) d.parentNode.appendChild(ln);
+    // silence Part 3's old rain line (the one that says 'No rain expected in the next 4 hours')
+    var kids = sc.children, i;
+    for (i = 0; i < kids.length; i++) {
+      var t = (kids[i].textContent || '');
+      if (kids[i] !== ln && kids[i] !== up && /^(No rain expected|Raining now|Rain in)/.test(t.trim()) && kids[i].children.length === 0) kids[i].style.display = 'none';
     }
-  }, 100);
+  }
+  putLine(); setInterval(putLine, 500);
 
   // ---- radar frames: refresh every 2 minutes and whenever the app is opened ----
   function frames() {
