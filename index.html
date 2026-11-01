@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 244 -->
+<!-- Van Dash rev 245 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r244</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r245</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3258,32 +3258,34 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 244): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 245): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
   if (!pl || !sc) return;
-  // main weather card: the rain line is its own row between the condition and the orange location
+  // main weather card: just the weather icon, a small location pin beside it, and an alert line (only when there is rain to report)
   var wrap = D.querySelector('#wxCard .wx-wrap'), wxv = D.getElementById('wx'), icon = D.getElementById('wxIcon');
   var rl = D.createElement('div');
   rl.id = 'vd4Card';
-  rl.style.cssText = 'font-size:13px;font-weight:600;line-height:1.1;margin-top:1px;white-space:nowrap';
+  rl.style.cssText = 'font-size:15px;font-weight:600;line-height:1.15;margin-top:4px;white-space:nowrap;display:none';
   if (wrap) {
-    wrap.style.marginTop = '-2px';
-    if (icon) { icon.style.fontSize = '36px'; icon.style.marginBottom = '-4px'; }
+    wrap.style.marginTop = '8px';
+    wrap.style.gap = '0';
+    wrap.style.alignItems = 'flex-start';
+    if (wxv) wxv.style.display = 'none';
+    if (icon) { icon.style.fontSize = '54px'; icon.style.lineHeight = '1.1'; icon.style.marginBottom = '0'; }
+    // the pin sits right next to the icon so it reads as "weather where you are"
+    var pinEl = D.createElement('span');
+    pinEl.innerHTML = '<svg viewBox="0 0 24 32" style="width:14px;height:19px;display:block"><path d="M12 1C6.2 1 1.5 5.7 1.5 11.5c0 7.6 10.5 19 10.5 19s10.5-11.4 10.5-19C22.5 5.7 17.8 1 12 1z" fill="#ff8a2b"/><circle cx="12" cy="11.5" r="4" fill="#151c25"/></svg>';
+    pinEl.style.cssText = 'position:absolute;margin:4px 0 0 58px';
+    var iconRow = D.createElement('div');
+    iconRow.style.cssText = 'position:relative';
+    icon.parentNode.insertBefore(iconRow, icon);
+    iconRow.appendChild(icon); iconRow.appendChild(pinEl);
     wrap.appendChild(rl);
   }
-  // the location label goes back to being a plain label: Part 3's swap is stopped by keeping its saved text in step
-  pl.style.cssText += ';position:absolute;left:12px;bottom:10px;color:#ff8a2b';
-  // Part 3 and Part 2 both rewrite this label on timers; make it ignore them and keep showing the place name
-  var PLACE = 'Current location';
-  Object.defineProperty(pl, 'textContent', { get: function () { return PLACE; }, set: function () {} });
-  pl.textContent = pl.textContent;
-  setInterval(function () {
-    var t = '';
-    try { t = wxLive ? 'Current location' : (D.getElementById('wCity').textContent || '').trim(); } catch (e) {}
-    if (t && t !== PLACE) { PLACE = t; pl.firstChild ? (pl.firstChild.nodeValue = t) : pl.appendChild(D.createTextNode(t)); }
-  }, 400);
+  // no location text on the main card any more (the pin says it); hide the label and stop other code from showing it
+  pl.style.display = 'none';
   var RZ = 6, TS = 256, FR = [], HOST = 'https://tilecache.rainviewer.com', got = 0, tried = 0, imgs = {}, STAT = null;
 
   function pos() { try { return lastWeatherPos || null; } catch (e) { return null; } }
@@ -3332,8 +3334,12 @@ if (W.__fCen) W.__fCen(true);
   }
   function set(t, blue) {
     STAT = t;
-    rl.textContent = t; rl.style.color = blue ? '#6db3ff' : '#9fb0c3';
-    if (ln) { ln.textContent = t; ln.style.color = blue ? '#6db3ff' : '#9fb0c3'; }
+    // main card: alert only ('Raining now' / 'Rain in ~N min'); Clear shows nothing
+    var alert = /^(Raining now|Rain in)/.test(t);
+    rl.textContent = alert ? t : ''; rl.style.color = '#6db3ff'; rl.style.display = alert ? '' : 'none';
+    // weather page box: 'Raining now' is carried by the condition word ('Rain'); only 'Rain in ~N min' needs its own line
+    var soon = /^Rain in/.test(t);
+    if (ln) { ln.textContent = soon ? t : ''; ln.style.color = '#6db3ff'; ln.style.display = soon ? '' : 'none'; }
   }
   function scan() {
     var p = pos();
@@ -3402,6 +3408,12 @@ if (W.__fCen) W.__fCen(true);
     return ok > 0 || (bad === 0 && Date.now() - got < 20000);
   }
 
+  // if radar pixels turn out to be blocked, keep the forecast-model answer on screen (re-checked every 2 s)
+  setInterval(function () {
+    if (!live() || !Object.keys(imgs).length || radarWorks()) return;
+    up.textContent = 'Radar blocked, using forecast model';
+    modelFetch(); modelScan();
+  }, 2000);
   // the rain line lives in the weather box (under the cloud + condition); a small updated-time sits under the temperature
   var ln = D.createElement('div');
   ln.id = 'vd4Rain';
@@ -3422,6 +3434,41 @@ if (W.__fCen) W.__fCen(true);
     }
   }
   putLine(); setInterval(putLine, 500);
+
+  // ---- one decision for the weather icons (both cards): rain from radar wins, then night versions, else the forecast icon ----
+  function isNight() {
+    var sr = (D.getElementById('sunrise') || {}).textContent, ss = (D.getElementById('sunset') || {}).textContent;
+    function mins(s) { var m = /(\d+):(\d+)\s*(AM|PM)/i.exec(s || ''); if (!m) return null; var h = +m[1] % 12; if (/PM/i.test(m[3])) h += 12; return h * 60 + (+m[2]); }
+    var a = mins(sr), b = mins(ss);
+    if (a == null || b == null) return false;
+    var n = new Date(), now = n.getHours() * 60 + n.getMinutes();
+    return now < a || now >= b;
+  }
+  // no moon-with-cloud emoji exists, so that one is drawn
+  var MOONCLOUD = '<svg viewBox="0 0 64 64" style="width:1em;height:1em;display:inline-block;vertical-align:-0.12em"><path d="M30 8a20 20 0 1 0 20 28 16 16 0 0 1-20-28z" fill="#f4d35e"/><path d="M22 50a9 9 0 0 1 2-17.8 12 12 0 0 1 23 2.8A8 8 0 0 1 46 50z" fill="#e6edf5" stroke="#9fb0c3" stroke-width="1.5"/></svg>';
+  var MOON = '\uD83C\uDF19', RAINI = '\uD83C\uDF27\uFE0F';
+  // forecast icons that mean sun or part-sun, and which of those mean "partly cloudy"
+  var SUNNY = { '\u2600\uFE0F': 'moon', '\uD83C\uDF24\uFE0F': 'moon', '\u26C5': 'mooncloud' };
+  function setIcon(e, kind, plain) {
+    var want = kind === 'moon' ? MOON : kind === 'rain' ? RAINI : plain;
+    if (kind === 'mooncloud') { if (e.getAttribute('data-vd') !== 'mc') { e.innerHTML = MOONCLOUD; e.setAttribute('data-vd', 'mc'); } return; }
+    if (e.getAttribute('data-vd') === 'mc') { e.removeAttribute('data-vd'); }
+    if (e.textContent !== want) e.textContent = want;
+  }
+  var lastForecastIcon = { wxIcon: null, wBoxIcon: null };
+  setInterval(function () {
+    var raining = live() && STAT === 'Raining now', night = isNight();
+    [['wxIcon', 'wx'], ['wBoxIcon', 'wBoxDesc']].forEach(function (ids) {
+      var ic = D.getElementById(ids[0]), tx = D.getElementById(ids[1]);
+      if (!ic) return;
+      // remember the forecast icon whenever Part 1 has written one (it is plain text, not our drawing)
+      if (ic.getAttribute('data-vd') !== 'mc' && ic.textContent !== RAINI && ic.textContent !== MOON) lastForecastIcon[ids[0]] = ic.textContent;
+      var f = lastForecastIcon[ids[0]];
+      if (raining) { setIcon(ic, 'rain'); if (tx && ids[1] === 'wBoxDesc' && tx.textContent !== 'Rain') tx.textContent = 'Rain'; return; }
+      if (night && SUNNY[f]) { setIcon(ic, SUNNY[f]); return; }
+      if (f != null) setIcon(ic, 'plain', f);
+    });
+  }, 200);
 
   // ---- radar frames: refresh every 2 minutes and whenever the app is opened ----
   function frames() {
