@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 241 -->
+<!-- Van Dash rev 242 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r241</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r242</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2202,7 +2202,7 @@ function decorateResults() {
 
 
 })();
-/* ===== Part 3 (rev 240): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
+/* ===== Part 3 (rev 242): photo spot-log. Paste this at the very end of index.html, after Part 2. ===== */
 /* ---- Spotify player on the Spotify page (rev 230) ---- */
 (function () {
   var CID = '322720d14efb4c4992d38812daeca636', RED = 'https://gm3sf.github.io/van-dash/', SC = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
@@ -2630,7 +2630,7 @@ function decorateResults() {
   function when(t) { var d = new Date(t); return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
   function redraw() { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }
 
-  // what the recorder has right now (it saves to the phone every few seconds and on this event)
+  ;
   function peek() {
     var pts = [];
     try { pts = JSON.parse(localStorage.getItem('vdCrumbs') || '[]'); } catch (e) { pts = []; }
@@ -2656,7 +2656,7 @@ function decorateResults() {
     render();
   }
 
-  // ---- drawing the shown trails on the big map (called from the map's own draw) ----
+  ;
   function dot(ctx, p, z, left, top, col) {
     var w = vWorld(p[0], p[1], z);
     ctx.beginPath(); ctx.arc(w.x - left, w.y - top, 8, 0, 6.2832);
@@ -2693,7 +2693,7 @@ function decorateResults() {
     if (window.__fGo) window.__fGo((la0 + la1) / 2, (lo0 + lo1) / 2, z); else redraw();
   }
 
-  // ---- share as a GPX file (opens in Google Maps, Gaia, Apple Maps and most trail apps) ----
+  ;
   function gpx(tr) {
     var s = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Van Dash" xmlns="http://www.topografix.com/GPX/1/1">\n<trk><name>' + esc(tr.name) + '</name><trkseg>\n';
     tr.pts.forEach(function (p) { s += '<trkpt lat="' + p[0] + '" lon="' + p[1] + '"/>\n'; });
@@ -2712,7 +2712,7 @@ function decorateResults() {
     } catch (e) { alert('Sharing is not available here.'); }
   }
 
-  // ---- the Trails page ----
+  ;
   var panel = document.createElement('div');
   panel.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:95;background:#000;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 24px)';
   document.body.appendChild(panel);
@@ -2783,7 +2783,7 @@ function decorateResults() {
   function when(t) { var d = new Date(t); return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
   function redraw() { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }
 
-  // ---- draw the pins on the big map (added to the map's own draw) ----
+  ;
   var prev = window.__fOver;
   window.__fOver = function (ctx, left, top, z) {
     if (prev) prev(ctx, left, top, z);
@@ -2806,22 +2806,24 @@ function decorateResults() {
     });
   };
 
-  // ---- the Pins page ----
+  ;
   var panel = document.createElement('div');
   panel.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:95;background:#000;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 24px)';
   document.body.appendChild(panel);
   var msg = '';
+  panel.oninput = function (e) { if (e.target.id !== 'pnQ') return; var q = e.target.value.trim().toLowerCase(); panel.querySelectorAll('[data-t]').forEach(function (n) { n.parentNode.style.display = n.getAttribute('data-t').indexOf(q) < 0 ? 'none' : ''; }); };
   function render() {
     var h = '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 12px">' +
       '<button id="pnBack" style="margin:0;background:#26303c;padding:8px 14px;font-size:15px">&lsaquo; Back</button>' +
       '<div style="font-size:20px;font-weight:600;color:#e8eef5">Pins</div><div style="width:70px"></div></div>' +
       '<button id="pnDrop" style="width:100%;margin:0 0 8px;padding:13px;font-size:16px;background:#c9651a">Drop a pin at my location</button>' +
       '<button id="pnPick" style="width:100%;margin:0 0 8px;padding:13px;font-size:16px;background:#26303c">Pick a spot on the map</button>' +
+      '<input id="pnQ" type="search" placeholder="Search pins by name or notes" style="width:100%;box-sizing:border-box;margin:0 0 8px;padding:11px;font-size:16px;background:#0b1117;color:#e8eef5;border:0.5px solid #8a96a6;border-radius:10px">' +
       '<div style="text-align:center;font-size:13px;color:#7f8fa3;min-height:18px;margin-bottom:8px">' + msg + '</div>';
     if (!pins.length) h += '<div style="text-align:center;color:#7f8fa3;padding:30px 0">No pins yet.</div>';
     pins.forEach(function (p, i) {
       h += '<div style="background:#151c25;border:0.5px solid #8a96a6;border-radius:14px;padding:12px;margin-bottom:8px">' +
-        '<div style="font-size:17px;font-weight:600;color:#e8eef5">' + esc(p.name) + '</div>' + (p.note ? '<div style="font-size:13px;color:#cdd6e0;margin-top:3px;white-space:pre-wrap">' + esc(p.note) + '</div>' : '') +
+        '<div data-t="' + esc((p.name + ' ' + (p.note || '')).toLowerCase()) + '" style="font-size:17px;font-weight:600;color:#e8eef5">' + esc(p.name) + '</div>' + (p.note ? '<div style="font-size:13px;color:#cdd6e0;margin-top:3px;white-space:pre-wrap">' + esc(p.note) + '</div>' : '') +
         '<div style="font-size:13px;color:#9fb0c3;margin:3px 0 10px">' + when(p.t) + ' &middot; ' + p.lat.toFixed(5) + ', ' + p.lon.toFixed(5) + '</div>' +
         '<div style="display:flex;gap:8px">' +
         '<button data-a="go" data-i="' + i + '" style="flex:1;margin:0;padding:10px 6px;font-size:14px;background:#c9651a">Show on map</button>' +
@@ -2866,7 +2868,7 @@ function decorateResults() {
     }
   };
 
-  // ---- pick a spot: drag the map under the crosshair, then tap Place pin ----
+  ;
   var st = document.getElementById('fStats');
   var cross = document.createElement('div');
   cross.style.cssText = 'position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;z-index:4;pointer-events:none;display:none';
@@ -2911,7 +2913,7 @@ function decorateResults() {
     redraw();
   };
 
-  // ---- the pin button, above the zoom buttons on the big map ----
+  ;
   var pb = document.createElement('button');
   pb.setAttribute('aria-label', 'Pins');
   pb.style.cssText = 'width:46px;height:46px;margin:0;padding:0;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6';
