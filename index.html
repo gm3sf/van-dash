@@ -3275,12 +3275,13 @@ if (W.__fCen) W.__fCen(true);
     // the pin sits right next to the icon so it reads as "weather where you are"
     var pinEl = D.createElement('span');
     pinEl.innerHTML = '<svg viewBox="0 0 24 32" style="width:14px;height:19px;display:block"><path d="M12 1C6.2 1 1.5 5.7 1.5 11.5c0 7.6 10.5 19 10.5 19s10.5-11.4 10.5-19C22.5 5.7 17.8 1 12 1z" fill="#ff8a2b"/><circle cx="12" cy="11.5" r="4" fill="#151c25"/></svg>';
-    // rev 247: the pin goes in the card's title row, just left of the word "Weather" (after the little cloud icon)
-    pinEl.style.cssText = 'display:inline-block;vertical-align:-3px;margin-right:6px';
+    // rev 247: no pin on this card. Instead a hollow location arrow (same shape as the one on the weather page), the same size as the cloud, sits right after the word "Weather"
     var wlab = D.querySelector('#wxCard .label');
-    if (wlab) {
-      var wcloud = wlab.querySelector('svg.ico');
-      if (wcloud && wcloud.nextSibling) wlab.insertBefore(pinEl, wcloud.nextSibling); else wlab.insertBefore(pinEl, wlab.firstChild);
+    if (wlab && !D.getElementById('vdLoc')) {
+      var locEl = D.createElement('span');
+      locEl.id = 'vdLoc';
+      locEl.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px;height:18px;display:inline-block;vertical-align:-3px;margin-left:6px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round"><path d="M3 11 21 3l-8 18-2-8z"/></svg>';
+      wlab.appendChild(locEl);
     }
     wrap.appendChild(rl);
   }
@@ -3796,6 +3797,105 @@ if (W.__fCen) W.__fCen(true);
     if (live) return; // already on current location, nothing to do
     bar.click(); // runs the existing 'back to current location' code
   });
+})();
+
+/* ---- rev 247: the pin button above the measure tool is now a crosshair: aim it, then place a pin or open the spot in Google Maps ---- */
+(function () {
+  var D = document, W = window, fm = D.getElementById('fullMap'), fc = D.getElementById('fCanvas');
+  if (!fm || !fc) return;
+  var pb = fm.querySelector('button[aria-label="Pins"]');
+  if (!pb) return;
+  var G = '#26303c', O = '#c9651a';
+  function redraw() { try { W.dispatchEvent(new Event('resize')); } catch (e) {} }
+  function stp(e) { e.stopPropagation(); }
+  function np(b) { ['pointerdown', 'pointerup'].forEach(function (ev) { b.addEventListener(ev, stp); }); }
+  function cen() { return W.__fCen ? W.__fCen() : null; }
+  function vs(el) { return !!el && el.getClientRects().length > 0; }
+
+  // the old button opened the Pins list; swap it for a crosshair button (the list is still reachable from the bar below)
+  var nb = pb.cloneNode(false);
+  nb.setAttribute('aria-label', 'Crosshair');
+  nb.innerHTML = '<svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;display:block;margin:auto"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/><circle cx="12" cy="12" r="1.2" fill="#ff8a2b"/></svg>';
+  pb.parentNode.replaceChild(nb, pb);
+  np(nb);
+  var oldPins = pb; // the original handler is kept so the Pins list still opens from the bar
+
+  // the crosshair itself, fixed at the middle of the map
+  var cross = D.createElement('div');
+  cross.style.cssText = 'position:fixed;width:44px;height:44px;margin:-22px 0 0 -22px;pointer-events:none;z-index:4;display:none';
+  cross.innerHTML = '<svg viewBox="0 0 44 44" style="width:44px;height:44px;display:block;fill:none;stroke-linecap:round;filter:drop-shadow(0 0 1.5px #fff)"><path d="M22 3v13M22 28v13M3 22h13M28 22h13" stroke="#ff8a2b" stroke-width="2.5"/><circle cx="22" cy="22" r="2" fill="#ff8a2b" stroke="none"/></svg>';
+  fm.appendChild(cross);
+
+  // the bar: where am I aiming, plus the choices
+  var st = D.getElementById('fStats');
+  var bar = D.createElement('div');
+  bar.style.cssText = 'position:absolute;left:0;right:0;top:0;z-index:5;display:none;align-items:center;gap:6px;padding:0 8px;box-sizing:border-box;background:rgba(21,28,37,0.97);border:0.5px solid #ff8a2b;border-radius:10px';
+  var bs = 'margin:0;padding:0 10px;height:34px;font-size:13px;border:0;border-radius:8px;flex:none;color:#e8eef5;';
+  bar.innerHTML = '<div style="flex:1;min-width:0;line-height:1.2"><div class="xhT" style="font-size:14px;font-weight:700;color:#ff8a2b">Aim the crosshair</div><div class="xhS" style="font-size:11px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div></div>' +
+    '<button class="xhX" style="' + bs + 'background:' + G + '">Cancel</button>' +
+    '<button class="xhG" style="' + bs + 'background:' + G + '">Google Maps</button>' +
+    '<button class="xhP" style="' + bs + 'background:' + O + '">Place pin</button>';
+  if (st && st.parentNode) st.parentNode.insertBefore(bar, st); else fm.appendChild(bar);
+  var xS = bar.querySelector('.xhS'), bX = bar.querySelector('.xhX'), bG = bar.querySelector('.xhG'), bP = bar.querySelector('.xhP');
+  [bX, bG, bP].forEach(np);
+
+  // a small way to the saved pins list (search by name, rename, delete all still live there)
+  var lst = D.createElement('button');
+  lst.textContent = 'Saved pins';
+  lst.style.cssText = 'position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:5;display:none;margin:0;padding:0 12px;height:34px;font-size:13px;border:0.5px solid #8a96a6;border-radius:8px;background:rgba(21,28,37,0.92);color:#ff8a2b';
+  np(lst);
+  fm.appendChild(lst);
+
+  var on = false, tick = 0;
+  function show() {
+    var a = cen();
+    if (!a || a[0] == null) { alert('The map has no location yet.'); return; }
+    if (vs(D.getElementById('pnYes')) || vs(D.getElementById('msAdd'))) return; // another picker is busy
+    on = true;
+    if (W.__fGo) W.__fGo(a[0], a[1]); // stop following the GPS so the map stays where you aim
+    cross.style.display = 'block'; bar.style.display = 'flex'; lst.style.display = 'block';
+    nb.style.borderColor = '#ff8a2b';
+    bar.style.height = Math.max(40, (st && st.offsetHeight) || 0) + 'px';
+    redraw();
+    clearInterval(tick);
+    tick = setInterval(loop, 200);
+    loop();
+  }
+  function hide() {
+    on = false; clearInterval(tick);
+    cross.style.display = 'none'; bar.style.display = 'none'; lst.style.display = 'none';
+    nb.style.borderColor = '#8a96a6';
+    redraw();
+  }
+  function loop() {
+    if (fm.classList.contains('hidden')) { hide(); return; }
+    var r = fc.getBoundingClientRect();
+    cross.style.left = (r.left + r.width / 2) + 'px'; cross.style.top = (r.top + r.height / 2) + 'px';
+    var a = cen();
+    if (a && a[0] != null) xS.textContent = a[0].toFixed(5) + ', ' + a[1].toFixed(5);
+    if (W.__fCen) W.__fCen(true); // keep the map from snapping back to the GPS while you line it up
+  }
+  nb.onclick = function (e) { e.stopPropagation(); if (on) hide(); else show(); };
+  bX.onclick = function (e) { e.stopPropagation(); hide(); };
+  bG.onclick = function (e) {
+    e.stopPropagation();
+    var a = cen(); if (!a || a[0] == null) return;
+    var l = D.createElement('a');
+    l.href = 'https://maps.google.com/?q=' + a[0].toFixed(6) + ',' + a[1].toFixed(6); l.target = '_blank'; l.rel = 'noopener';
+    D.body.appendChild(l); l.click(); l.remove();
+  };
+  bP.onclick = function (e) {
+    e.stopPropagation();
+    var a = cen(); if (!a || a[0] == null) return;
+    var ps = W.__vdPins; if (!ps) { alert('Pins are not ready yet.'); return; }
+    var def = 'Pin ' + (ps.length + 1), nm = prompt('Name this pin:', def);
+    if (nm === null) return;
+    ps.unshift({ id: 'p' + Date.now(), name: nm.trim() || def, lat: a[0], lon: a[1], t: Date.now() });
+    if (W.__vdPinSave && W.__vdPinSave() === false) { ps.shift(); W.__vdPinSave(); alert('Phone storage is full.'); return; }
+    if (W.__vdPinRender) W.__vdPinRender();
+    hide();
+  };
+  lst.onclick = function (e) { e.stopPropagation(); hide(); oldPins.onclick && oldPins.onclick(e); };
 })();
 </script>
 </body>
