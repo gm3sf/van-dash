@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 250 -->
+<!-- Van Dash rev 251 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r250</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r251</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 250): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 251): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -3936,6 +3936,87 @@ if (W.__fCen) W.__fCen(true);
   });
 })();
 
+/* ---- rev 251: Sun page. Tap the Sun card for the week's sunrise and sunset. The Sun card also shows the moon phase and its name ---- */
+(function () {
+  var D = document, W = window, sc = D.getElementById('weatherScreen'), main = D.getElementById('mainScreen'),
+    srEl = D.getElementById('sunrise'), card = srEl && srEl.closest ? srEl.closest('.card') : null, row = card && card.querySelector('.sunrow');
+  if (!sc || !main || !card || !row || !W.__vdMoon) return;
+  var DATA = null, DKEY = '', DT = 0, PEND = null;
+  var st = D.createElement('style');
+  st.textContent = '.sunrow{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 2px}.sunrow .t{font-size:12px;white-space:nowrap;letter-spacing:-0.2px}#sunMoon{display:flex;align-items:center;justify-content:center}#sunMoon span{display:block;line-height:1}';
+  D.head.appendChild(st);
+
+  function pos() { try { return lastWeatherPos || null; } catch (e) { return null; } }
+  function pname(a) {
+    return a < 1.85 ? 'New moon' : a < 5.54 ? 'Waxing crescent' : a < 9.23 ? 'First quarter' : a < 12.92 ? 'Waxing gibbous' :
+      a < 16.61 ? 'Full moon' : a < 20.3 ? 'Waning gibbous' : a < 23.99 ? 'Last quarter' : a < 27.68 ? 'Waning crescent' : 'New moon';
+  }
+  function t12(s) { return new Date(s).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+  var SUNI = function (up) { return '<svg viewBox="0 0 38 28" style="display:block;margin:0 auto;width:30px;height:22px;stroke:#ffb84d;fill:none;stroke-width:1.8;stroke-linecap:round"><path d="M4 22h30"/><path d="M10 22a9 9 0 0 1 18 0"/><path d="M19 4v5M8 9l3 3M30 9l-3 3"/><path d="' + (up ? 'M15 6l4-4 4 4' : 'M15 2l4 4 4-4') + '"/></svg>'; };
+
+  // ---- the main sun card: sunrise, sunset, moon phase, with the phase name beside the label ----
+  var mc = D.createElement('div'); mc.id = 'sunMoon';
+  row.appendChild(mc);
+  var lab = card.querySelector('.label'), nm = D.createElement('span');
+  lab.style.display = 'flex'; lab.style.alignItems = 'center';
+  nm.style.cssText = 'margin-left:auto;font-size:11px;letter-spacing:0;text-transform:none;color:#9fb0c3;white-space:nowrap';
+  lab.appendChild(nm);
+  function moonCard() {
+    var p = W.__vdPhase(), h = Math.max(36, (row.children[0].offsetHeight || 41));
+    mc.innerHTML = '<span style="font-size:' + h + 'px">' + W.__vdMoon(false) + '</span>';
+    nm.textContent = pname(p.age);
+  }
+  moonCard(); setTimeout(moonCard, 600); setInterval(moonCard, 300000);
+  card.style.cursor = 'pointer';
+
+  // ---- the sunrise and sunset page ----
+  var pg = D.createElement('div');
+  pg.id = 'sunScreen'; pg.className = 'hidden';
+  pg.innerHTML =
+    '<div class="topbar"><button id="spBack">‹ Back</button><div class="title">Sunrise &amp; sunset</div><div class="spacer"></div></div>' +
+    '<div id="spPlace" style="text-align:center;font-size:13px;color:#7f8fa3;margin:-2px 0 10px"></div>' +
+    '<div id="spMoon" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#151c25;border-radius:16px;padding:10px 14px;margin-bottom:10px;border:0.5px solid #8a96a6"></div>' +
+    '<div id="spList" style="background:#151c25;border-radius:16px;padding:4px 14px;border:0.5px solid #8a96a6"><div style="padding:18px 0;text-align:center;color:#7f8fa3">Loading...</div></div>';
+  sc.parentNode.insertBefore(pg, sc.nextSibling);
+  var list = pg.querySelector('#spList'), place = pg.querySelector('#spPlace'), moon = pg.querySelector('#spMoon');
+
+  function load() {
+    var p = pos();
+    if (!p) return Promise.reject(new Error('no position'));
+    var key = p.latitude.toFixed(2) + ',' + p.longitude.toFixed(2);
+    if (DATA && key === DKEY && Date.now() - DT < 1800000) return Promise.resolve(DATA);
+    if (PEND && PEND.k === key) return PEND.p;
+    var pr = fetch('https://api.open-meteo.com/v1/forecast?latitude=' + p.latitude + '&longitude=' + p.longitude +
+      '&daily=sunrise,sunset,daylight_duration&forecast_days=7&timezone=auto')
+      .then(function (r) { return r.json(); })
+      .then(function (d) { DATA = d; DKEY = key; DT = Date.now(); PEND = null; return d; }, function (e) { PEND = null; throw e; });
+    PEND = { k: key, p: pr };
+    return pr;
+  }
+  function render() {
+    var dy = DATA && DATA.daily;
+    if (!dy) return;
+    var h = '', i;
+    for (i = 0; i < dy.time.length; i++) {
+      var dl = Math.round(dy.daylight_duration[i] / 60), d0 = new Date(dy.time[i] + 'T12:00:00');
+      h += '<div style="display:flex;align-items:center;gap:6px;padding:11px 0;border-top:' + (i ? '1px solid #26303c' : 'none') + '">' +
+        '<div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:600">' + (i ? d0.toLocaleDateString([], { weekday: 'long' }) : 'Today') + '</div>' +
+        '<div style="font-size:12px;color:#9fb0c3;margin-top:2px">' + d0.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' · ' + Math.floor(dl / 60) + 'h ' + (dl % 60) + 'm daylight</div></div>' +
+        '<div style="flex:none;width:76px;text-align:center">' + SUNI(true) + '<div style="font-size:15px;font-weight:600;margin-top:3px">' + t12(dy.sunrise[i]) + '</div></div>' +
+        '<div style="flex:none;width:76px;text-align:center">' + SUNI(false) + '<div style="font-size:15px;font-weight:600;margin-top:3px">' + t12(dy.sunset[i]) + '</div></div></div>';
+    }
+    list.innerHTML = h;
+  }
+  function open() {
+    var p = W.__vdPhase(), live = true; try { live = wxLive; } catch (e) {}
+    place.textContent = live ? 'Current location' : (D.getElementById('wCity') ? D.getElementById('wCity').textContent : '');
+    moon.innerHTML = '<span style="font-size:34px;line-height:1;display:block">' + W.__vdMoon(false) + '</span><div><div style="font-size:16px;font-weight:600">' + pname(p.age) + '</div><div style="font-size:12px;color:#9fb0c3;margin-top:2px">' + Math.round(p.lit * 100) + '% lit · ' + (p.waxing ? 'waxing' : 'waning') + '</div></div>';
+    main.classList.add('hidden'); pg.classList.remove('hidden'); W.scrollTo(0, 0);
+    load().then(render, function () { list.innerHTML = '<div style="padding:18px 0;text-align:center;color:#7f8fa3">Sunrise and sunset unavailable</div>'; });
+  }
+  card.addEventListener('click', open);
+  pg.querySelector('#spBack').onclick = function () { pg.classList.add('hidden'); main.classList.remove('hidden'); W.scrollTo(0, 0); };
+})();
 /* ---- rev 250: Wind forecast page. Tap the Wind or Gusts line on the weather page to open it. Seven days, tap a day for the hours ---- */
 (function () {
   var D = document, W = window, sc = D.getElementById('weatherScreen'), box = D.getElementById('wBox2');
