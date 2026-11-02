@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 245 -->
+<!-- Van Dash rev 246 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r245</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r246</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3228,12 +3228,10 @@ if (W.__fCen) W.__fCen(true);
     if (cb) cb.onclick = function () { if (confirm("Clear all " + shots.length + " queued photos?")) { shots = []; saveShots(); sync(); renderList(); } };
   }
 
+  // rev 246: sending never removes photos; they stay until you delete them yourself
   function afterSend(msg) {
     var m = document.getElementById("shMsg");
-    if (m) m.textContent = msg;
-    setTimeout(function () {
-      if (confirm("Did that send? OK clears these photos from the queue.")) { shots = []; saveShots(); sync(); renderList(); }
-    }, 400);
+    if (m) m.textContent = msg + " They stay here until you delete them.";
   }
 
   async function sendAll() {
@@ -3258,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 245): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 246): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -3277,7 +3275,7 @@ if (W.__fCen) W.__fCen(true);
     // the pin sits right next to the icon so it reads as "weather where you are"
     var pinEl = D.createElement('span');
     pinEl.innerHTML = '<svg viewBox="0 0 24 32" style="width:14px;height:19px;display:block"><path d="M12 1C6.2 1 1.5 5.7 1.5 11.5c0 7.6 10.5 19 10.5 19s10.5-11.4 10.5-19C22.5 5.7 17.8 1 12 1z" fill="#ff8a2b"/><circle cx="12" cy="11.5" r="4" fill="#151c25"/></svg>';
-    pinEl.style.cssText = 'position:absolute;margin:4px 0 0 58px';
+    pinEl.style.cssText = 'position:absolute;left:60px;top:0';
     var iconRow = D.createElement('div');
     iconRow.style.cssText = 'position:relative';
     icon.parentNode.insertBefore(iconRow, icon);
@@ -3455,7 +3453,7 @@ if (W.__fCen) W.__fCen(true);
     if (e.getAttribute('data-vd') === 'mc') { e.removeAttribute('data-vd'); }
     if (e.textContent !== want) e.textContent = want;
   }
-  var lastForecastIcon = { wxIcon: null, wBoxIcon: null };
+  var lastForecastIcon = { wxIcon: null, wBoxIcon: null }, lastForecastWord = null;
   setInterval(function () {
     var raining = live() && STAT === 'Raining now', night = isNight();
     [['wxIcon', 'wx'], ['wBoxIcon', 'wBoxDesc']].forEach(function (ids) {
@@ -3464,7 +3462,13 @@ if (W.__fCen) W.__fCen(true);
       // remember the forecast icon whenever Part 1 has written one (it is plain text, not our drawing)
       if (ic.getAttribute('data-vd') !== 'mc' && ic.textContent !== RAINI && ic.textContent !== MOON) lastForecastIcon[ids[0]] = ic.textContent;
       var f = lastForecastIcon[ids[0]];
-      if (raining) { setIcon(ic, 'rain'); if (tx && ids[1] === 'wBoxDesc' && tx.textContent !== 'Rain') tx.textContent = 'Rain'; return; }
+      // keep the weather-page word steady: remember the forecast word, and only ever show it or 'Rain', so Part 1 and this loop never fight
+      if (tx && ids[1] === 'wBoxDesc') {
+        if (tx.textContent !== 'Rain') lastForecastWord = tx.textContent;
+        var wantWord = raining ? 'Rain' : (lastForecastWord || tx.textContent);
+        if (tx.textContent !== wantWord) tx.textContent = wantWord;
+      }
+      if (raining) { setIcon(ic, 'rain'); return; }
       if (night && SUNNY[f]) { setIcon(ic, SUNNY[f]); return; }
       if (f != null) setIcon(ic, 'plain', f);
     });
@@ -3496,6 +3500,230 @@ if (W.__fCen) W.__fCen(true);
   var wc = D.getElementById('wxCard');
   if (wc) wc.addEventListener('click', function () { tried = 0; frames(); refresh(); });
   setTimeout(frames, 3000);
+})();
+/* ---- rev 246: photo list keeps photos after sending; select several or delete one at a time ---- */
+(function () {
+  var D = document, panel = D.getElementById('shotPanel');
+  if (!panel) return;
+  var selMode = false, sel = {}, busy = false;
+  function load() { try { return JSON.parse(localStorage.getItem('vdShots') || '[]'); } catch (e) { return []; } }
+  function store(a) { try { localStorage.setItem('vdShots', JSON.stringify(a)); return true; } catch (e) { return false; } }
+  function stamp(t) { var d = new Date(t); return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+  function fname(s) { var d = new Date(s.t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return 'vandash-geo-photos-' + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '-' + z(d.getHours()) + z(d.getMinutes()) + z(d.getSeconds()) + '.jpg'; }
+  function link(s) { return s.lat == null ? 'no GPS fix' : s.lat.toFixed(5) + ', ' + s.lon.toFixed(5) + ' https://maps.google.com/?q=' + s.lat.toFixed(5) + ',' + s.lon.toFixed(5); }
+  function toFile(s) { var bin = atob(s.img.split(',')[1]), u = new Uint8Array(bin.length); for (var k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k); return new File([u], fname(s), { type: 'image/jpeg' }); }
+  function refreshBadge() {
+    var b = D.getElementById('vCam'), n = load().length, sp = b && b.querySelector('span');
+    if (sp) { sp.textContent = n; sp.style.display = n ? 'block' : 'none'; }
+  }
+  function msg(t) { var m = D.getElementById('pxMsg'); if (m) m.textContent = t; }
+  function render() {
+    var shots = load(), keys = Object.keys(sel).filter(function (k) { return shots.some(function (s) { return String(s.t) === k; }); }), i;
+    sel = {}; keys.forEach(function (k) { sel[k] = 1; });
+    var n = keys.length;
+    var h = '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 12px">' +
+      '<button id="pxBack" style="margin:0;background:#26303c;padding:8px 14px;font-size:15px">&lsaquo; Back</button>' +
+      '<div style="font-size:20px;font-weight:600;color:#e8eef5">Photo spots</div><div style="width:70px"></div></div>';
+    if (!shots.length) {
+      h += '<div style="text-align:center;color:#7f8fa3;padding:30px 0">No photos saved.</div>';
+    } else {
+      h += '<div style="display:flex;gap:8px;margin-bottom:8px">' +
+        '<button id="pxSend" style="flex:1;margin:0;padding:13px;font-size:16px;background:#c9651a">' + (selMode && n ? 'Send selected (' + n + ')' : 'Send all (' + shots.length + ')') + '</button>' +
+        '<button id="pxSel" class="alt" style="margin:0;padding:13px 16px;font-size:16px;' + (selMode ? 'border:0.5px solid #ff8a2b;color:#ff8a2b' : '') + '">' + (selMode ? 'Done' : 'Select') + '</button></div>';
+      if (selMode) {
+        h += '<div style="display:flex;gap:8px;margin-bottom:8px">' +
+          '<button id="pxAll" class="alt" style="flex:1;margin:0;padding:11px;font-size:15px">' + (n === shots.length ? 'Select none' : 'Select all') + '</button>' +
+          '<button id="pxDelSel" class="alt" style="flex:1;margin:0;padding:11px;font-size:15px;color:#ff8a2b;opacity:' + (n ? '1' : '0.5') + '">Delete selected (' + n + ')</button></div>';
+      }
+      for (i = shots.length - 1; i >= 0; i--) {
+        var s = shots[i], on = !!sel[s.t];
+        h += '<div ' + (selMode ? 'data-pick="' + s.t + '" ' : '') + 'style="display:flex;gap:12px;align-items:center;background:#151c25;border:0.5px solid ' + (selMode && on ? '#ff8a2b' : '#8a96a6') + ';border-radius:14px;padding:10px;margin-bottom:8px">' +
+          (selMode ? '<div style="flex:none;width:26px;height:26px;border-radius:50%;border:2px solid ' + (on ? '#ff8a2b' : '#8a96a6') + ';background:' + (on ? '#ff8a2b' : 'none') + ';color:#000;font-weight:700;text-align:center;line-height:22px;font-size:16px">' + (on ? '\u2713' : '') + '</div>' : '') +
+          '<img ' + (selMode ? '' : 'data-view="' + s.t + '" ') + 'src="' + s.img + '" style="width:72px;height:72px;object-fit:cover;border-radius:8px;flex:none">' +
+          '<div ' + (selMode ? '' : 'data-view="' + s.t + '" ') + 'style="flex:1;min-width:0"><div style="font-size:16px;font-weight:600;color:#e8eef5">' + stamp(s.t) + '</div>' +
+          '<div style="font-size:12px;color:#9fb0c3;margin-top:3px">' + (s.lat == null ? 'No GPS fix' : s.lat.toFixed(5) + ', ' + s.lon.toFixed(5)) + '</div></div>' +
+          (selMode ? '' : '<button data-del="' + s.t + '" style="margin:0;background:none;color:#ff8a2b;font-size:20px;padding:6px 10px">\u2715</button>') + '</div>';
+      }
+    }
+    h += '<div id="pxMsg" style="text-align:center;font-size:13px;color:#7f8fa3;margin-top:10px;min-height:18px"></div>';
+    panel.innerHTML = h;
+    refreshBadge();
+  }
+  async function sendThese(list) {
+    if (!list.length || busy) return;
+    busy = true;
+    var text = list.map(function (s, i) { return (i + 1) + '. ' + stamp(s.t) + ' - ' + link(s); }).join('\n');
+    var files = list.map(toFile);
+    try {
+      if (navigator.canShare && navigator.canShare({ files: files })) {
+        await navigator.share({ files: files, title: 'Photo spots', text: text });
+        msg('Shared. The photos stay here until you delete them.'); busy = false; return;
+      }
+    } catch (e) { if (e && e.name === 'AbortError') { busy = false; return; } }
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Photo spots', text: text });
+        msg('Shared the list of spots (this phone cannot share the photos from here). They stay here.'); busy = false; return;
+      }
+    } catch (e) { if (e && e.name === 'AbortError') { busy = false; return; } }
+    msg("Sharing isn't available here."); busy = false;
+  }
+  function delThese(ts) {
+    var keep = load().filter(function (s) { return ts.indexOf(String(s.t)) < 0; });
+    store(keep); sel = {};
+    if (!keep.length) selMode = false;
+    render();
+  }
+  // catch clicks before Part 3's own handlers so nothing is cleared by accident
+  panel.addEventListener('click', function (e) {
+    var t = e.target, b = t && t.closest ? t.closest('button') : null, row = t && t.closest ? t.closest('[data-pick]') : null;
+    if (b && b.id === 'pxBack') { e.stopPropagation(); panel.style.display = 'none'; return; }
+    if (b && b.id === 'pxSel') { e.stopPropagation(); selMode = !selMode; sel = {}; render(); return; }
+    if (b && b.id === 'pxAll') { e.stopPropagation(); var a = load(); if (Object.keys(sel).length === a.length) sel = {}; else a.forEach(function (s) { sel[s.t] = 1; }); render(); return; }
+    if (b && b.id === 'pxSend') {
+      e.stopPropagation();
+      var all = load(), pick = all.filter(function (s) { return sel[s.t]; });
+      sendThese(selMode && pick.length ? pick : all); return;
+    }
+    if (b && b.id === 'pxDelSel') {
+      e.stopPropagation();
+      var ks = Object.keys(sel);
+      if (ks.length && confirm('Delete ' + ks.length + ' photo' + (ks.length === 1 ? '' : 's') + '?')) delThese(ks);
+      return;
+    }
+    if (b && b.getAttribute('data-del')) {
+      e.stopPropagation();
+      if (confirm('Delete this photo?')) delThese([b.getAttribute('data-del')]);
+      return;
+    }
+    if (row && !b) { e.stopPropagation(); var k = row.getAttribute('data-pick'); if (sel[k]) delete sel[k]; else sel[k] = 1; render(); return; }
+    // tap a photo to see it full size
+    var im = t && t.closest ? t.closest('[data-view]') : null;
+    if (im && !b) { e.stopPropagation(); openView(im.getAttribute('data-view')); }
+  }, true);
+
+  // ---- full-size photo viewer with a See location button ----
+  var vw = D.createElement('div');
+  vw.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:97;background:#000;display:none;flex-direction:column;padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 16px)';
+  D.body.appendChild(vw);
+  var curShot = null;
+  function openView(t) {
+    var s = load().filter(function (x) { return String(x.t) === String(t); })[0];
+    if (!s) return;
+    curShot = s;
+    vw.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 10px">' +
+      '<button id="pvBack" style="margin:0;background:#26303c;padding:8px 14px;font-size:15px">&lsaquo; Back</button>' +
+      '<div style="font-size:16px;font-weight:600;color:#e8eef5">' + stamp(s.t) + '</div><div style="width:70px"></div></div>' +
+      '<div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center"><img src="' + s.img + '" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px"></div>' +
+      '<div style="text-align:center;font-size:12px;color:#9fb0c3;margin:10px 0">' + (s.lat == null ? 'No GPS fix for this photo' : s.lat.toFixed(5) + ', ' + s.lon.toFixed(5)) + '</div>' +
+      (s.lat == null ? '' : '<button id="pvLoc" style="width:100%;margin:0;padding:13px;font-size:16px;background:#c9651a">See location</button>');
+    vw.style.display = 'flex';
+  }
+  vw.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    e.stopPropagation();
+    if (b.id === 'pvBack') { vw.style.display = 'none'; return; }
+    if (b.id === 'pvLoc' && curShot) { showSpot(curShot); }
+  });
+
+  // ---- centre the big map on the spot, with a small bar to leave a pin or close ----
+  var fm = D.getElementById('fullMap'), spot = null, spotBar = null;
+  function drawSpot(ctx, left, top, z) {
+    if (!spot || typeof vWorld !== 'function') return;
+    var w = vWorld(spot.lat, spot.lon, z), x = w.x - left, y = w.y - top, head = window.__mapHead || 0;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(head * Math.PI / 180);
+    ctx.beginPath(); ctx.arc(0, 0, 14, 0, 6.2832); ctx.strokeStyle = '#ff8a2b'; ctx.lineWidth = 3; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, 4, 0, 6.2832); ctx.fillStyle = '#ff8a2b'; ctx.fill();
+    ctx.restore();
+  }
+  var prevOver = window.__fOver;
+  window.__fOver = function (ctx, left, top, z) { if (prevOver) prevOver(ctx, left, top, z); drawSpot(ctx, left, top, z); };
+  function endSpot() {
+    spot = null;
+    if (spotBar) spotBar.style.display = 'none';
+    try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+  }
+  function showSpot(s) {
+    if (!fm || !window.__fGo) { alert('The big map is not ready yet.'); return; }
+    spot = { lat: s.lat, lon: s.lon, t: s.t };
+    vw.style.display = 'none'; panel.style.display = 'none';
+    fm.classList.remove('hidden');
+    window.__fGo(s.lat, s.lon, 16);
+    if (!spotBar) {
+      spotBar = D.createElement('div');
+      spotBar.style.cssText = 'position:absolute;left:12px;right:70px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:6;display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(21,28,37,0.97);border:0.5px solid #ff8a2b;border-radius:10px';
+      spotBar.innerHTML = '<div style="flex:1;min-width:0;font-size:14px;color:#e8eef5">Photo spot</div>' +
+        '<button id="spPin" style="margin:0;padding:0 12px;height:34px;font-size:14px;background:#c9651a;border:0;border-radius:8px;flex:none">Leave a pin</button>' +
+        '<button id="spNo" style="margin:0;padding:0 12px;height:34px;font-size:14px;background:#26303c;border:0;border-radius:8px;flex:none">Close</button>';
+      fm.appendChild(spotBar);
+      ['pointerdown', 'pointerup'].forEach(function (ev) { spotBar.addEventListener(ev, function (e) { e.stopPropagation(); }); });
+      spotBar.querySelector('#spNo').onclick = function (e) { e.stopPropagation(); endSpot(); };
+      spotBar.querySelector('#spPin').onclick = function (e) {
+        e.stopPropagation();
+        if (!spot) return;
+        var ps = window.__vdPins;
+        if (!ps) { alert('Pins are not ready yet.'); return; }
+        var def = 'Photo ' + stamp(spot.t), nm = prompt('Name this pin:', def);
+        if (nm === null) return;
+        ps.unshift({ id: 'p' + Date.now(), name: nm.trim() || def, lat: spot.lat, lon: spot.lon, t: Date.now() });
+        if (window.__vdPinSave && window.__vdPinSave() === false) { ps.shift(); window.__vdPinSave(); alert('Phone storage is full.'); return; }
+        if (window.__vdPinRender) window.__vdPinRender();
+        endSpot();
+      };
+    }
+    spotBar.style.display = 'flex';
+    try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+  }
+  setInterval(function () { if (spot && fm && fm.classList.contains('hidden')) endSpot(); }, 500);
+  // when the list opens, draw ours (Part 3 draws its own first, then we replace it)
+  new MutationObserver(function () {
+    if (panel.style.display === 'none') { selMode = false; sel = {}; return; }
+    if (!panel.querySelector('#pxBack') && !busy) { setTimeout(function () { if (panel.style.display !== 'none' && !panel.querySelector('#pxBack')) render(); }, 0); }
+  }).observe(panel, { childList: true, attributes: true, attributeFilter: ['style'] });
+})();
+/* ---- rev 246: weather-page word never flickers: fix it the instant anything overwrites it ---- */
+(function () {
+  var D = document, tx = D.getElementById('wBoxDesc');
+  if (!tx || !window.MutationObserver) return;
+  var fword = null, fixing = false;
+  function wantRain() { try { return wxLive && D.getElementById('vd4Rain') && false; } catch (e) { return false; } }
+  function raining() {
+    // the icon loop shows the rain icon only while radar says it is raining, so use that as the truth
+    var ic = D.getElementById('wBoxIcon');
+    return !!ic && ic.textContent === '\uD83C\uDF27\uFE0F';
+  }
+  function settle() {
+    if (fixing) return;
+    var cur = tx.textContent;
+    if (cur !== 'Rain') fword = cur;
+    var want = raining() ? 'Rain' : (fword || cur);
+    if (cur !== want) { fixing = true; tx.textContent = want; fixing = false; }
+  }
+  // runs right after every write, before the screen repaints, so the wrong word is never seen
+  new MutationObserver(function () { settle(); }).observe(tx, { childList: true, characterData: true, subtree: true });
+  var ico = D.getElementById('wBoxIcon');
+  if (ico) new MutationObserver(function () { settle(); }).observe(ico, { childList: true, characterData: true, subtree: true, attributes: true });
+})();
+/* ---- rev 246: the location arrow on the weather page is the back-to-current-location button; the wide bar is gone ---- */
+(function () {
+  var D = document, bar = D.getElementById('srchLive'), arrow = D.getElementById('wLiveArrow');
+  if (!bar || !arrow) return;
+  // the old wide bar never shows again (its own code still toggles it, so keep it hidden for good)
+  bar.style.display = 'none';
+  // the arrow was click-through (it sat on top of the magnifier); make it a real button, left of the magnifier
+  arrow.style.pointerEvents = 'auto';
+  arrow.style.cursor = 'pointer';
+  arrow.setAttribute('role', 'button');
+  arrow.setAttribute('aria-label', 'Back to current location');
+  ['pointerdown', 'pointerup'].forEach(function (ev) { arrow.addEventListener(ev, function (e) { e.stopPropagation(); }); });
+  arrow.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var live = true;
+    try { live = wxLive; } catch (er) {}
+    if (live) return; // already on current location, nothing to do
+    bar.click(); // runs the existing 'back to current location' code
+  });
 })();
 </script>
 </body>
