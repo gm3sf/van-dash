@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 251 -->
+<!-- Van Dash rev 252 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r251</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r252</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 251): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 252): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -3704,14 +3704,14 @@ if (W.__fCen) W.__fCen(true);
 (function () {
   var D = document, W = window;
   // phase from the date: age in days since a known new moon, 29.53-day cycle
-  function phase() {
-    var age = ((Date.now() - Date.UTC(2000, 0, 6, 18, 14)) / 86400000) % 29.530588853;
+  function phase(t) {
+    var age = (((t || Date.now()) - Date.UTC(2000, 0, 6, 18, 14)) / 86400000) % 29.530588853;
     if (age < 0) age += 29.530588853;
     return { age: age, waxing: age < 14.765294, lit: (1 - Math.cos(2 * Math.PI * age / 29.530588853)) / 2 };
   }
   // a round moon: dark disc, then the lit part. k runs -1 (new) to 1 (full); the terminator is an ellipse
-  function moonSvg(withCloud) {
-    var p = phase(), r = 27, c = 32, lit = p.lit, k = 1 - 2 * lit; // k: 1 new, -1 full
+  function moonSvg(withCloud, t) {
+    var p = phase(t), r = 27, c = 32, lit = p.lit, k = 1 - 2 * lit; // k: 1 new, -1 full
     var rx = Math.abs(k) * r, path;
     if (lit < 0.02) path = '';
     else if (lit > 0.98) path = 'M' + c + ' ' + (c - r) + 'A' + r + ' ' + r + ' 0 1 1 ' + c + ' ' + (c + r) + 'A' + r + ' ' + r + ' 0 1 1 ' + c + ' ' + (c - r) + 'Z';
@@ -3998,12 +3998,13 @@ if (W.__fCen) W.__fCen(true);
     if (!dy) return;
     var h = '', i;
     for (i = 0; i < dy.time.length; i++) {
-      var dl = Math.round(dy.daylight_duration[i] / 60), d0 = new Date(dy.time[i] + 'T12:00:00');
-      h += '<div style="display:flex;align-items:center;gap:6px;padding:11px 0;border-top:' + (i ? '1px solid #26303c' : 'none') + '">' +
+      var dl = Math.round(dy.daylight_duration[i] / 60), d0 = new Date(dy.time[i] + 'T12:00:00'), mp = W.__vdPhase(d0.getTime());
+      h += '<div style="display:flex;align-items:center;gap:4px;padding:11px 0;border-top:' + (i ? '1px solid #26303c' : 'none') + '">' +
         '<div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:600">' + (i ? d0.toLocaleDateString([], { weekday: 'long' }) : 'Today') + '</div>' +
         '<div style="font-size:12px;color:#9fb0c3;margin-top:2px">' + d0.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' · ' + Math.floor(dl / 60) + 'h ' + (dl % 60) + 'm daylight</div></div>' +
-        '<div style="flex:none;width:76px;text-align:center">' + SUNI(true) + '<div style="font-size:15px;font-weight:600;margin-top:3px">' + t12(dy.sunrise[i]) + '</div></div>' +
-        '<div style="flex:none;width:76px;text-align:center">' + SUNI(false) + '<div style="font-size:15px;font-weight:600;margin-top:3px">' + t12(dy.sunset[i]) + '</div></div></div>';
+        '<div style="flex:none;width:62px;text-align:center">' + SUNI(true) + '<div style="font-size:14px;font-weight:600;margin-top:3px">' + t12(dy.sunrise[i]) + '</div></div>' +
+        '<div style="flex:none;width:62px;text-align:center">' + SUNI(false) + '<div style="font-size:14px;font-weight:600;margin-top:3px">' + t12(dy.sunset[i]) + '</div></div>' +
+        '<div style="flex:none;width:60px;text-align:center"><span style="font-size:30px;line-height:1;display:block">' + W.__vdMoon(false, d0.getTime()) + '</span><div style="font-size:10px;line-height:1.1;color:#9fb0c3;margin-top:3px;min-height:22px">' + pname(mp.age) + '</div></div></div>';
     }
     list.innerHTML = h;
   }
