@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 247 -->
+<!-- Van Dash rev 248 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r247</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r248</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 247): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 248): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -3452,8 +3452,15 @@ if (W.__fCen) W.__fCen(true);
   var SUNNY = { '\u2600\uFE0F': 'moon', '\uD83C\uDF24\uFE0F': 'moon', '\u26C5': 'mooncloud' };
   function setIcon(e, kind, plain) {
     var want = kind === 'moon' ? MOON : kind === 'rain' ? RAINI : plain;
+    // rev 248: the night moon (clear or with a cloud) is always the real shaded moon, never the old flat crescent or the plain emoji
+    if ((kind === 'moon' || kind === 'mooncloud') && window.__vdMoon) {
+      var mk = kind === 'mooncloud' ? 'c' : 'm';
+      if (e.getAttribute('data-vdm') !== mk || !e.querySelector('svg')) { e.innerHTML = window.__vdMoon(mk === 'c'); e.setAttribute('data-vdm', mk); }
+      e.setAttribute('data-vd', 'mc');
+      return;
+    }
     if (kind === 'mooncloud') { if (e.getAttribute('data-vd') !== 'mc') { e.innerHTML = MOONCLOUD; e.setAttribute('data-vd', 'mc'); } return; }
-    if (e.getAttribute('data-vd') === 'mc') { e.removeAttribute('data-vd'); }
+    if (e.getAttribute('data-vd') === 'mc') { e.removeAttribute('data-vd'); e.removeAttribute('data-vdm'); }
     if (e.textContent !== want) e.textContent = want;
   }
   var lastForecastIcon = { wxIcon: null, wBoxIcon: null }, lastForecastWord = null;
@@ -3704,7 +3711,7 @@ if (W.__fCen) W.__fCen(true);
   }
   // a round moon: dark disc, then the lit part. k runs -1 (new) to 1 (full); the terminator is an ellipse
   function moonSvg(withCloud) {
-    var p = phase(), r = 28, c = 32, lit = p.lit, k = 1 - 2 * lit; // k: 1 new, -1 full
+    var p = phase(), r = 27, c = 32, lit = p.lit, k = 1 - 2 * lit; // k: 1 new, -1 full
     var rx = Math.abs(k) * r, path;
     if (lit < 0.02) path = '';
     else if (lit > 0.98) path = 'M' + c + ' ' + (c - r) + 'A' + r + ' ' + r + ' 0 1 1 ' + c + ' ' + (c + r) + 'A' + r + ' ' + r + ' 0 1 1 ' + c + ' ' + (c - r) + 'Z';
@@ -3713,10 +3720,22 @@ if (W.__fCen) W.__fCen(true);
       var s1 = p.waxing ? 1 : 0, s2 = (k > 0) === p.waxing ? 0 : 1;
       path = 'M' + c + ' ' + (c - r) + 'A' + r + ' ' + r + ' 0 0 ' + s1 + ' ' + c + ' ' + (c + r) + 'A' + rx.toFixed(2) + ' ' + r + ' 0 0 ' + s2 + ' ' + c + ' ' + (c - r) + 'Z';
     }
+    // shaded like the emoji icons: soft-lit moon on a dim dark disc, faint craters, a night-sky tile with a few stars behind
+    var id = 'vm' + Math.floor(Math.random() * 1e6);
+    function star(x, y, z, o) { return '<path d="M' + x + ' ' + (y - z) + 'Q' + x + ' ' + y + ' ' + (x + z) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y + z) + 'Q' + x + ' ' + y + ' ' + (x - z) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y - z) + 'Z" fill="#fff6d0" opacity="' + o + '"/>'; }
+    var stars = star(7, 9, 3.2, 0.95) + star(57, 12, 2.4, 0.85) + star(55, 52, 3, 0.9) + star(9, 50, 2, 0.7) +
+      '<circle cx="14" cy="26" r="0.9" fill="#fff" opacity="0.8"/><circle cx="50" cy="28" r="0.8" fill="#fff" opacity="0.7"/><circle cx="31" cy="5" r="0.8" fill="#fff" opacity="0.7"/><circle cx="60" cy="34" r="0.8" fill="#fff" opacity="0.6"/><circle cx="5" cy="36" r="0.8" fill="#fff" opacity="0.6"/><circle cx="24" cy="60" r="0.8" fill="#fff" opacity="0.6"/>';
     var s = '<svg viewBox="0 0 64 64" style="width:1em;height:1em;display:inline-block;vertical-align:-0.12em">' +
-      '<circle cx="32" cy="32" r="28" fill="#2a3340" stroke="#556073" stroke-width="1"/>' +
-      (path ? '<path d="' + path + '" fill="#f4e9b8"/>' : '');
-    if (withCloud) s += '<path d="M22 54a9 9 0 0 1 2-17.8 12 12 0 0 1 23 2.8A8 8 0 0 1 46 54z" fill="#e6edf5" stroke="#9fb0c3" stroke-width="1.5"/>';
+      '<defs>' +
+      '<radialGradient id="' + id + 'd" cx="40%" cy="38%" r="75%"><stop offset="0" stop-color="#4a5568"/><stop offset="1" stop-color="#232b38"/></radialGradient>' +
+      '<radialGradient id="' + id + 'l" cx="42%" cy="38%" r="80%"><stop offset="0" stop-color="#fff7d6"/><stop offset="0.6" stop-color="#f6df8e"/><stop offset="1" stop-color="#e0b94f"/></radialGradient>' +
+      '<clipPath id="' + id + 'c"><circle cx="32" cy="32" r="27"/></clipPath></defs>' +
+      '<rect x="0" y="0" width="64" height="64" rx="14" fill="#0b1220"/>' + stars +
+      '<circle cx="32" cy="32" r="27" fill="url(#' + id + 'd)"/>' +
+      (path ? '<g clip-path="url(#' + id + 'c)"><path d="' + path + '" fill="url(#' + id + 'l)"/>' +
+        '<g fill="#b8963c" opacity="0.30"><circle cx="24" cy="24" r="4.2"/><circle cx="38" cy="38" r="5.4"/><circle cx="26" cy="43" r="3"/><circle cx="41" cy="22" r="2.6"/><circle cx="33" cy="30" r="1.8"/></g></g>' : '') +
+      '<circle cx="32" cy="32" r="27" fill="none" stroke="#000" stroke-opacity="0.25" stroke-width="1"/>';
+    if (withCloud) s += '<path d="M20 56a9 9 0 0 1 2-17.8 12 12 0 0 1 23 2.8A8 8 0 0 1 44 56z" fill="#eef3f9" stroke="#b9c6d6" stroke-width="1.2"/>';
     return s + '</svg>';
   }
   W.__vdMoon = moonSvg;
@@ -3842,7 +3861,7 @@ if (W.__fCen) W.__fCen(true);
   // a small way to the saved pins list (search by name, rename, delete all still live there)
   var lst = D.createElement('button');
   lst.textContent = 'Saved pins';
-  lst.style.cssText = 'position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:5;display:none;margin:0;padding:0 12px;height:34px;font-size:13px;border:0.5px solid #8a96a6;border-radius:8px;background:rgba(21,28,37,0.92);color:#ff8a2b';
+  lst.style.cssText = 'position:absolute;z-index:5;display:none;margin:0;padding:0 12px;height:34px;font-size:13px;border:0.5px solid #8a96a6;border-radius:8px;background:rgba(21,28,37,0.92);color:#ff8a2b';
   np(lst);
   fm.appendChild(lst);
 
@@ -3871,6 +3890,10 @@ if (W.__fCen) W.__fCen(true);
     if (fm.classList.contains('hidden')) { hide(); return; }
     var r = fc.getBoundingClientRect();
     cross.style.left = (r.left + r.width / 2) + 'px'; cross.style.top = (r.top + r.height / 2) + 'px';
+    // Saved pins sits just left of the crosshair button, so it never lands on Start Track at the bottom
+    var nr = nb.getBoundingClientRect(), fr = fm.getBoundingClientRect();
+    lst.style.left = Math.max(8, nr.left - fr.left - lst.offsetWidth - 8) + 'px';
+    lst.style.top = Math.max(0, nr.top - fr.top + (nr.height - lst.offsetHeight) / 2) + 'px';
     var a = cen();
     if (a && a[0] != null) xS.textContent = a[0].toFixed(5) + ', ' + a[1].toFixed(5);
     if (W.__fCen) W.__fCen(true); // keep the map from snapping back to the GPS while you line it up
