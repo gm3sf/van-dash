@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 246 -->
+<!-- Van Dash rev 247 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r246</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r247</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 246): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 247): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -3275,11 +3275,13 @@ if (W.__fCen) W.__fCen(true);
     // the pin sits right next to the icon so it reads as "weather where you are"
     var pinEl = D.createElement('span');
     pinEl.innerHTML = '<svg viewBox="0 0 24 32" style="width:14px;height:19px;display:block"><path d="M12 1C6.2 1 1.5 5.7 1.5 11.5c0 7.6 10.5 19 10.5 19s10.5-11.4 10.5-19C22.5 5.7 17.8 1 12 1z" fill="#ff8a2b"/><circle cx="12" cy="11.5" r="4" fill="#151c25"/></svg>';
-    pinEl.style.cssText = 'position:absolute;left:60px;top:0';
-    var iconRow = D.createElement('div');
-    iconRow.style.cssText = 'position:relative';
-    icon.parentNode.insertBefore(iconRow, icon);
-    iconRow.appendChild(icon); iconRow.appendChild(pinEl);
+    // rev 247: the pin goes in the card's title row, just left of the word "Weather" (after the little cloud icon)
+    pinEl.style.cssText = 'display:inline-block;vertical-align:-3px;margin-right:6px';
+    var wlab = D.querySelector('#wxCard .label');
+    if (wlab) {
+      var wcloud = wlab.querySelector('svg.ico');
+      if (wcloud && wcloud.nextSibling) wlab.insertBefore(pinEl, wcloud.nextSibling); else wlab.insertBefore(pinEl, wlab.firstChild);
+    }
     wrap.appendChild(rl);
   }
   // no location text on the main card any more (the pin says it); hide the label and stop other code from showing it
@@ -3639,14 +3641,22 @@ if (W.__fCen) W.__fCen(true);
   }
   var prevOver = window.__fOver;
   window.__fOver = function (ctx, left, top, z) { if (prevOver) prevOver(ctx, left, top, z); drawSpot(ctx, left, top, z); };
-  function endSpot() {
+  // rev 247: leaving the map takes you back to the photo you came from (and the photo's Back goes on to the list)
+  function endSpot(backToPhoto) {
+    var from = spot && spot.from;
     spot = null;
     if (spotBar) spotBar.style.display = 'none';
+    if (fm && !fm.classList.contains('hidden')) fm.classList.add('hidden');
     try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+    if (backToPhoto !== false && from) {
+      panel.style.display = 'block';
+      if (!panel.querySelector('#pxBack')) render();
+      openView(from);
+    }
   }
   function showSpot(s) {
     if (!fm || !window.__fGo) { alert('The big map is not ready yet.'); return; }
-    spot = { lat: s.lat, lon: s.lon, t: s.t };
+    spot = { lat: s.lat, lon: s.lon, t: s.t, from: s.t };
     vw.style.display = 'none'; panel.style.display = 'none';
     fm.classList.remove('hidden');
     window.__fGo(s.lat, s.lon, 16);
@@ -3655,7 +3665,7 @@ if (W.__fCen) W.__fCen(true);
       spotBar.style.cssText = 'position:absolute;left:12px;right:70px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:6;display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(21,28,37,0.97);border:0.5px solid #ff8a2b;border-radius:10px';
       spotBar.innerHTML = '<div style="flex:1;min-width:0;font-size:14px;color:#e8eef5">Photo spot</div>' +
         '<button id="spPin" style="margin:0;padding:0 12px;height:34px;font-size:14px;background:#c9651a;border:0;border-radius:8px;flex:none">Leave a pin</button>' +
-        '<button id="spNo" style="margin:0;padding:0 12px;height:34px;font-size:14px;background:#26303c;border:0;border-radius:8px;flex:none">Close</button>';
+        '<button id="spNo" style="margin:0;padding:0 12px;height:34px;font-size:14px;background:#26303c;border:0;border-radius:8px;flex:none">Back to photo</button>';
       fm.appendChild(spotBar);
       ['pointerdown', 'pointerup'].forEach(function (ev) { spotBar.addEventListener(ev, function (e) { e.stopPropagation(); }); });
       spotBar.querySelector('#spNo').onclick = function (e) { e.stopPropagation(); endSpot(); };
@@ -3682,7 +3692,36 @@ if (W.__fCen) W.__fCen(true);
     if (!panel.querySelector('#pxBack') && !busy) { setTimeout(function () { if (panel.style.display !== 'none' && !panel.querySelector('#pxBack')) render(); }, 0); }
   }).observe(panel, { childList: true, attributes: true, attributeFilter: ['style'] });
 })();
-/* ---- rev 246: weather-page word never flickers: fix it the instant anything overwrites it ---- */
+/* ---- rev 247: real moon phase, drawn to match tonight; replaces the plain moon emoji ---- */
+(function () {
+  var D = document, W = window;
+  // phase from the date: age in days since a known new moon, 29.53-day cycle
+  function phase() {
+    var age = ((Date.now() - Date.UTC(2000, 0, 6, 18, 14)) / 86400000) % 29.530588853;
+    if (age < 0) age += 29.530588853;
+    return { age: age, waxing: age < 14.765294, lit: (1 - Math.cos(2 * Math.PI * age / 29.530588853)) / 2 };
+  }
+  // a round moon: dark disc, then the lit part. k runs -1 (new) to 1 (full); the terminator is an ellipse
+  function moonSvg(withCloud) {
+    var p = phase(), r = 28, c = 32, lit = p.lit, k = 1 - 2 * lit; // k: 1 new, -1 full
+    var rx = Math.abs(k) * r, path;
+    if (lit < 0.02) path = '';
+    else if (lit > 0.98) path = 'M' + c + ' ' + (c - r) + 'A' + r + ' ' + r + ' 0 1 1 ' + c + ' ' + (c + r) + 'A' + r + ' ' + r + ' 0 1 1 ' + c + ' ' + (c - r) + 'Z';
+    else {
+      // lit limb on the right when waxing, left when waning (northern hemisphere view)
+      var s1 = p.waxing ? 1 : 0, s2 = (k > 0) === p.waxing ? 0 : 1;
+      path = 'M' + c + ' ' + (c - r) + 'A' + r + ' ' + r + ' 0 0 ' + s1 + ' ' + c + ' ' + (c + r) + 'A' + rx.toFixed(2) + ' ' + r + ' 0 0 ' + s2 + ' ' + c + ' ' + (c - r) + 'Z';
+    }
+    var s = '<svg viewBox="0 0 64 64" style="width:1em;height:1em;display:inline-block;vertical-align:-0.12em">' +
+      '<circle cx="32" cy="32" r="28" fill="#2a3340" stroke="#556073" stroke-width="1"/>' +
+      (path ? '<path d="' + path + '" fill="#f4e9b8"/>' : '');
+    if (withCloud) s += '<path d="M22 54a9 9 0 0 1 2-17.8 12 12 0 0 1 23 2.8A8 8 0 0 1 46 54z" fill="#e6edf5" stroke="#9fb0c3" stroke-width="1.5"/>';
+    return s + '</svg>';
+  }
+  W.__vdMoon = moonSvg;
+  W.__vdPhase = phase;
+})();
+/* ---- rev 247: both weather icons and the weather-page word never flicker: fix them the instant anything overwrites them ---- */
 (function () {
   var D = document, tx = D.getElementById('wBoxDesc');
   if (!tx || !window.MutationObserver) return;
@@ -3704,6 +3743,39 @@ if (W.__fCen) W.__fCen(true);
   new MutationObserver(function () { settle(); }).observe(tx, { childList: true, characterData: true, subtree: true });
   var ico = D.getElementById('wBoxIcon');
   if (ico) new MutationObserver(function () { settle(); }).observe(ico, { childList: true, characterData: true, subtree: true, attributes: true });
+
+  // ---- icons: the same idea. Part 1 writes the sun on every refresh; put the night icon back before the screen repaints ----
+  var SUN = '\u2600\uFE0F', MOONSUN = '\uD83C\uDF24\uFE0F', PARTLY = '\u26C5', RAIN = '\uD83C\uDF27\uFE0F', OLDMOON = '\uD83C\uDF19';
+  function night() {
+    var sr = (D.getElementById('sunrise') || {}).textContent, ss = (D.getElementById('sunset') || {}).textContent;
+    function mins(s) { var m = /(\d+):(\d+)\s*(AM|PM)/i.exec(s || ''); if (!m) return null; var h = +m[1] % 12; if (/PM/i.test(m[3])) h += 12; return h * 60 + (+m[2]); }
+    var a = mins(sr), b = mins(ss);
+    if (a == null || b == null) return false;
+    var n = new Date(), now = n.getHours() * 60 + n.getMinutes();
+    return now < a || now >= b;
+  }
+  function guard(id) {
+    var e = D.getElementById(id);
+    if (!e || !window.MutationObserver) return;
+    var busy = false;
+    function fix() {
+      if (busy) return;
+      var t = e.textContent, mine = e.getAttribute('data-vdm');
+      if (t === RAIN) { if (mine) e.removeAttribute('data-vdm'); return; }
+      var wantNight = night() && (t === SUN || t === MOONSUN || t === PARTLY || t === OLDMOON || mine);
+      if (!wantNight) { if (mine && t === '') { /* ours, but daylight now: let the normal code put the forecast icon back */ e.removeAttribute('data-vdm'); } return; }
+      var kind = (t === PARTLY || mine === 'c') ? 'c' : 'm';
+      if (mine === kind && e.querySelector('svg')) return;
+      busy = true;
+      e.innerHTML = window.__vdMoon(kind === 'c');
+      e.setAttribute('data-vdm', kind);
+      busy = false;
+    }
+    new MutationObserver(fix).observe(e, { childList: true, characterData: true, subtree: true });
+    setInterval(fix, 600);
+    fix();
+  }
+  guard('wxIcon'); guard('wBoxIcon');
 })();
 /* ---- rev 246: the location arrow on the weather page is the back-to-current-location button; the wide bar is gone ---- */
 (function () {
