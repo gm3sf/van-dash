@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 249 -->
+<!-- Van Dash rev 250 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r249</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r250</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 249): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 250): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -3934,6 +3934,137 @@ if (W.__fCen) W.__fCen(true);
     var b = D.getElementById(id);
     if (b) { b.innerHTML = ARROW; b.style.lineHeight = '0'; }
   });
+})();
+
+/* ---- rev 250: Wind forecast page. Tap the Wind or Gusts line on the weather page to open it. Seven days, tap a day for the hours ---- */
+(function () {
+  var D = document, W = window, sc = D.getElementById('weatherScreen'), box = D.getElementById('wBox2');
+  if (!sc || !box || !D.getElementById('mainScreen')) return;
+  var DIRS16 = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  var DATA = null, DKEY = '', DT = 0, PEND = null, openDay = -1;
+
+  function pos() { try { return lastWeatherPos || null; } catch (e) { return null; } }
+  function compass(deg) { return DIRS16[Math.round(((deg % 360) + 360) % 360 / 22.5) % 16]; }
+  // the same rotating-compass look as the wind box: white ring, orange arrow pointing the way the wind blows toward,
+  // and the whole ring turned so it matches the real world (ring turns with your heading)
+  function ring(from, px, hd) {
+    return '<svg viewBox="0 0 100 100" style="width:' + px + 'px;height:' + px + 'px;display:block;flex:none">' +
+      '<g class="wpRing" style="transform-origin:50px 50px;transform:rotate(' + (-hd) + 'deg)">' +
+      '<circle cx="50" cy="50" r="46" fill="none" stroke="#ffffff" stroke-width="4"/>' +
+      '<g style="transform-origin:50px 50px;transform:rotate(' + ((from + 180) % 360) + 'deg)">' +
+      '<path d="M50 80 L50 30" stroke="#ff8a2b" stroke-width="8" stroke-linecap="round" fill="none"/>' +
+      '<path d="M33 47 L50 28 L67 47" stroke="#ff8a2b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' +
+      '</g></g></svg>';
+  }
+
+  // ---- the page ----
+  var pg = D.createElement('div');
+  pg.id = 'windScreen';
+  pg.className = 'hidden';
+  pg.innerHTML =
+    '<div class="topbar"><button id="wpBack">&lsaquo; Back</button><div class="title">Wind forecast</div><div class="spacer"></div></div>' +
+    '<div id="wpPlace" style="text-align:center;font-size:13px;color:#7f8fa3;margin:-2px 0 10px"></div>' +
+    '<div id="wpList" style="background:#151c25;border-radius:16px;padding:4px 14px;border:0.5px solid #8a96a6"><div style="padding:18px 0;text-align:center;color:#7f8fa3">Loading wind forecast...</div></div>' +
+    '<div style="text-align:center;font-size:12px;color:#7f8fa3;margin-top:10px">Arrow shows the way the wind is coming from. Tap a day for the hours.</div>';
+  sc.parentNode.insertBefore(pg, sc.nextSibling);
+  var list = pg.querySelector('#wpList'), place = pg.querySelector('#wpPlace');
+
+  // the compass heading the app already tracks (the weather-page ring uses the same number)
+  var HD = 0;
+  (function () {
+    var prev = showHeading;
+    showHeading = function (deg) { prev(deg); if (deg != null && !isNaN(deg)) HD = (deg + 360) % 360; };
+  })();
+
+  // ---- data: hourly wind + daily max wind and gust, one fetch ----
+  function load(force) {
+    var p = pos();
+    if (!p) return Promise.reject(new Error('no position'));
+    var key = p.latitude.toFixed(2) + ',' + p.longitude.toFixed(2);
+    if (!force && DATA && key === DKEY && Date.now() - DT < 480000) return Promise.resolve(DATA);
+    if (PEND && PEND.k === key) return PEND.p;
+    var pr = fetch('https://api.open-meteo.com/v1/forecast?latitude=' + p.latitude + '&longitude=' + p.longitude +
+      '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m' +
+      '&daily=wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant' +
+      '&forecast_days=7&wind_speed_unit=mph&timezone=auto')
+      .then(function (r) { return r.json(); })
+      .then(function (d) { DATA = d; DKEY = key; DT = Date.now(); PEND = null; return d; }, function (e) { PEND = null; throw e; });
+    PEND = { k: key, p: pr };
+    return pr;
+  }
+
+  function dayName(i, t) { return i === 0 ? 'Today' : new Date(t + 'T12:00:00').toLocaleDateString([], { weekday: 'long' }); }
+  function hourLabel(h) { return h === 0 ? '12 AM' : (h % 12 || 12) + (h < 12 ? ' AM' : ' PM'); }
+
+  function hoursFor(d, i) {
+    var h = d.hourly, s = i * 24, e = Math.min(s + 24, h.time.length), out = '', k;
+    var off = (d.utc_offset_seconds || 0) * 1000, now = Date.now();
+    if (i === 0) { while (s < e - 1 && Date.parse(h.time[s] + ':00Z') - off < now - 1800000) s++; }
+    for (k = s; k < e; k++) {
+      var hr = +h.time[k].slice(11, 13), sp = Math.round(h.wind_speed_10m[k]), gu = Math.round(h.wind_gusts_10m[k]), dr = h.wind_direction_10m[k];
+      out += '<div style="flex:none;width:62px;text-align:center">' +
+        '<div style="font-size:13px;color:#9fb0c3">' + hourLabel(hr) + '</div>' +
+        '<div style="margin:5px auto 3px;width:38px">' + ring(dr, 38, HD) + '</div>' +
+        '<div style="font-size:15px;font-weight:600">' + sp + ' <span style="font-size:11px;color:#7f8fa3;font-weight:400">mph</span></div>' +
+        '<div style="font-size:12px;color:#ff8a2b">gust ' + gu + '</div>' +
+        '<div style="font-size:11px;color:#7f8fa3">' + compass(dr) + '</div></div>';
+    }
+    return out || '<div style="padding:10px;color:#7f8fa3">No hourly data</div>';
+  }
+
+  function render() {
+    var d = DATA;
+    if (!d || !d.daily) return;
+    var dy = d.daily, h = '', i;
+    for (i = 0; i < dy.time.length; i++) {
+      var sp = Math.round(dy.wind_speed_10m_max[i]), gu = Math.round(dy.wind_gusts_10m_max[i]), dr = dy.wind_direction_10m_dominant[i];
+      h += '<div class="vdWd" data-i="' + i + '" style="border-top:' + (i ? '1px solid #26303c' : 'none') + '">' +
+        '<div style="display:flex;align-items:center;gap:12px;padding:10px 0">' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="font-size:18px;font-weight:600">' + dayName(i, dy.time[i]) + '</div>' +
+            '<div style="font-size:13px;color:#9fb0c3;margin-top:2px">Wind from ' + compass(dr) + '</div>' +
+          '</div>' +
+          '<div style="text-align:right">' +
+            '<div style="font-size:20px;font-weight:600">' + sp + ' <span style="font-size:12px;color:#7f8fa3;font-weight:400">mph</span></div>' +
+            '<div style="font-size:13px;color:#ff8a2b;margin-top:2px">Max gust ' + gu + ' mph</div>' +
+          '</div>' +
+          '<div style="flex:none">' + ring(dr, 48, HD) + '</div>' +
+        '</div>' +
+        '<div class="vdWh" style="display:' + (openDay === i ? 'flex' : 'none') + ';overflow-x:auto;-webkit-overflow-scrolling:touch;gap:4px;padding:6px 0 12px;border-top:1px solid #26303c">' + (openDay === i ? hoursFor(d, i) : '') + '</div>' +
+      '</div>';
+    }
+    list.innerHTML = h;
+  }
+
+  list.addEventListener('click', function (e) {
+    var row = e.target && e.target.closest ? e.target.closest('.vdWd') : null;
+    if (!row) return;
+    var i = +row.getAttribute('data-i');
+    openDay = (openDay === i) ? -1 : i;
+    render();
+  });
+
+  // keep the rings turning with the compass without redrawing the whole list
+  setInterval(function () {
+    if (pg.classList.contains('hidden')) return;
+    var r = pg.querySelectorAll('.wpRing'), k;
+    for (k = 0; k < r.length; k++) r[k].style.transform = 'rotate(' + (-HD) + 'deg)';
+  }, 300);
+
+  function open() {
+    openDay = -1;
+    D.getElementById('weatherScreen').classList.add('hidden');
+    pg.classList.remove('hidden');
+    W.scrollTo(0, 0);
+    var live = true; try { live = wxLive; } catch (e) {}
+    place.textContent = live ? 'Current location' : (D.getElementById('wCity').textContent || '');
+    load(false).then(render, function () { list.innerHTML = '<div style="padding:18px 0;text-align:center;color:#7f8fa3">Wind forecast unavailable</div>'; });
+  }
+  pg.querySelector('#wpBack').onclick = function () { pg.classList.add('hidden'); D.getElementById('weatherScreen').classList.remove('hidden'); W.scrollTo(0, 0); };
+
+  // tapping anywhere on the Wind / Gusts box opens it
+  box.style.cursor = 'pointer';
+  box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
 </script>
 </body>
