@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 252 -->
+<!-- Van Dash rev 253 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r252</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r253</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 252): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 253): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -4017,6 +4017,61 @@ if (W.__fCen) W.__fCen(true);
   }
   card.addEventListener('click', open);
   pg.querySelector('#spBack').onclick = function () { pg.classList.add('hidden'); main.classList.remove('hidden'); W.scrollTo(0, 0); };
+})();
+/* ---- rev 253: Daily forecast icons from the hourly data ---- */
+(function () {
+  var D = document, W = window, fc = D.getElementById('forecast');
+  if (!fc || !W.MutationObserver) return;
+  var DATA = null, DKEY = '', DT = 0, PEND = null;
+  function pos() { try { return lastWeatherPos || null; } catch (e) { return null; } }
+  function load() {
+    var p = pos();
+    if (!p) return Promise.reject(new Error('no position'));
+    var key = p.latitude.toFixed(2) + ',' + p.longitude.toFixed(2);
+    if (DATA && key === DKEY && Date.now() - DT < 900000) return Promise.resolve(DATA);
+    if (PEND && PEND.k === key) return PEND.p;
+    var pr = fetch('https://api.open-meteo.com/v1/forecast?latitude=' + p.latitude + '&longitude=' + p.longitude +
+      '&hourly=weather_code,cloud_cover,precipitation,is_day&forecast_days=7&timezone=auto')
+      .then(function (r) { return r.json(); })
+      .then(function (d) { DATA = d; DKEY = key; DT = Date.now(); PEND = null; return d; }, function (e) { PEND = null; throw e; });
+    PEND = { k: key, p: pr };
+    return pr;
+  }
+  // one icon per day, from the hours: daylight cloud cover picks the sky, wet hours add the rain
+  function pick(h, day) {
+    var s = day * 24, e = Math.min(s + 24, h.time.length), k, cs = 0, cn = 0, ca = 0, wet = 0, snow = 0, thun = 0;
+    for (k = s; k < e; k++) {
+      var cc = h.cloud_cover[k], code = h.weather_code[k];
+      ca += cc || 0;
+      if (h.is_day[k]) { cs += cc || 0; cn++; }
+      if (h.precipitation[k] >= 0.2) wet++;
+      if (code >= 95) thun++;
+      if ((code >= 71 && code <= 77) || code === 85 || code === 86) snow++;
+    }
+    if (e <= s) return null;
+    var c = cn ? cs / cn : ca / (e - s);
+    if (thun) return '⛈️';
+    if (snow >= 2) return '🌨️';
+    if (wet) {
+      if (c < 35 && wet < 6) return '🌦️';
+      if (c < 65 && wet < 3) return '🌦️';
+      return '🌧️';
+    }
+    return c < 12 ? '☀️' : c < 35 ? '🌤️' : c < 65 ? '⛅' : c < 85 ? '🌥️' : '☁️';
+  }
+  function apply() {
+    var h = DATA && DATA.hourly;
+    if (!h) return;
+    var rows = fc.querySelectorAll(':scope > .day'), i;
+    for (i = 0; i < rows.length; i++) {
+      var em = rows[i].querySelector('.ic .emoji'), ic = pick(h, i);
+      if (em && ic && em.textContent !== ic) em.textContent = ic;
+    }
+  }
+  function go() { load().then(apply, function () {}); apply(); }
+  new MutationObserver(go).observe(fc, { childList: true });
+  go();
+  setInterval(go, 300000);
 })();
 /* ---- rev 250: Wind forecast page. Tap the Wind or Gusts line on the weather page to open it. Seven days, tap a day for the hours ---- */
 (function () {
