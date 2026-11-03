@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 253 -->
+<!-- Van Dash rev 254 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r253</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r254</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 253): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 254): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -4017,6 +4017,138 @@ if (W.__fCen) W.__fCen(true);
   }
   card.addEventListener('click', open);
   pg.querySelector('#spBack').onclick = function () { pg.classList.add('hidden'); main.classList.remove('hidden'); W.scrollTo(0, 0); };
+})();
+/* ---- rev 254: Weather radar controls ---- */
+(function () {
+var D = document, W = window, sc = D.getElementById('weatherScreen'), old = sc && sc.querySelector('#vdRC');
+if (!sc || !old) return;
+var DP = W.devicePixelRatio || 1;
+var box = D.createElement('div');
+box.className = 'card';
+box.style.cssText = 'margin-top:14px;padding:10px 12px';
+var bs = 'position:absolute;margin:0;padding:0;width:40px;height:40px;border-radius:20px;background:rgba(20,26,34,.9);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;';
+function bt(i, p, t) { return '<button id="vdR' + i + '" style="' + bs + p + '">' + t + '</button>'; }
+box.innerHTML = '<div style="font-size:15px;letter-spacing:0.12em;text-transform:uppercase;color:#9fb0c3;margin-bottom:8px">Radar</div>' +
+'<div style="position:relative">' +
+'<canvas id="vdRC2" style="width:100%;height:300px;border-radius:10px;background:#0b0f14;display:block;touch-action:none"></canvas>' +
+bt('In', 'top:8px;right:8px', '+') + bt('Out', 'top:54px;right:8px', '−') + bt('Me', 'top:100px;right:8px', '◎') + bt('Pl', 'bottom:8px;left:8px;font-size:16px', '❚❚') + '</div>' +
+'<div id="vdRT2" style="text-align:center;font-size:13px;color:#7f8fa3;margin-top:6px">Loading...</div>';
+var ob = old.closest('.card'); ob.parentNode.replaceChild(box, ob);
+var cv = box.querySelector('#vdRC2'), rt = box.querySelector('#vdRT2'), bI = box.querySelector('#vdRIn'), bO = box.querySelector('#vdROut'), bM = box.querySelector('#vdRMe'), bP = box.querySelector('#vdRPl');
+var R = { frames: [], i: 0, play: true, host: '', t: 0, tried: 0, last: 0, imgs: {}, lat: null, lon: null, z: 6, home: null }, pt = {}, p0 = null;
+function pos() { try { return lastWeatherPos || null; } catch (e) { return null; } }
+function far(p) { return !R.home || Math.abs(p.latitude - R.home.lat) > 0.2 || Math.abs(p.longitude - R.home.lon) > 0.2; }
+function hidden() { return sc.classList.contains('hidden'); }
+function wpx(lat, lon, z) {
+var n = 256 * Math.pow(2, z), s = Math.sin(lat * Math.PI / 180);
+return { x: (lon + 180) / 360 * n, y: (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n };
+}
+function upx(x, y, z) {
+var n = 256 * Math.pow(2, z);
+return { lon: x / n * 360 - 180, lat: Math.atan(Math.sinh(Math.PI * (1 - 2 * y / n))) * 180 / Math.PI };
+}
+function img(u) {
+var m = R.imgs[u];
+if (!m) {
+m = new Image(); m.onload = function () { this.vdOK = true; draw(); };
+m.src = u; R.imgs[u] = m;
+}
+return m;
+}
+function layer(ctx, w, h, zt, alpha, url) {
+var s = Math.pow(2, R.z - zt), c = wpx(R.lat, R.lon, zt), left = c.x - w / (2 * s), top = c.y - h / (2 * s), n = Math.pow(2, zt);
+var x0 = Math.floor(left / 256), x1 = Math.floor((left + w / s) / 256), y0 = Math.floor(top / 256), y1 = Math.floor((top + h / s) / 256), x, y;
+ctx.globalAlpha = alpha;
+for (y = y0; y <= y1; y++) {
+if (y < 0 || y >= n) continue;
+for (x = x0; x <= x1; x++) {
+var b = img(url(((x % n) + n) % n, y));
+if (b.vdOK) ctx.drawImage(b, (x * 256 - left) * s, (y * 256 - top) * s, 256 * s + 0.5, 256 * s + 0.5);
+}
+}
+ctx.globalAlpha = 1;
+}
+function draw() {
+if (R.lat == null || !cv.clientWidth) return;
+var w = cv.clientWidth, h = cv.clientHeight, ctx = cv.getContext('2d'), f = R.frames[R.i], bz = Math.max(3, Math.min(12, Math.round(R.z)));
+if (cv.width !== Math.round(w * DP)) { cv.width = Math.round(w * DP); cv.height = Math.round(h * DP); }
+ctx.setTransform(DP, 0, 0, DP, 0, 0);
+ctx.clearRect(0, 0, w, h);
+layer(ctx, w, h, bz, 1, function (x, y) { return 'https://tile.openstreetmap.org/' + bz + '/' + x + '/' + y + '.png'; });
+ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(0, 0, w, h);
+if (f) { var rz = Math.min(bz, 7); layer(ctx, w, h, rz, 0.75, function (x, y) { return R.host + f.path + '/256/' + rz + '/' + x + '/' + y + '/2/1_1.png'; }); }
+if (R.home) {
+var a = wpx(R.home.lat, R.home.lon, R.z), c = wpx(R.lat, R.lon, R.z), px = w / 2 + a.x - c.x, py = h / 2 + a.y - c.y;
+ctx.beginPath(); ctx.arc(px, py, 6, 0, 6.2832); ctx.fillStyle = '#ff3b30'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.stroke();
+}
+}
+function label() {
+var f = R.frames[R.i];
+if (!f) return;
+rt.textContent = new Date(f.time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) +
+'  (' + Math.round((Date.now() - f.time * 1000) / 60000) + ' min ago)';
+}
+function me() {
+var p = pos();
+if (!p) return;
+R.home = { lat: p.latitude, lon: p.longitude }; R.lat = p.latitude; R.lon = p.longitude; R.z = 6;
+draw();
+}
+function loadRadar() {
+var p = pos();
+if (!p) return;
+R.tried = Date.now();
+fetch('https://api.rainviewer.com/public/weather-maps.json')
+.then(function (r) { return r.json(); })
+.then(function (j) {
+var past = (j.radar && j.radar.past) || [], moved = far(p);
+R.t = Date.now(); R.host = j.host;
+R.frames = past.slice(-7); R.i = 0;
+if (moved || R.lat == null) me();
+if (!R.frames.length) { rt.textContent = 'No radar'; return; }
+draw(); label();
+})
+.catch(function () { rt.textContent = 'No radar'; });
+}
+function zb(d) { R.z = Math.max(3, Math.min(11, R.z + d)); draw(); }
+bI.onclick = function () { zb(1); };
+bO.onclick = function () { zb(-1); };
+bM.onclick = me;
+bP.onclick = function () { R.play = !R.play; bP.textContent = R.play ? '❚❚' : '▶'; };
+function two() { var k = Object.keys(pt); return k.length >= 2 ? [pt[k[0]], pt[k[1]]] : null; }
+cv.onpointerdown = function (e) {
+pt[e.pointerId] = { x: e.clientX, y: e.clientY };
+try { cv.setPointerCapture(e.pointerId); } catch (x) {}
+var t = two();
+p0 = t ? { d: Math.hypot(t[0].x - t[1].x, t[0].y - t[1].y), z: R.z } : null;
+};
+cv.onpointermove = function (e) {
+var p = pt[e.pointerId];
+if (!p || R.lat == null) return;
+var dx = e.clientX - p.x, dy = e.clientY - p.y;
+p.x = e.clientX; p.y = e.clientY;
+var t = two();
+if (t && p0) {
+var d = Math.hypot(t[0].x - t[1].x, t[0].y - t[1].y);
+if (p0.d > 0) R.z = Math.max(3, Math.min(11, p0.z + Math.log(d / p0.d) / Math.LN2));
+} else if (!t) {
+var c = wpx(R.lat, R.lon, R.z), u = upx(c.x - dx, c.y - dy, R.z);
+R.lat = u.lat; R.lon = u.lon;
+}
+draw();
+};
+cv.onpointerup = cv.onpointercancel = function (e) {
+delete pt[e.pointerId]; p0 = null;
+};
+setInterval(function () {
+if (hidden()) return;
+var now = Date.now(), p = pos();
+var stale = !R.frames.length || now - R.t > 600000 || (p && far(p));
+if (stale && now - R.tried > 20000) loadRadar();
+if (R.play && R.frames.length > 1 && now - R.last >= (R.i === R.frames.length - 1 ? 1600 : 650)) {
+R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
+}
+}, 200);
 })();
 /* ---- rev 253: Daily forecast icons from the hourly data ---- */
 (function () {
