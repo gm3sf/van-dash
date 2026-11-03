@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 254 -->
+<!-- Van Dash rev 256 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r254</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r256</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1580,7 +1580,7 @@ function decorateResults() {
     for (var tx = tx0; tx <= tx1; tx++) {
       for (var ty = ty0; ty <= ty1; ty++) {
         if (ty < 0 || ty >= n) continue;
-        var wx = ((tx % n) + n) % n, key = fSatOn + "/" + fZoom + "/" + wx + "/" + ty, t = fTiles[key];
+        var wx = ((tx % n) + n) % n, key = (window.__vdTP|0) + "" + fSatOn + "/" + fZoom + "/" + wx + "/" + ty, t = fTiles[key];
         if (!t) {
           t = fTiles[key] = new Image();
           t.onload = fDraw;
@@ -3256,7 +3256,58 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 254): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 4 (rev 255): Topo map layer on the small and full-screen maps; Altitude card opens the big map on Topo ===== */
+(function () {
+  var W = window, D = document, topo = false, G = '#4fb06d';
+  try { topo = localStorage.getItem('vdTopo') === '1'; } catch (e) {}
+  W.__vdTP = topo ? 1 : 0;
+  var d = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+  if (d && d.set) Object.defineProperty(HTMLImageElement.prototype, 'src', { configurable: true, enumerable: d.enumerable, get: d.get, set: function (u) {
+    var m = topo && typeof u === 'string' && /^https:\/\/tile\.openstreetmap\.org\/(\d+)\/(\d+)\/(\d+)\.png$/.exec(u);
+    if (m) u = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/' + m[1] + '/' + m[3] + '/' + m[2];
+    d.set.call(this, u);
+  } });
+  function clr() { try { for (var k in vTiles) delete vTiles[k]; } catch (e) {} }
+  function setTopo(on) {
+    topo = on; W.__vdTP = on ? 1 : 0;
+    try { localStorage.setItem('vdTopo', on ? '1' : '0'); } catch (e) {}
+    clr();
+  }
+  var vb = D.getElementById('vSat'), fb = D.getElementById('fSat'), fm = D.getElementById('fullMap');
+  if (vb) vb.onclick = function () {
+    var n = ((topo ? 2 : vSatOn ? 1 : 0) + 1) % 3;
+    setTopo(n === 2); vSatOn = n === 1;
+    try { localStorage.setItem('vSat', vSatOn ? '1' : '0'); } catch (e) {}
+    vSatSet(); vb.style.borderColor = topo ? G : (vSatOn ? '#ff8a2b' : '');
+  };
+  var fo = fb && fb.onclick;
+  if (fo) fb.onclick = function () {
+    var s = topo ? 2 : fb.style.borderColor ? 1 : 0;
+    if (s === 0) fo.call(fb);
+    else if (s === 1) { setTopo(true); fo.call(fb); }
+    else { setTopo(false); W.dispatchEvent(new Event('resize')); }
+    fb.style.borderColor = topo ? G : (s === 0 ? '#ff8a2b' : '');
+  };
+  if (fm && fb && W.MutationObserver) new MutationObserver(function () {
+    if (topo && !fm.classList.contains('hidden')) fb.style.borderColor = G;
+  }).observe(fm, { attributes: true, attributeFilter: ['class'] });
+  if (topo) { clr(); if (vb) vb.style.borderColor = G; try { vDraw(); } catch (e) {} }
+  var ac = D.getElementById('alt'); ac = ac && ac.closest('.card');
+  if (ac) {
+    ac.style.cursor = 'pointer';
+    ac.onclick = function () {
+      setTopo(true); vSatOn = false;
+      try { localStorage.setItem('vSat', '0'); } catch (e) {}
+      vSatSet(); if (vb) vb.style.borderColor = G;
+      var c = D.getElementById('vmapCanvas'), o = { bubbles: true, clientX: 5, clientY: 5, pointerId: 1 };
+      c.setPointerCapture = function () {};
+      c.dispatchEvent(new PointerEvent('pointerdown', o));
+      c.dispatchEvent(new PointerEvent('pointerup', o));
+      delete c.setPointerCapture;
+    };
+  }
+})();
+/* ===== Part 5 (rev 256): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -4074,8 +4125,8 @@ var w = cv.clientWidth, h = cv.clientHeight, ctx = cv.getContext('2d'), f = R.fr
 if (cv.width !== Math.round(w * DP)) { cv.width = Math.round(w * DP); cv.height = Math.round(h * DP); }
 ctx.setTransform(DP, 0, 0, DP, 0, 0);
 ctx.clearRect(0, 0, w, h);
-layer(ctx, w, h, bz, 1, function (x, y) { return 'https://tile.openstreetmap.org/' + bz + '/' + x + '/' + y + '.png'; });
-ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(0, 0, w, h);
+layer(ctx, w, h, bz, 1, function (x, y) { return 'https://a.tile.openstreetmap.org/' + bz + '/' + x + '/' + y + '.png'; });
+ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fillRect(0, 0, w, h);
 if (f) { var rz = Math.min(bz, 7); layer(ctx, w, h, rz, 0.75, function (x, y) { return R.host + f.path + '/256/' + rz + '/' + x + '/' + y + '/2/1_1.png'; }); }
 if (R.home) {
 var a = wpx(R.home.lat, R.home.lon, R.z), c = wpx(R.lat, R.lon, R.z), px = w / 2 + a.x - c.x, py = h / 2 + a.y - c.y;
