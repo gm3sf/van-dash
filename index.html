@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 257 -->
+<!-- Van Dash rev 258 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r257</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r258</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,11 +3256,11 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 257): Weather map picker, then Topo layer ===== */
-/* rev 257: Pick a weather spot on a map (crosshair), show once or save with a name; rename saved spots */
+/* ===== Part 4 (rev 258): Weather map picker, then Topo layer ===== */
+/* rev 258: search results open a crosshair map; Show weather or Save and show; Street/Satellite/Topo; find-me; rename saved spots */
 (function () {
-  var D = document, W = window, inp = D.getElementById('srchIn'), msg = D.getElementById('srchMsg');
-  if (!inp || !msg || typeof favs === 'undefined') return;
+  var D = document, W = window, sl = D.getElementById('srchList');
+  if (!sl || typeof favs === 'undefined') return;
   function sa(s) { try { return STATE_ABBR[s] || s; } catch (e) { return s; } }
   var nm = D.createElement('div');
   nm.style.cssText = 'display:none;position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:20px';
@@ -3301,13 +3301,14 @@ if (W.__fCen) W.__fCen(true);
     '<div style="position:relative;flex:1;min-height:0">' +
     '<canvas id="pkC" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block"></canvas>' +
     '<svg viewBox="0 0 60 60" style="position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;pointer-events:none;fill:none;stroke:#ff3b30;stroke-width:2.5;stroke-linecap:round"><circle cx="30" cy="30" r="11"/><path d="M30 3v17M30 40v17M3 30h17M40 30h17"/></svg>' +
-    '<button id="pkIn" style="' + bs + 'top:10px">+</button><button id="pkOut" style="' + bs + 'top:62px">−</button><button id="pkT" style="' + bs + 'top:114px;font-size:13px">Topo</button></div>' +
+    '<button id="pkIn" style="' + bs + 'top:10px">+</button><button id="pkOut" style="' + bs + 'top:62px">−</button><button id="pkT" style="' + bs + 'top:114px;font-size:13px;width:auto;padding:0 14px"></button>' +
+    '<button id="pkM" style="' + bs + 'top:166px"><svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linejoin:round"><path d="M21 3 3 10.5l7.5 2.5L13 20.5z"/></svg></button></div>' +
     '<div style="display:flex;gap:10px;padding:10px 12px calc(env(safe-area-inset-bottom) + 12px)">' +
-    '<button id="pkGo" class="alt" style="flex:1;margin:0;padding:14px 6px;font-size:16px">Just show weather</button>' +
+    '<button id="pkGo" class="alt" style="flex:1;margin:0;padding:14px 6px;font-size:16px">Show weather</button>' +
     '<button id="pkSv" style="flex:1;margin:0;padding:14px 6px;font-size:16px">Save and show</button></div>';
   D.body.appendChild(pk);
   var cv = pk.querySelector('#pkC'), inf = pk.querySelector('#pkI'), bT = pk.querySelector('#pkT');
-  var P = { lat: 39.5, lon: -98.35, z: 4 }, topo = false, near = '', imgs = {}, pt = {}, p0 = null, rt = 0, rn = 0, DP = W.devicePixelRatio || 1;
+  var P = { lat: 39.5, lon: -98.35, z: 4 }, lay = 0, dirty = false, start = { label: '' }, LN = ['Street', 'Satellite', 'Topo'], near = '', imgs = {}, pt = {}, p0 = null, rt = 0, rn = 0, DP = W.devicePixelRatio || 1;
   function wpx(lat, lon, z) {
     var n = 256 * Math.pow(2, z), s = Math.sin(lat * Math.PI / 180);
     return { x: (lon + 180) / 360 * n, y: (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n };
@@ -3316,11 +3317,14 @@ if (W.__fCen) W.__fCen(true);
     var n = 256 * Math.pow(2, z);
     return { lon: x / n * 360 - 180, lat: Math.atan(Math.sinh(Math.PI * (1 - 2 * y / n))) * 180 / Math.PI };
   }
+  try { lay = +localStorage.getItem('vdPkL') || 0; } catch (e) {}
+  bT.textContent = LN[lay];
   function coords() { return P.lat.toFixed(4) + ', ' + P.lon.toFixed(4); }
-  function label() { return near ? 'Near ' + near : coords(); }
-  function info() { inf.textContent = (near ? 'Near ' + near + ' · ' : '') + coords(); }
+  function label() { return dirty ? (near ? 'Near ' + near : coords()) : (start.label || (near ? 'Near ' + near : coords())); }
+  function info() { var t = dirty ? (near ? 'Near ' + near : '') : start.label; inf.textContent = (t ? t + ' · ' : '') + coords(); }
   function url(z, x, y) {
-    return topo ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/' + z + '/' + y + '/' + x
+    return lay === 2 ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/' + z + '/' + y + '/' + x
+      : lay === 1 ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' + z + '/' + y + '/' + x
       : 'https://a.tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png';
   }
   function draw() {
@@ -3356,7 +3360,11 @@ if (W.__fCen) W.__fCen(true);
   function zb(d) { P.z = Math.max(3, Math.min(18, P.z + d)); moved(); }
   pk.querySelector('#pkIn').onclick = function () { zb(1); };
   pk.querySelector('#pkOut').onclick = function () { zb(-1); };
-  bT.onclick = function () { topo = !topo; bT.style.borderColor = topo ? '#4fb06d' : ''; draw(); };
+  bT.onclick = function () {
+    lay = (lay + 1) % 3; bT.textContent = LN[lay];
+    try { localStorage.setItem('vdPkL', lay); } catch (e) {}
+    draw();
+  };
   pk.querySelector('#pkX').onclick = function () { pk.style.display = 'none'; };
   function two() { var k = Object.keys(pt); return k.length >= 2 ? [pt[k[0]], pt[k[1]]] : null; }
   cv.onpointerdown = function (e) {
@@ -3376,48 +3384,53 @@ if (W.__fCen) W.__fCen(true);
       if (p0.d > 0) P.z = Math.max(3, Math.min(18, p0.z + Math.log(d / p0.d) / Math.LN2));
     } else if (!t) {
       var c = wpx(P.lat, P.lon, P.z), u = upx(c.x - dx, c.y - dy, P.z);
-      P.lat = u.lat; P.lon = u.lon;
+      P.lat = u.lat; P.lon = u.lon; dirty = true;
     }
     moved();
   };
   cv.onpointerup = cv.onpointercancel = function (e) { delete pt[e.pointerId]; p0 = null; };
-  function show(la, lo, z) {
-    P.lat = la; P.lon = lo; P.z = z; near = '';
-    pk.style.display = 'flex'; topo = !!W.__vdTP; bT.style.borderColor = topo ? '#4fb06d' : '';
+  function show(la, lo, z, name) {
+    P.lat = la; P.lon = lo; P.z = z; near = ''; dirty = false; start = { label: name || '' };
+    pk.style.display = 'flex';
     setTimeout(moved, 30);
   }
   function lastPos() {
     var p = null;
     try { p = lastWeatherPos; } catch (e) {}
-    return p ? [p.latitude, p.longitude, 10, ''] : [39.5, -98.35, 4, 'No match, showing the last weather spot'];
+    return p ? [p.latitude, p.longitude] : [39.5, -98.35];
   }
-  function pick() {
-    var q = inp.value.trim(), lp = lastPos();
-    if (q.length < 2) { show(lp[0], lp[1], lp[2]); return; }
-    var job = /^\d{5}$/.test(q)
-      ? fetch('https://api.zippopotam.us/us/' + q).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { return j && [+j.places[0].latitude, +j.places[0].longitude]; })
-      : fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name=' + encodeURIComponent(q)).then(function (r) { return r.json(); }).then(function (j) { var r = j.results && j.results[0]; return r && [r.latitude, r.longitude]; });
-    job.then(function (r) { if (r) show(r[0], r[1], 10); else show(lp[0], lp[1], lp[2]); }, function () { show(lp[0], lp[1], lp[2]); });
-  }
+  pk.querySelector('#pkM').onclick = function () {
+    function go(la, lo) { P.lat = la; P.lon = lo; P.z = Math.max(P.z, 12); dirty = true; moved(); }
+    var g = null;
+    try { if (vGLat != null) g = [vGLat, vGLon]; } catch (e) {}
+    if (g) { go(g[0], g[1]); return; }
+    var lp = lastPos();
+    if (navigator.geolocation) navigator.geolocation.getCurrentPosition(function (p) { go(p.coords.latitude, p.coords.longitude); }, function () { go(lp[0], lp[1]); }, { timeout: 8000, maximumAge: 60000 });
+    else go(lp[0], lp[1]);
+  };
+  sl.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('.sres');
+    if (!a || e.target.closest('.fstar')) return;
+    var r = W.lastSrchRes && W.lastSrchRes[+a.dataset.i];
+    if (!r) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    var st = sa(r.admin1 || '');
+    show(r.latitude, r.longitude, 11, r.country === 'United States' && st ? r.name + ', ' + st : r.name);
+  }, true);
   pk.querySelector('#pkGo').onclick = function () {
     var f = { label: label(), lat: +P.lat.toFixed(5), lon: +P.lon.toFixed(5) };
     pk.style.display = 'none'; openFav(f);
   };
   pk.querySelector('#pkSv').onclick = function () {
-    ask('Name this spot', '', near || coords(), function (v) {
+    ask('Name this spot', '', dirty ? (near || coords()) : (start.label || near || coords()), function (v) {
       var f = { label: v, lat: +P.lat.toFixed(5), lon: +P.lon.toFixed(5) };
       favs.push(f); if (favs.length > 15) favs.shift();
       saveFavs(); renderFavs(); pk.style.display = 'none'; openFav(f);
     });
   };
   W.addEventListener('resize', function () { if (pk.style.display !== 'none') draw(); });
-  var b = D.createElement('button');
-  b.className = 'alt'; b.textContent = '⌖  Pick on map';
-  b.style.cssText = 'margin:10px 0 0;width:100%;padding:12px;font-size:16px';
-  b.onclick = pick;
-  msg.parentNode.insertBefore(b, msg);
 })();
-/* ---- rev 255: Topo map layer on the small and full-screen maps; Altitude card opens the big map on Topo ===== */
+/* ---- rev 255: Topo map layer on the small and full-screen maps; Altitude card opens the big map on Topo ---- */
 (function () {
   var W = window, D = document, topo = false, G = '#4fb06d';
   try { topo = localStorage.getItem('vdTopo') === '1'; } catch (e) {}
@@ -3468,7 +3481,7 @@ if (W.__fCen) W.__fCen(true);
     };
   }
 })();
-/* ===== Part 5 (rev 257): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 258): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
