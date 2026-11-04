@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 264 -->
+<!-- Van Dash rev 265 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r264</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r265</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 264): iPad camp layout, weather map picker, Topo layer ===== */
+/* ===== Part 4 (rev 265): iPad camp layout, weather map picker, Topo layer ===== */
 /* rev 260 (a): one writer for the weather icons and words, day or night, so nothing flickers */
 (function () {
 var D = document, W = window;
@@ -3448,7 +3448,7 @@ st.textContent =
 'html.camp #cSunT .sr:first-child{border-top:0}' +
 'html.camp #cSunT .sr b{font-weight:600}html.camp #cSunT .sr i{font-style:normal;color:#ffb84d;margin-right:3px}' +
 'html.camp #cSunT .mn{display:flex;align-items:center;gap:6px;color:#9fb0c3;font-size:13px;white-space:nowrap}' +
-'html.camp #cSunT .mn span{font-size:20px;line-height:1;display:block}@media (min-height:861px){html.camp #cSunT .sr{line-height:27px}html.camp #weatherScreen .day{padding:5px 0}}';
+'html.camp #cSunT .mn span{font-size:20px;line-height:1;display:block}@media (min-height:861px){html.camp #cSunT .sr{line-height:27px}html.camp #weatherScreen .day{padding:5px 0}}html.camp #cwL{flex:1 1 auto;min-width:150px;display:flex;flex-direction:column;align-items:center;text-align:center}html.camp #cwL #vd4Up{text-align:center!important;margin:4px 0 0!important}html.camp #cwBox #wBox1{flex:none!important;margin-left:auto!important;gap:20px!important}html.camp #cwBox #wBox1>div:first-child{width:84px!important}html.camp #cwBox #wBox1>div:last-child{flex:none!important;grid-template-columns:auto auto!important;gap:10px 18px!important}html.camp #weatherScreen>.card:has(.sunrow){flex:1 1 auto!important;display:flex;flex-direction:column;min-height:0}html.camp #cSunT{flex:1;display:flex;flex-direction:column;min-height:0}html.camp #cSunT .sr{flex:1 1 0;font-size:15px;line-height:normal!important}html.camp #cSunT .mn{font-size:15px}html.camp #cSunT .mn span{font-size:24px}html.camp #spCtl svg{stroke-width:1.15!important}html.camp #spPrev svg,html.camp #spNext svg{stroke-width:1.6!important}html.camp #spPlay svg{stroke-width:1!important}html.camp .batt-row .bsoc svg{stroke-width:1.2!important}html.camp #mainScreen .vmap{margin-bottom:-12px!important}html.camp body,html.camp body *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}html.camp #spT,html.camp #plList .plrow .pn,html.camp #weatherScreen .day .d,html.camp #cSunT .sr b{font-weight:500!important}html.camp .tk .b{box-shadow:inset 0 2px 5px rgba(0,0,0,.8),0 0 0 .5px #3a4658,0 1px 0 rgba(255,255,255,.08)!important}';
 function att() { setTimeout(function () { D.head.appendChild(st); }, 150); }
 if (D.readyState === 'complete') att(); else W.addEventListener('load', att);
 function addL(svg) {
@@ -4065,7 +4065,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     };
   }
 })();
-/* ===== Part 5 (rev 264): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 265): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
