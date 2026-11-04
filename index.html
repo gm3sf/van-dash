@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 260 -->
+<!-- Van Dash rev 262 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r260</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r262</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 260): iPad camp layout, weather map picker, Topo layer ===== */
+/* ===== Part 4 (rev 262): iPad camp layout, weather map picker, Topo layer ===== */
 /* rev 260 (a): one writer for the weather icons and words, day or night, so nothing flickers */
 (function () {
 var D = document, W = window;
@@ -3288,7 +3288,7 @@ var cache = {};
 function svg(kind) {
 if (cache[kind] || !W.__vdMoon) return cache[kind];
 var s = W.__vdMoon(kind !== 'moon');
-if (kind === 'rain') s = s.replace('</svg>', DROPS + '</svg>');
+if (kind === 'rain') s = '<span style="position:relative;display:inline-block;width:1em;height:1em;vertical-align:-0.12em"><span style="position:absolute;left:0;top:0;font-size:.74em;line-height:1">' + W.__vdMoon(false) + '</span><span style="position:absolute;right:-0.04em;bottom:-0.1em;font-size:.68em;line-height:1">🌧️</span></span>';
 return (cache[kind] = s);
 }
 function tick() {
@@ -3421,6 +3421,106 @@ if (play && fr.length > 1) { idx = (idx + 1) % fr.length; ui(); draw(); }
 setInterval(ui, 2000);
 if (on) load();
 ui();
+})();
+/* rev 261: sun and moon week table, wind rings fixed with north up (wide layout), softer Spotify art, glossy tank tubes */
+(function () {
+var D = document, W = window;
+function camp() { return D.documentElement.classList.contains('camp'); }
+var st = D.createElement('style');
+st.textContent =
+'html.camp #campGrid{gap:16px}html.camp #mainScreen .grid{gap:12px}html.camp #mainScreen .vmap{margin-top:12px}html.camp #spotScreen>.card{margin-bottom:12px!important}html.camp .plrow{margin-top:7px;padding-top:5px;padding-bottom:5px}html.camp .plrow .pi{width:36px;height:36px}html.camp .plrow .pn{font-size:17px}html.camp #weatherScreen>#wBox2{margin-bottom:12px!important}html.camp #cwBox{margin-bottom:12px}html.camp #weatherScreen>.card:has(.sunrow){margin-top:12px}' +
+'html.camp #spCtl{display:flex!important}html.camp #spArt{border:0!important;outline:0!important;box-shadow:none!important;border-radius:14px!important;width:min(100%,17vh)!important;background-color:transparent!important}' +
+'html.camp .tk{grid-template-columns:112px 1fr 70px;margin-top:9px}' +
+'html.camp .tk .b{position:relative;height:26px;border-radius:13px;background:linear-gradient(#04070b,#161d27);box-shadow:inset 0 2px 5px rgba(0,0,0,.8),0 0 0 1px #3a4658,0 1px 0 rgba(255,255,255,.1)}' +
+'html.camp .tk .b i{height:100%;border-radius:13px;background-image:linear-gradient(to bottom,rgba(255,255,255,.5) 0,rgba(255,255,255,.14) 36%,rgba(0,0,0,0) 54%,rgba(0,0,0,.3) 100%)!important;box-shadow:inset 0 -2px 4px rgba(0,0,0,.35)}' +
+'html.camp .tk .b::after{content:"";position:absolute;left:9px;right:9px;top:3px;height:6px;border-radius:3px;background:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,.05));pointer-events:none}' +
+'html.camp #wBoxRing,html.camp .wpRing{transform:none!important;transition:none!important}' +
+'html:not(.camp) .cmpL{display:none}' +
+'html.camp #wBox2 svg{width:92px!important;height:92px!important}' +
+'html.camp .vdWd>div:first-child svg{width:64px!important;height:64px!important}' +
+'html.camp #weatherScreen #forecast{padding:0 14px}html.camp #weatherScreen .day{padding:1px 0}' +
+'html.camp #weatherScreen .day .ic{height:30px;width:44px}' +
+'html.camp #weatherScreen>#wBox2{padding:6px 14px!important}' +
+'html.camp #weatherScreen>.card:has(.sunrow) .sunrow,html.camp #weatherScreen>.card:has(.sunrow) .label span{display:none!important}' +
+'html.camp #weatherScreen>.card:has(.sunrow){padding:8px 14px 8px}' +
+'html.camp #cSunT .sr{display:grid;grid-template-columns:50px 1fr 1fr 1.7fr;align-items:center;gap:4px;font-size:13px;line-height:19px;border-top:1px solid #26303c}' +
+'html:not(.camp) #cSunT{display:none}' +
+'html.camp #cSunT .sr:first-child{border-top:0}' +
+'html.camp #cSunT .sr b{font-weight:600}html.camp #cSunT .sr i{font-style:normal;color:#ffb84d;margin-right:3px}' +
+'html.camp #cSunT .mn{display:flex;align-items:center;gap:6px;color:#9fb0c3;font-size:13px;white-space:nowrap}' +
+'html.camp #cSunT .mn span{font-size:20px;line-height:1;display:block}';
+function att() { setTimeout(function () { D.head.appendChild(st); }, 150); }
+if (D.readyState === 'complete') att(); else W.addEventListener('load', att);
+function addL(svg) {
+if (svg.querySelector('.cmpL')) return;
+var w = parseFloat(svg.style.width) || 40, g = D.createElementNS('http://www.w3.org/2000/svg', 'g');
+g.setAttribute('class', 'cmpL');
+g.setAttribute('font-family', '-apple-system,Helvetica,sans-serif'); g.setAttribute('font-weight', '700'); g.setAttribute('text-anchor', 'middle'); g.setAttribute('fill', '#cfd8e3');
+g.innerHTML = '<text x="50" y="' + (w < 45 ? 22 : 17) + '" font-size="' + (w < 45 ? 22 : 14) + '" fill="#ff5a4d">N</text>' + (w < 45 ? '' : '<text x="87" y="55" font-size="13">E</text><text x="50" y="91" font-size="13">S</text><text x="13" y="55" font-size="13">W</text>');
+svg.appendChild(g);
+}
+setInterval(function () {
+if (!camp()) return;
+D.querySelectorAll('#wBox2 svg, #windScreen svg').forEach(function (s) { if (s.getAttribute('viewBox') === '0 0 100 100') addL(s); });
+}, 800);
+function mix(a, b, t) { return 'rgb(' + [0, 1, 2].map(function (i) { return Math.round(parseInt(a.substr(1 + 2 * i, 2), 16) * (1 - t) + parseInt(b.substr(1 + 2 * i, 2), 16) * t); }) + ')'; }
+function ramp(v, s) { var i; if (v <= s[0][0]) return s[0][1]; for (i = 1; i < s.length; i++) if (v <= s[i][0]) return mix(s[i - 1][1], s[i][1], (v - s[i - 1][0]) / (s[i][0] - s[i - 1][0])); return s[s.length - 1][1]; }
+setInterval(function () {
+D.querySelectorAll('.tk').forEach(function (r) {
+var b = r.querySelector('.b i'), n = r.querySelector('.n'), p = parseFloat(b && b.style.width);
+if (!b || !n || isNaN(p) || !/\d/.test(r.querySelector('.p').textContent)) return;
+b.style.background = ramp(p, /gr[ae]y|waste/i.test(n.textContent) ? [[40, '#a3afbd'], [70, '#ffd34d'], [90, '#ff3b30']] : [[10, '#ff3b30'], [30, '#ffd34d'], [55, '#3da5ff']]);
+});
+}, 400);
+var DATA = null, KEY = '', DAY = '', busy = 0, tbl = null;
+function pname(a) {
+return a < 1.85 ? 'New moon' : a < 5.54 ? 'Waxing crescent' : a < 9.23 ? 'First quarter' : a < 12.92 ? 'Waxing gibbous' : a < 16.61 ? 'Full moon' : a < 20.3 ? 'Waning gibbous' : a < 23.99 ? 'Last quarter' : a < 27.68 ? 'Waning crescent' : 'New moon';
+}
+function t12(s) { return new Date(s).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+function render() {
+var dy = DATA && DATA.daily, card = D.getElementById('sunrise'), h = '', i;
+card = card && card.closest('.card');
+if (!dy || !card || !W.__vdMoon) return;
+if (!tbl) { tbl = D.createElement('div'); tbl.id = 'cSunT'; }
+if (tbl.parentNode !== card) card.appendChild(tbl);
+var lab = card.querySelector('.label'); if (lab && !/Moon/.test(lab.textContent)) lab.lastChild.nodeType === 3 ? lab.lastChild.nodeValue = 'Sun & moon' : 0;
+for (i = 0; i < dy.time.length; i++) {
+var d0 = new Date(dy.time[i] + 'T12:00:00'), p = W.__vdPhase(d0.getTime());
+h += '<div class="sr"><b>' + (i ? d0.toLocaleDateString([], { weekday: 'short' }) : 'Today') + '</b><span><i>↑</i>' + t12(dy.sunrise[i]) + '</span><span><i>↓</i>' + t12(dy.sunset[i]) + '</span><div class="mn"><span>' + W.__vdMoon(false, d0.getTime()) + '</span>' + pname(p.age) + '</div></div>';
+}
+tbl.innerHTML = h; DAY = new Date().toDateString();
+}
+function tick() {
+if (!camp()) return;
+var p = null; try { p = lastWeatherPos; } catch (e) {}
+if (!p) return;
+var key = p.latitude.toFixed(2) + ',' + p.longitude.toFixed(2);
+if (DATA && key === KEY && DAY === new Date().toDateString() && Date.now() - busy < 1800000) { if (!tbl || !tbl.parentNode) render(); return; }
+if (Date.now() - busy < 20000) return;
+busy = Date.now();
+fetch('https://api.open-meteo.com/v1/forecast?latitude=' + p.latitude + '&longitude=' + p.longitude + '&daily=sunrise,sunset&forecast_days=7&timezone=auto').then(function (r) { return r.json(); }).then(function (d) { DATA = d; KEY = key; render(); }).catch(function () {});
+}
+setInterval(tick, 2500);
+})();
+
+/* hourly night icons: moon instead of sun after sunset / before sunrise */
+(function () {
+function hrs(id) { var t = ($(id) && $(id).textContent) || '', x = /(\d+):(\d+)\s*([AP]M)/i.exec(t); if (!x) return null; return (+x[1] % 12) + (/p/i.test(x[3]) ? 12 : 0) + x[2] / 60; }
+setInterval(function () {
+var sr = hrs('sunrise'), ss = hrs('sunset'), cells = document.querySelectorAll('.vdHr > div');
+if (sr == null || ss == null || !window.__vdMoon) return;
+cells.forEach(function (c) {
+if (c.getAttribute('data-nt')) return;
+var l = c.children[0] && c.children[0].textContent.trim(), ic = c.children[1], x = /^(\d+)\s*([AP]M)$/i.exec(l || ''), h;
+if (!ic) return;
+h = x ? (+x[1] % 12) + (/p/i.test(x[2]) ? 12 : 0) : 0;
+c.setAttribute('data-nt', '1');
+if (h + 0.5 >= sr && h + 0.5 < ss) return;
+var t = ic.textContent;
+if (t.indexOf('☀') > -1) ic.innerHTML = window.__vdMoon(false);
+else if (t.indexOf('🌤') > -1 || t.indexOf('⛅') > -1) ic.innerHTML = window.__vdMoon(true);
+});
+}, 500);
 })();
 /* rev 260 (d): iPad landscape camp layout (Spotify | weather + sun | battery + tanks + map) */
 (function () {
@@ -3965,7 +4065,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     };
   }
 })();
-/* ===== Part 5 (rev 260): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 262): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
