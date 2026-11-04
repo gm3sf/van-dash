@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 256 -->
+<!-- Van Dash rev 257 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r256</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r257</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,168 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 255): Topo map layer on the small and full-screen maps; Altitude card opens the big map on Topo ===== */
+/* ===== Part 4 (rev 257): Weather map picker, then Topo layer ===== */
+/* rev 257: Pick a weather spot on a map (crosshair), show once or save with a name; rename saved spots */
+(function () {
+  var D = document, W = window, inp = D.getElementById('srchIn'), msg = D.getElementById('srchMsg');
+  if (!inp || !msg || typeof favs === 'undefined') return;
+  function sa(s) { try { return STATE_ABBR[s] || s; } catch (e) { return s; } }
+  var nm = D.createElement('div');
+  nm.style.cssText = 'display:none;position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:20px';
+  nm.innerHTML = '<div class="card" style="width:100%;max-width:360px;padding:16px"><div id="pkNT" style="font-size:18px;font-weight:600;margin-bottom:10px"></div>' +
+    '<input id="pkNI" maxlength="40" style="width:100%;box-sizing:border-box;font-size:18px;padding:12px;border-radius:10px;border:1px solid #3a4658;background:#0b0f14;color:#fff">' +
+    '<div style="display:flex;gap:10px;margin-top:12px"><button id="pkNC" class="alt" style="flex:1;margin:0;padding:12px">Cancel</button><button id="pkNS" style="flex:1;margin:0;padding:12px">Save</button></div></div>';
+  D.body.appendChild(nm);
+  var ni = nm.querySelector('#pkNI'), nCb = null;
+  function ask(title, init, ph, cb) {
+    nm.querySelector('#pkNT').textContent = title; ni.value = init || ''; ni.placeholder = ph || ''; nCb = cb;
+    nm.style.display = 'flex'; setTimeout(function () { ni.focus(); }, 50);
+  }
+  nm.querySelector('#pkNC').onclick = function () { nm.style.display = 'none'; };
+  nm.querySelector('#pkNS').onclick = function () {
+    var v = ni.value.trim() || ni.placeholder;
+    if (!v) return;
+    nm.style.display = 'none'; nCb(v);
+  };
+  var ro = renderFavs;
+  renderFavs = function () {
+    ro.apply(this, arguments);
+    var box = D.getElementById('favBox');
+    if (!box) return;
+    box.querySelectorAll('[data-del]').forEach(function (b) {
+      var e = D.createElement('button');
+      e.className = 'alt'; e.textContent = '✎';
+      e.style.cssText = 'margin:0;padding:12px 14px;font-size:16px;color:#9fb0c3;width:auto;flex:none';
+      e.onclick = function () { var f = favs[+b.dataset.del]; ask('Rename spot', f.label, '', function (v) { f.label = v; saveFavs(); renderFavs(); }); };
+      b.parentNode.insertBefore(e, b);
+    });
+  };
+  renderFavs();
+  var pk = D.createElement('div'), bs = 'position:absolute;right:10px;margin:0;padding:0;width:44px;height:44px;border-radius:22px;background:rgba(20,26,34,.92);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;';
+  pk.style.cssText = 'display:none;position:fixed;inset:0;z-index:9500;background:#0b0f14;color:#fff;flex-direction:column';
+  pk.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px">' +
+    '<button id="pkX" class="alt" style="margin:0;padding:10px 16px;font-size:16px;width:auto;flex:none">Cancel</button>' +
+    '<div id="pkI" style="flex:1;font-size:14px;line-height:1.3;color:#9fb0c3"></div></div>' +
+    '<div style="position:relative;flex:1;min-height:0">' +
+    '<canvas id="pkC" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block"></canvas>' +
+    '<svg viewBox="0 0 60 60" style="position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;pointer-events:none;fill:none;stroke:#ff3b30;stroke-width:2.5;stroke-linecap:round"><circle cx="30" cy="30" r="11"/><path d="M30 3v17M30 40v17M3 30h17M40 30h17"/></svg>' +
+    '<button id="pkIn" style="' + bs + 'top:10px">+</button><button id="pkOut" style="' + bs + 'top:62px">−</button><button id="pkT" style="' + bs + 'top:114px;font-size:13px">Topo</button></div>' +
+    '<div style="display:flex;gap:10px;padding:10px 12px calc(env(safe-area-inset-bottom) + 12px)">' +
+    '<button id="pkGo" class="alt" style="flex:1;margin:0;padding:14px 6px;font-size:16px">Just show weather</button>' +
+    '<button id="pkSv" style="flex:1;margin:0;padding:14px 6px;font-size:16px">Save and show</button></div>';
+  D.body.appendChild(pk);
+  var cv = pk.querySelector('#pkC'), inf = pk.querySelector('#pkI'), bT = pk.querySelector('#pkT');
+  var P = { lat: 39.5, lon: -98.35, z: 4 }, topo = false, near = '', imgs = {}, pt = {}, p0 = null, rt = 0, rn = 0, DP = W.devicePixelRatio || 1;
+  function wpx(lat, lon, z) {
+    var n = 256 * Math.pow(2, z), s = Math.sin(lat * Math.PI / 180);
+    return { x: (lon + 180) / 360 * n, y: (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n };
+  }
+  function upx(x, y, z) {
+    var n = 256 * Math.pow(2, z);
+    return { lon: x / n * 360 - 180, lat: Math.atan(Math.sinh(Math.PI * (1 - 2 * y / n))) * 180 / Math.PI };
+  }
+  function coords() { return P.lat.toFixed(4) + ', ' + P.lon.toFixed(4); }
+  function label() { return near ? 'Near ' + near : coords(); }
+  function info() { inf.textContent = (near ? 'Near ' + near + ' · ' : '') + coords(); }
+  function url(z, x, y) {
+    return topo ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/' + z + '/' + y + '/' + x
+      : 'https://a.tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png';
+  }
+  function draw() {
+    var w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !h) return;
+    var ctx = cv.getContext('2d'), bz = Math.max(3, Math.min(17, Math.round(P.z)));
+    if (cv.width !== Math.round(w * DP) || cv.height !== Math.round(h * DP)) { cv.width = Math.round(w * DP); cv.height = Math.round(h * DP); }
+    ctx.setTransform(DP, 0, 0, DP, 0, 0);
+    ctx.fillStyle = '#1a222c'; ctx.fillRect(0, 0, w, h);
+    var s = Math.pow(2, P.z - bz), c = wpx(P.lat, P.lon, bz), left = c.x - w / (2 * s), top = c.y - h / (2 * s), n = Math.pow(2, bz), x, y;
+    for (y = Math.floor(top / 256); y <= Math.floor((top + h / s) / 256); y++) {
+      if (y < 0 || y >= n) continue;
+      for (x = Math.floor(left / 256); x <= Math.floor((left + w / s) / 256); x++) {
+        var u = url(bz, ((x % n) + n) % n, y), m = imgs[u];
+        if (!m) { m = imgs[u] = new Image(); m.onload = function () { this.vdOK = true; draw(); }; m.src = u; }
+        if (m.vdOK) ctx.drawImage(m, (x * 256 - left) * s, (y * 256 - top) * s, 256 * s + 0.5, 256 * s + 0.5);
+      }
+    }
+  }
+  function moved() {
+    near = ''; info(); draw(); clearTimeout(rt);
+    var n = ++rn;
+    rt = setTimeout(function () {
+      fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=12&lat=' + P.lat.toFixed(5) + '&lon=' + P.lon.toFixed(5))
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (n !== rn) return;
+          var a = j.address || {}, t = a.city || a.town || a.village || a.hamlet || a.suburb || a.county || '';
+          near = t ? t + (a.state ? ', ' + sa(a.state) : '') : ''; info();
+        }, function () {});
+    }, 800);
+  }
+  function zb(d) { P.z = Math.max(3, Math.min(18, P.z + d)); moved(); }
+  pk.querySelector('#pkIn').onclick = function () { zb(1); };
+  pk.querySelector('#pkOut').onclick = function () { zb(-1); };
+  bT.onclick = function () { topo = !topo; bT.style.borderColor = topo ? '#4fb06d' : ''; draw(); };
+  pk.querySelector('#pkX').onclick = function () { pk.style.display = 'none'; };
+  function two() { var k = Object.keys(pt); return k.length >= 2 ? [pt[k[0]], pt[k[1]]] : null; }
+  cv.onpointerdown = function (e) {
+    pt[e.pointerId] = { x: e.clientX, y: e.clientY };
+    try { cv.setPointerCapture(e.pointerId); } catch (x) {}
+    var t = two();
+    p0 = t ? { d: Math.hypot(t[0].x - t[1].x, t[0].y - t[1].y), z: P.z } : null;
+  };
+  cv.onpointermove = function (e) {
+    var p = pt[e.pointerId];
+    if (!p) return;
+    var dx = e.clientX - p.x, dy = e.clientY - p.y;
+    p.x = e.clientX; p.y = e.clientY;
+    var t = two();
+    if (t && p0) {
+      var d = Math.hypot(t[0].x - t[1].x, t[0].y - t[1].y);
+      if (p0.d > 0) P.z = Math.max(3, Math.min(18, p0.z + Math.log(d / p0.d) / Math.LN2));
+    } else if (!t) {
+      var c = wpx(P.lat, P.lon, P.z), u = upx(c.x - dx, c.y - dy, P.z);
+      P.lat = u.lat; P.lon = u.lon;
+    }
+    moved();
+  };
+  cv.onpointerup = cv.onpointercancel = function (e) { delete pt[e.pointerId]; p0 = null; };
+  function show(la, lo, z) {
+    P.lat = la; P.lon = lo; P.z = z; near = '';
+    pk.style.display = 'flex'; topo = !!W.__vdTP; bT.style.borderColor = topo ? '#4fb06d' : '';
+    setTimeout(moved, 30);
+  }
+  function lastPos() {
+    var p = null;
+    try { p = lastWeatherPos; } catch (e) {}
+    return p ? [p.latitude, p.longitude, 10, ''] : [39.5, -98.35, 4, 'No match, showing the last weather spot'];
+  }
+  function pick() {
+    var q = inp.value.trim(), lp = lastPos();
+    if (q.length < 2) { show(lp[0], lp[1], lp[2]); return; }
+    var job = /^\d{5}$/.test(q)
+      ? fetch('https://api.zippopotam.us/us/' + q).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { return j && [+j.places[0].latitude, +j.places[0].longitude]; })
+      : fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name=' + encodeURIComponent(q)).then(function (r) { return r.json(); }).then(function (j) { var r = j.results && j.results[0]; return r && [r.latitude, r.longitude]; });
+    job.then(function (r) { if (r) show(r[0], r[1], 10); else show(lp[0], lp[1], lp[2]); }, function () { show(lp[0], lp[1], lp[2]); });
+  }
+  pk.querySelector('#pkGo').onclick = function () {
+    var f = { label: label(), lat: +P.lat.toFixed(5), lon: +P.lon.toFixed(5) };
+    pk.style.display = 'none'; openFav(f);
+  };
+  pk.querySelector('#pkSv').onclick = function () {
+    ask('Name this spot', '', near || coords(), function (v) {
+      var f = { label: v, lat: +P.lat.toFixed(5), lon: +P.lon.toFixed(5) };
+      favs.push(f); if (favs.length > 15) favs.shift();
+      saveFavs(); renderFavs(); pk.style.display = 'none'; openFav(f);
+    });
+  };
+  W.addEventListener('resize', function () { if (pk.style.display !== 'none') draw(); });
+  var b = D.createElement('button');
+  b.className = 'alt'; b.textContent = '⌖  Pick on map';
+  b.style.cssText = 'margin:10px 0 0;width:100%;padding:12px;font-size:16px';
+  b.onclick = pick;
+  msg.parentNode.insertBefore(b, msg);
+})();
+/* ---- rev 255: Topo map layer on the small and full-screen maps; Altitude card opens the big map on Topo ===== */
 (function () {
   var W = window, D = document, topo = false, G = '#4fb06d';
   try { topo = localStorage.getItem('vdTopo') === '1'; } catch (e) {}
@@ -3307,7 +3468,7 @@ if (W.__fCen) W.__fCen(true);
     };
   }
 })();
-/* ===== Part 5 (rev 256): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 257): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
