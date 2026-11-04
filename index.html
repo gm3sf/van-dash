@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 263 -->
+<!-- Van Dash rev 264 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r263</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r264</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 263): iPad camp layout, weather map picker, Topo layer ===== */
+/* ===== Part 4 (rev 264): iPad camp layout, weather map picker, Topo layer ===== */
 /* rev 260 (a): one writer for the weather icons and words, day or night, so nothing flickers */
 (function () {
 var D = document, W = window;
@@ -3429,7 +3429,7 @@ function camp() { return D.documentElement.classList.contains('camp'); }
 var st = D.createElement('style');
 st.textContent =
 'html.camp #campGrid{gap:16px}html.camp #mainScreen .grid{gap:12px}html.camp #mainScreen .vmap{margin-top:12px}html.camp #spotScreen>.card{margin-bottom:12px!important}html.camp .plrow{margin-top:7px;padding-top:5px;padding-bottom:5px}html.camp .plrow .pi{width:36px;height:36px}html.camp .plrow .pn{font-size:17px}html.camp #weatherScreen>#wBox2{margin-bottom:12px!important}html.camp #cwBox{margin-bottom:12px}html.camp #weatherScreen>.card:has(.sunrow){margin-top:12px}' +
-'html.camp #spCtl{display:flex!important}html.camp #spArt{border:0!important;outline:0!important;box-shadow:none!important;border-radius:14px!important;clip-path:inset(3px round 14px)!important;width:min(100%,17vh)!important;background-color:transparent!important}' +
+'html.camp #spCtl{display:flex!important}html.camp #spCtl svg{transform:none!important}html.camp #spPrev svg,html.camp #spNext svg{width:34px!important;height:34px!important}html.camp #spBack svg,html.camp #spFwd svg{width:50px!important;height:50px!important}html.camp #spPlay svg{width:58px!important;height:58px!important}html.camp #spBack span,html.camp #spFwd span{top:0!important;bottom:0!important;display:flex!important;align-items:center;justify-content:center;font-size:13px!important;padding-top:1px}html.camp #spotScreen>.card{margin-bottom:0!important;border-radius:14px 14px 0 0!important;border-bottom:0!important}html.camp #spotScreen #plList{background:#151c25;border:0.5px solid #8a96a6;border-top:0;border-radius:0 0 14px 14px;padding:0 14px 8px}html.camp #spotScreen #plList .plrow{background:none!important;box-shadow:none!important;border:0!important;border-top:1px solid #26303c!important;border-radius:0!important;margin:0!important;padding:6px 2px!important}html.camp #spotScreen #plList .plrow .pi{width:34px;height:34px;border-width:1px;background:transparent}html.camp #spotScreen #plList .plrow .pn{font-size:17px}html.camp #spArt{border:0!important;outline:0!important;box-shadow:none!important;border-radius:14px!important;clip-path:inset(3px round 14px)!important;width:min(100%,20vh)!important;background-color:transparent!important}' +
 'html.camp .tk{grid-template-columns:112px 1fr 70px;margin-top:9px}' +
 'html.camp .tk .b{position:relative;height:26px;border-radius:13px;background:linear-gradient(#04070b,#161d27);box-shadow:inset 0 2px 5px rgba(0,0,0,.8),0 0 0 1px #3a4658,0 1px 0 rgba(255,255,255,.1)}' +
 'html.camp .tk .b i{height:100%;border-radius:13px;background-image:linear-gradient(to bottom,rgba(255,255,255,.5) 0,rgba(255,255,255,.14) 36%,rgba(0,0,0,0) 54%,rgba(0,0,0,.3) 100%)!important;box-shadow:inset 0 -2px 4px rgba(0,0,0,.35)}' +
@@ -3438,17 +3438,17 @@ st.textContent =
 'html:not(.camp) .cmpL{display:none}' +
 'html.camp #wBox2 svg{width:92px!important;height:92px!important}' +
 'html.camp .vdWd>div:first-child svg{width:64px!important;height:64px!important}' +
-'html.camp #weatherScreen #forecast{padding:0 14px}html.camp #weatherScreen .day{padding:clamp(1px,calc(.8vh - 5px),7px) 0}' +
+'html.camp #weatherScreen #forecast{padding:0 14px}html.camp #weatherScreen .day{padding:1px 0}' +
 'html.camp #weatherScreen .day .ic{height:30px;width:44px}' +
 'html.camp #weatherScreen>#wBox2{padding:6px 14px!important}' +
 'html.camp #weatherScreen>.card:has(.sunrow) .sunrow,html.camp #weatherScreen>.card:has(.sunrow) .label span{display:none!important}' +
 'html.camp #weatherScreen>.card:has(.sunrow){padding:8px 14px 8px}' +
-'html.camp #cSunT .sr{display:grid;grid-template-columns:62px 1fr 1fr 1.8fr;align-items:center;gap:8px;font-size:13px;line-height:clamp(19px,calc(2.9vh - 5px),28px);border-top:1px solid #26303c}' +
+'html.camp #cSunT .sr{display:grid;grid-template-columns:62px 1fr 1fr 1.8fr;align-items:center;gap:8px;font-size:13px;line-height:19px;border-top:1px solid #26303c}' +
 'html:not(.camp) #cSunT{display:none}' +
 'html.camp #cSunT .sr:first-child{border-top:0}' +
 'html.camp #cSunT .sr b{font-weight:600}html.camp #cSunT .sr i{font-style:normal;color:#ffb84d;margin-right:3px}' +
 'html.camp #cSunT .mn{display:flex;align-items:center;gap:6px;color:#9fb0c3;font-size:13px;white-space:nowrap}' +
-'html.camp #cSunT .mn span{font-size:20px;line-height:1;display:block}';
+'html.camp #cSunT .mn span{font-size:20px;line-height:1;display:block}@media (min-height:861px){html.camp #cSunT .sr{line-height:27px}html.camp #weatherScreen .day{padding:5px 0}}';
 function att() { setTimeout(function () { D.head.appendChild(st); }, 150); }
 if (D.readyState === 'complete') att(); else W.addEventListener('load', att);
 function addL(svg) {
@@ -4065,7 +4065,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     };
   }
 })();
-/* ===== Part 5 (rev 263): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 264): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
