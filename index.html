@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 270 -->
+<!-- Van Dash rev 271 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r270</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r271</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 270): iPad camp layout, weather map picker, Topo layer ===== */
+/* ===== Part 4 (rev 271): iPad camp layout, weather map picker, Topo layer ===== */
 /* rev 260 (a): one writer for the weather icons and words, day or night, so nothing flickers */
 (function () {
 var D = document, W = window;
@@ -3522,6 +3522,41 @@ else if (t.indexOf('🌤') > -1 || t.indexOf('⛅') > -1) ic.innerHTML = window.
 });
 }, 500);
 })();
+/* rev 271: Spotify shuffle and repeat, 15 sec size, bigger art */
+(function () {
+var D = document, ctl = D.getElementById('spCtl'), pv = D.getElementById('spPrev');
+if (!ctl || !pv) return;
+var sh = false, rp = 'off', lk = 0;
+function put(p) { var a = null; try { a = JSON.parse(localStorage.getItem('vdSp')).a; } catch (e) {} if (a) fetch('https://api.spotify.com/v1/me/player/' + p, { method: 'PUT', headers: { Authorization: 'Bearer ' + a } }).catch(function () {}); }
+function mk(id, d) { var b = D.createElement('button'); b.id = id; b.className = 'spx'; b.style.cssText = pv.getAttribute('style'); b.innerHTML = '<svg viewBox="0 0 24 24">' + d + '</svg><span class="spn">1</span>'; return b; }
+var b1 = mk('spShuf', '<path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>'), b2 = mk('spRep', '<path d="M17 2l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/>');
+ctl.insertBefore(b1, ctl.firstChild); ctl.appendChild(b2);
+function paint() { b1.style.color = sh ? '#ff8a2b' : '#5f7288'; b2.style.color = rp != 'off' ? '#ff8a2b' : '#5f7288'; b2.lastChild.style.display = rp == 'track' ? 'flex' : 'none'; }
+paint();
+b1.onclick = function () { sh = !sh; lk = Date.now() + 3000; paint(); put('shuffle?state=' + sh); };
+b2.onclick = function () { rp = rp == 'off' ? 'context' : rp == 'context' ? 'track' : 'off'; lk = Date.now() + 3000; paint(); put('repeat?state=' + rp); };
+var F = window.fetch;
+window.fetch = function (u) {
+var p = F.apply(this, arguments);
+try { if (/me\/player$/.test(String(u))) p.then(function (r) { if (r.status === 200) r.clone().json().then(function (j) { if (j && j.shuffle_state != null && Date.now() > lk) { sh = j.shuffle_state; rp = j.repeat_state || 'off'; paint(); } }).catch(function () {}); }).catch(function () {}); } catch (e) {}
+return p;
+};
+var E = 0;
+setInterval(function () {
+var art = D.getElementById('spArt'), pl = D.getElementById('plList'), par = art && art.parentNode;
+if (!par || !pl || !D.documentElement.classList.contains('camp') || art.style.display === 'none') return;
+var cs = getComputedStyle(par), cap = par.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), B = Math.min(cap, innerHeight * 0.2);
+var ne = Math.max(0, Math.min(cap - B, (pl.clientHeight - pl.scrollHeight + E) / 2));
+if (Math.abs(ne - E) > 3) { E = ne; art.style.setProperty('width', (B + E) + 'px', 'important'); }
+}, 700);
+var st = D.createElement('style');
+st.textContent =
+'#spCtl .spx{display:none!important}html.camp #spCtl .spx{display:block!important;color:#5f7288}' +
+'html.camp #spCtl button:not(#spPlay){flex:1 1 0!important;width:auto!important;min-width:0!important}html.camp #spCtl #spPlay{flex:none!important;width:52px!important}html.camp #spPlay svg{width:50px!important;height:50px!important}' +
+'html.camp #spPrev svg,html.camp #spNext svg{width:36px!important;height:36px!important}html.camp #spBack svg,html.camp #spFwd svg{width:33px!important;height:33px!important}html.camp #spBack span,html.camp #spFwd span{font-size:9px!important}' +
+'#spCtl .spx svg{display:block;margin:auto;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}#spCtl .spn{position:absolute;left:0;right:0;top:0;bottom:0;display:none;align-items:center;justify-content:center;font-size:9px;font-weight:700}';
+setTimeout(function () { D.head.appendChild(st); }, 500);
+})();
 /* rev 270: round battery gauge, slimmer tanks */
 (function () {
 var D = document, card = D.querySelector('.battcard');
@@ -3536,7 +3571,7 @@ function up() {
 var p = parseFloat((g('bSoc') || {}).textContent), ok = !isNaN(p), P = g('bgP'), f = g('bgF'), t = g('wTemp');
 P.innerHTML = ok ? Math.round(p) + '<span>%</span>' : '--';
 f.style.opacity = ok && p > 0 ? 1 : 0; f.style.strokeDasharray = (ok ? Math.max(0, Math.min(100, p)) : 0) + ' 100';
-if (t) { var c = getComputedStyle(t); P.style.fontSize = c.fontSize; P.style.fontWeight = c.fontWeight; P.style.letterSpacing = c.letterSpacing; }
+if (t) P.style.fontWeight = getComputedStyle(t).fontWeight;
 g('bgA').textContent = (g('bAmps') || {}).textContent; g('bgW').textContent = (g('bWatts') || {}).textContent;
 var b = g('bStatus'), s = b ? b.textContent : '', live = /live/.test(s), a = s.split(' • '), S = g('bgS');
 S.textContent = live && a.length > 2 ? a[0] : ''; S.style.color = /^Charg/.test(S.textContent) ? '#4cd964' : /^Disch/.test(S.textContent) ? '#ff8a2b' : '#9fb0c3';
@@ -3551,7 +3586,7 @@ st.textContent =
 '#bgDial{display:none}html.camp #bgDial{display:flex;align-items:center;gap:8px;margin-top:6px}html.camp .battcard .batt-row{display:none!important}' +
 '#bgDial .bgw{position:relative;width:196px;flex:none}#bgDial .bgw>svg{display:block;width:100%;height:auto}' +
 '#bgDial .bgc{position:absolute;left:0;right:0;top:53.5%;transform:translateY(-50%);text-align:center;line-height:1}' +
-'#bgP{font-size:62px;line-height:1}#bgP span{font-size:.42em;margin-left:0;color:#cfd8e3}#bgS{font-size:13px;margin-top:6px}#bgV{font-size:13px;color:#9fb0c3;margin-top:3px}' +
+'#bgP{font-size:52px;line-height:1;position:relative;display:inline-block}#bgP span{position:absolute;left:100%;top:.1em;font-size:.45em;color:#cfd8e3}#bgS{font-size:13px;margin-top:6px}#bgV{font-size:13px;color:#9fb0c3;margin-top:3px}' +
 '#bgDial .bgb{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}' +
 '#bgDial .bgx{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#0b0f14;border-radius:12px;padding:8px 6px;min-height:58px}' +
 '#bgDial .bgx svg{width:22px;height:22px;flex:none;fill:none;stroke:#ff8a2b;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}' +
@@ -3853,103 +3888,6 @@ chk();
 function go() { try { init(); } catch (e) {} }
 if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('load', function () { setTimeout(go, 0); });
 })();
-/* rev 259 camp layout: replaced by the rev 260 code above and switched off */
-(function () {
-var D = document, W = window;
-function init() {
-var mq = W.matchMedia('(min-width:1000px) and (orientation:landscape)');
-var ids = ['spotScreen', 'weatherScreen', 'mainScreen'], on = false, grid = null, back = $('backBtn'), backHTML = back ? back.innerHTML : '', backClick = back ? back.onclick : null;
-var tc = D.createElement('div'), tk = {}, tws = null, tid = null;
-tc.className = 'card tankcard hidden';
-tc.innerHTML = '<div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>Tanks</div><div class="tkl"><div class="sub" style="margin-top:8px">Tap the battery status line to connect</div></div>';
-$('mainScreen').querySelector('.grid').appendChild(tc);
-var TN = ['Fuel', 'Fresh water', 'Gray water', 'Live well', 'Oil', 'Black water'];
-function tkShow() {
-var ks = Object.keys(tk).filter(function (k) { return tk[k].lv != null && tk[k].ft !== 5; }).sort(function (a, b) { return (tk[a].ft === 1 ? 0 : 1) - (tk[b].ft === 1 ? 0 : 1) || a - b; });
-if (!ks.length) return;
-tc.classList.remove('hidden');
-tc.querySelector('.tkl').innerHTML = ks.map(function (k) {
-var t = tk[k], p = Math.max(0, Math.min(100, t.lv)), fresh = t.ft === 1 || t.ft === 0, c;
-c = fresh ? (p >= 20 ? '#3da5ff' : p >= 10 ? '#ffd34d' : '#ff3b30') : (p >= 90 ? '#ff3b30' : p >= 75 ? '#ffd34d' : t.ft === 5 ? '#b08968' : '#a3afbd');
-return '<div class="tk"><div class="n">' + (t.nm || TN[t.ft] || 'Tank ' + k) + '</div><div class="b"><i style="width:' + p + '%;background:' + c + '"></i></div><div class="p">' + Math.round(p) + '%</div></div>';
-}).join('');
-}
-function tkConnect() {
-if (tws && tws.readyState < 2) return;
-var ws;
-try { ws = new WebSocket('wss://192.168.68.120/websocket-mqtt', 'mqtt'); } catch (e) { return; }
-tws = ws; ws.binaryType = 'arraybuffer';
-var send = function (b) { try { ws.send(b); } catch (e) {} };
-ws.onopen = function () {
-send(mqPkt(0x10, mqCat([mqStr('MQTT'), Uint8Array.of(4, 2, 0, 60), mqStr('vdtank' + Math.random().toString(16).slice(2, 8))])));
-var parts = [Uint8Array.of(0, 2)];
-['Level', 'FluidType', 'CustomName'].forEach(function (k) { parts.push(mqStr('N/+/tank/+/' + k)); parts.push(Uint8Array.of(0)); });
-send(mqPkt(0x82, mqCat(parts)));
-var ping = setInterval(function () {
-if (ws.readyState !== 1) { clearInterval(ping); return; }
-send(Uint8Array.of(0xC0, 0)); if (tid) send(mqPkt(0x30, mqStr('R/' + tid + '/keepalive')));
-}, 25000);
-};
-ws.onmessage = function (ev) {
-var u = new Uint8Array(ev.data), i = 0;
-while (i < u.length) {
-var type = u[i] >> 4, n = 0, m = 1, j = i + 1, b;
-do { b = u[j++]; n += (b & 127) * m; m *= 128; } while (b & 128);
-if (type === 3) {
-var tl = (u[j] << 8) | u[j + 1], topic = new TextDecoder().decode(u.slice(j + 2, j + 2 + tl)), k = j + 2 + tl;
-if (((u[i] >> 1) & 3) > 0) k += 2;
-try {
-var v = JSON.parse(new TextDecoder().decode(u.slice(k, j + n))).value, p = topic.split('/');
-if (!tid) { tid = p[1]; send(mqPkt(0x30, mqStr('R/' + tid + '/keepalive'))); }
-if (v != null && p[2] === 'tank') {
-var t = tk[p[3]] || (tk[p[3]] = {});
-if (p[4] === 'Level') t.lv = Number(v); else if (p[4] === 'FluidType') t.ft = Number(v); else if (p[4] === 'CustomName') t.nm = String(v);
-tkShow();
-}
-} catch (e) {}
-}
-i = j + n;
-}
-};
-}
-var bs = $('bStatus'), bsOld = bs.onclick;
-bs.onclick = function () { if (bsOld) bsOld.apply(this, arguments); if (mq.matches) tkConnect(); };
-var st = D.createElement('style');
-st.textContent =
-'html.camp #weatherScreen #vdRC2{position:absolute;left:0;top:0;height:100%!important}';
-D.head.appendChild(st);
-function unhide() {
-if (!on) return;
-ids.forEach(function (i) { var e = $(i); if (e && e.classList.contains('hidden')) e.classList.remove('hidden'); });
-}
-var mo = W.MutationObserver ? new MutationObserver(unhide) : null;
-function enter() {
-if (!grid) {
-grid = D.createElement('div'); grid.id = 'campGrid';
-var first = $('mainScreen'); first.parentNode.insertBefore(grid, first);
-ids.forEach(function (i) { grid.appendChild($(i)); });
-if (mo) ids.forEach(function (i) { mo.observe($(i), { attributes: true, attributeFilter: ['class'] }); });
-}
-on = true; D.documentElement.classList.add('camp');
-if (back) { back.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>'; back.onclick = function () { $('srchBtn').click(); }; }
-unhide();
-setTimeout(function () { W.dispatchEvent(new Event('resize')); }, 50);
-}
-function leave() {
-on = false; D.documentElement.classList.remove('camp');
-if (back) { back.innerHTML = backHTML; back.onclick = backClick; }
-if (grid) { grid.style.display = 'contents'; }
-var m = $('mainScreen'), w = $('weatherScreen'), s = $('spotScreen');
-if (w) w.classList.add('hidden'); if (s) s.classList.add('hidden'); if (m) m.classList.remove('hidden');
-W.dispatchEvent(new Event('resize'));
-}
-function chk() { if (mq.matches) { if (grid) grid.style.display = ''; enter(); } else if (on) leave(); }
-if (mq.addEventListener) mq.addEventListener('change', chk); else if (mq.addListener) mq.addListener(chk);
-chk();
-}
-function go() {}
-if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('load', function () { setTimeout(go, 0); });
-})();
 /* rev 258 and earlier: weather map picker, then Topo layer */
 /* rev 258: search results open a crosshair map; Show weather or Save and show; Street/Satellite/Topo; find-me; rename saved spots */
 (function () {
@@ -4175,7 +4113,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     };
   }
 })();
-/* ===== Part 5 (rev 270): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 271): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
