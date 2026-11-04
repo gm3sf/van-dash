@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 268 -->
+<!-- Van Dash rev 269 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r268</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r269</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 268): iPad camp layout, weather map picker, Topo layer ===== */
+/* ===== Part 4 (rev 269): iPad camp layout, weather map picker, Topo layer ===== */
 /* rev 260 (a): one writer for the weather icons and words, day or night, so nothing flickers */
 (function () {
 var D = document, W = window;
@@ -3521,6 +3521,126 @@ if (t.indexOf('☀') > -1) ic.innerHTML = window.__vdMoon(false);
 else if (t.indexOf('🌤') > -1 || t.indexOf('⛅') > -1) ic.innerHTML = window.__vdMoon(true);
 });
 }, 500);
+})();
+/* rev 269: GX setup page, wind forecast in place */
+(function () {
+var D = document, W = window, K = 'vdGx', DEF = '192.168.68.132', OLD = '192.168.68.120';
+function camp() { return D.documentElement.classList.contains('camp'); }
+function ld() { var o = null; try { o = JSON.parse(localStorage.getItem(K) || 'null'); } catch (e) { o = null; } if (!o || !o.cur) o = { cur: DEF, list: [{ n: 'Home', h: DEF }] }; return o; }
+function sv(o) { try { localStorage.setItem(K, JSON.stringify(o)); } catch (e) {} }
+var NW = W.WebSocket;
+function WS(u, p) { u = String(u).replace(OLD, ld().cur); return p === undefined ? new NW(u) : new NW(u, p); }
+WS.prototype = NW.prototype;
+W.WebSocket = WS;
+function fixLink() { var a = D.querySelector('#mainScreen > a[href^="https://192"]'); if (a) a.href = 'https://' + ld().cur; }
+fixLink();
+var ov = null;
+function esc(s) { return String(s).replace(/</g, '&lt;'); }
+function chips() {
+var o = ld();
+return o.list.map(function (x, i) {
+return '<div data-i="' + i + '" class="gxc" style="display:inline-flex;gap:8px;margin:0 8px 8px 0;padding:8px 12px;border-radius:12px;border:1px solid ' + (x.h === o.cur ? '#ff8a2b' : '#3a4658') + ';background:#0b0f14;color:#e8eef5"><span class="gxp">' + esc(x.n) + ' · ' + esc(x.h) + '</span><span class="gxd" style="color:#7f8fa3;font-size:16px;padding:0 2px">✕</span></div>';
+}).join('');
+}
+function build() {
+if (ov) return;
+ov = D.createElement('div'); ov.id = 'gxSetup';
+ov.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:300;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:14px';
+var inp = 'width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border-radius:10px;border:1px solid #3a4658;background:#0b0f14;color:#fff;font-size:18px;outline:0';
+var btn = 'display:block;text-align:center;padding:13px;border-radius:12px;font-size:16px;font-weight:600;text-decoration:none;margin-top:10px;';
+ov.innerHTML = '<div style="width:100%;max-width:520px;max-height:92vh;overflow:auto;background:#151c25;border:0.5px solid #8a96a6;border-radius:16px;padding:16px 18px;color:#e8eef5;font-size:14px">' +
+'<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:18px;font-weight:600">Connect to your GX</div><div id="gxX" style="font-size:22px;color:#9fb0c3;padding:4px 8px;cursor:pointer">✕</div></div>' +
+'<div class="gxl" style="margin-top:14px">GX address</div><input id="gxIp" inputmode="decimal" autocomplete="off" autocapitalize="off" style="' + inp + '" placeholder="192.168.68.132">' +
+'<div class="gxl" style="margin-top:12px">Name (optional)</div><input id="gxNm"  style="' + inp + '" placeholder="Home, Van">' +
+'<div id="gxSave" style="' + btn + 'background:#ff8a2b;color:#000">Save and connect</div>' +
+'<a id="gxOpen" target="_blank" style="' + btn + 'border:1px solid #3a4658;color:#ff8a2b">Open the GX page to trust it</a>' +
+'<div class="gxl" style="margin-top:16px">Saved networks</div><div id="gxList" style="margin-top:8px"></div>' +
+'<div class="gxl" style="margin-top:12px">How to find the address</div>' +
+'<ol style="margin:8px 0 0;padding-left:20px;color:#cfd8e3">' +
+'<li>Same Wi-Fi as the GX.</li><li>GX: Menu, Settings, Wi-Fi, your network, read the IP address. Each Wi-Fi gives a different one.</li><li>Settings, Services: MQTT Access on.</li><li>Tap Open the GX page; if Safari warns, Show Details, visit the website (once per address).</li><li>Save and connect.</li></ol></div>';
+D.body.appendChild(ov);
+function close() { ov.style.display = 'none'; }
+ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+ov.querySelector('#gxX').onclick = close;
+var ip = ov.querySelector('#gxIp'), nm = ov.querySelector('#gxNm'), op = ov.querySelector('#gxOpen');
+ip.addEventListener('input', function () { op.href = 'https://' + (ip.value.trim() || ld().cur); });
+ov.querySelector('#gxSave').onclick = function () {
+var h = ip.value.trim().replace(/\b0+(\d)/g, '$1');
+if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(h)) { ip.style.borderColor = '#ff3b30'; return; }
+var o = ld(), n = nm.value.trim() || ('GX ' + h), f = false;
+o.list.forEach(function (x) { if (x.h === h) { f = true; if (nm.value.trim()) x.n = n; } });
+if (!f) o.list.push({ n: n, h: h });
+o.cur = h; sv(o); fixLink(); close();
+var b = D.getElementById('bStatus'); if (b) b.click();
+};
+ov.querySelector('#gxList').addEventListener('click', function (e) {
+var c = e.target.closest ? e.target.closest('.gxc') : null; if (!c) return;
+var i = +c.getAttribute('data-i'), o = ld();
+if (e.target.classList.contains('gxd')) { o.list.splice(i, 1); if (!o.list.length) o.list.push({ n: 'Home', h: DEF }); if (!o.list.some(function (x) { return x.h === o.cur; })) o.cur = o.list[0].h; sv(o); show(); return; }
+o.cur = o.list[i].h; sv(o); fixLink(); close();
+var b = D.getElementById('bStatus'); if (b) b.click();
+});
+}
+function show() {
+build();
+var o = ld();
+ov.querySelector('#gxIp').value = o.cur; ov.querySelector('#gxNm').value = '';
+ov.querySelector('#gxOpen').href = 'https://' + o.cur;
+ov.querySelector('#gxList').innerHTML = chips();
+ov.style.display = 'flex';
+}
+var gear = null;
+setInterval(function () {
+var lab = D.querySelector('.battcard .label');
+if (!lab || (gear && gear.parentNode === lab)) return;
+gear = D.createElement('span'); gear.id = 'gxCfg'; gear.setAttribute('role', 'button');
+gear.style.cssText = 'display:inline-block;margin:-9px 0 -9px 2px;padding:9px 8px;vertical-align:middle;line-height:0';
+gear.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="17" r="2"/></svg>';
+gear.addEventListener('click', function (e) { e.stopPropagation(); show(); });
+lab.appendChild(gear);
+}, 1000);
+var st = D.createElement('style');
+st.textContent =
+'#wpHdr{display:none}' +
+'#gxSetup .gxl{font-size:12px;letter-spacing:1px;color:#7f8fa3;text-transform:uppercase}' +
+'html.camp #wpHdr{display:flex;align-items:center;justify-content:space-between;padding:10px 0 4px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#7f8fa3}' +
+'html.camp #wpX{font-size:20px;color:#9fb0c3;padding:0 6px}' +
+'html.camp #weatherScreen>#windScreen{position:static!important;flex:none;overflow:auto;margin:0!important;padding:0 14px 8px!important;background:#151c25!important;border:0.5px solid #8a96a6;border-top:0;border-radius:0 0 14px 14px}' +
+'html.camp #windScreen>.topbar,html.camp #windScreen>#wpPlace,html.camp #windScreen>div:last-child{display:none!important}' +
+'html.camp #windScreen #wpList{background:none!important;border:0!important;padding:0!important}' +
+'html.camp #windScreen .vdWd>div:first-child{padding:5px 0!important}' +
+'html.camp #windScreen .vdWd>div:first-child svg{width:40px!important;height:40px!important}' +
+'html.camp.windx #weatherScreen>#wBox2{margin-bottom:0!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;border-bottom-color:#26303c!important}' +
+'html.camp.windx #weatherScreen>.section-title,html.camp.windx #weatherScreen>#forecast,html.camp.windx #weatherScreen>.card:has(#forecast){display:none!important}';
+D.head.appendChild(st);
+var X = null, lastH = 0;
+function hdr(pg) {
+if (X) return;
+X = D.createElement('div'); X.id = 'wpHdr';
+X.innerHTML = '<span>7-day wind forecast</span><span id="wpX">✕</span>';
+pg.insertBefore(X, pg.firstChild);
+X.lastChild.onclick = function () { D.getElementById('wpBack').click(); };
+}
+setInterval(function () {
+var pg = D.getElementById('windScreen'), b2 = D.getElementById('wBox2'), ws = D.getElementById('weatherScreen'), de = D.documentElement;
+if (!pg || !b2 || !ws) return;
+hdr(pg);
+var cp = camp(), fc = D.getElementById('forecast');
+if (cp && b2.parentNode === ws && pg.parentNode !== ws) ws.insertBefore(pg, b2.nextSibling);
+if (!cp) { if (pg.parentNode === ws) D.body.insertBefore(pg, ws.nextSibling); de.classList.remove('windx'); pg.style.height = ''; return; }
+var open = !pg.classList.contains('hidden');
+if (!open) {
+de.classList.remove('windx');
+if (fc) { while (fc.parentNode && fc.parentNode !== ws) fc = fc.parentNode; var h = fc.getBoundingClientRect().bottom - b2.getBoundingClientRect().bottom; if (h > 150 && h < 900) lastH = h; }
+return;
+}
+if (!de.classList.contains('windx') && lastH) { pg.style.height = lastH + 'px'; de.classList.add('windx'); }
+}, 120);
+D.addEventListener('click', function (e) {
+if (!camp()) return;
+var t = e.target && e.target.closest ? e.target.closest('#wBox2') : null, pg = D.getElementById('windScreen');
+if (t && pg && !pg.classList.contains('hidden')) { e.stopImmediatePropagation(); e.preventDefault(); D.getElementById('wpBack').click(); }
+}, true);
 })();
 /* rev 260 (d): iPad landscape camp layout (Spotify | weather + sun | battery + tanks + map) */
 (function () {
@@ -4065,7 +4185,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     };
   }
 })();
-/* ===== Part 5 (rev 268): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 269): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
