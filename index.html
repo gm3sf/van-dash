@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 269 -->
+<!-- Van Dash rev 270 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r269</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r270</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 269): iPad camp layout, weather map picker, Topo layer ===== */
+/* ===== Part 4 (rev 270): iPad camp layout, weather map picker, Topo layer ===== */
 /* rev 260 (a): one writer for the weather icons and words, day or night, so nothing flickers */
 (function () {
 var D = document, W = window;
@@ -3521,6 +3521,43 @@ if (t.indexOf('☀') > -1) ic.innerHTML = window.__vdMoon(false);
 else if (t.indexOf('🌤') > -1 || t.indexOf('⛅') > -1) ic.innerHTML = window.__vdMoon(true);
 });
 }, 500);
+})();
+/* rev 270: round battery gauge, slimmer tanks */
+(function () {
+var D = document, card = D.querySelector('.battcard');
+if (!card) return;
+var d = 'M40.6 159.4A84 84 0 1 1 159.4 159.4', I = 'fill="none" stroke-width="13" stroke-linecap="round" pathLength="100"';
+var box = D.createElement('div'); box.id = 'bgDial';
+box.innerHTML = '<div class="bgw"><svg viewBox="0 8 200 172"><defs><linearGradient id="bgG" gradientUnits="userSpaceOnUse" x1="16" y1="0" x2="184" y2="0"><stop offset="0" stop-color="#ff3b30"/><stop offset=".5" stop-color="#ffd34d"/><stop offset="1" stop-color="#4cd964"/></linearGradient></defs><path d="' + d + '" ' + I + ' stroke="#2b3542"/><path id="bgF" d="' + d + '" ' + I + ' stroke="url(#bgG)" style="stroke-dasharray:0 100;transition:stroke-dasharray .5s"/><text x="40" y="177" text-anchor="middle" font-size="11" fill="#7f8fa3">E</text><text x="160" y="177" text-anchor="middle" font-size="11" fill="#7f8fa3">F</text></svg><div class="bgc"><div id="bgP">--</div><div id="bgS"></div><div id="bgV"></div></div></div>' +
+'<div class="bgb"><div class="bgx"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span id="bgA">--</span><i>A</i></div><div class="bgx"><svg viewBox="0 0 24 24"><path d="M9 3v5M15 3v5"/><path d="M6 8h12v3a6 6 0 0 1-12 0z"/><path d="M12 17v4"/></svg><span id="bgW">--</span><i>W</i></div></div>';
+card.insertBefore(box, card.querySelector('.batt-row'));
+function g(i) { return D.getElementById(i); }
+function up() {
+var p = parseFloat((g('bSoc') || {}).textContent), ok = !isNaN(p), P = g('bgP'), f = g('bgF'), t = g('wTemp');
+P.innerHTML = ok ? Math.round(p) + '<span>%</span>' : '--';
+f.style.opacity = ok && p > 0 ? 1 : 0; f.style.strokeDasharray = (ok ? Math.max(0, Math.min(100, p)) : 0) + ' 100';
+if (t) { var c = getComputedStyle(t); P.style.fontSize = c.fontSize; P.style.fontWeight = c.fontWeight; P.style.letterSpacing = c.letterSpacing; }
+g('bgA').textContent = (g('bAmps') || {}).textContent; g('bgW').textContent = (g('bWatts') || {}).textContent;
+var b = g('bStatus'), s = b ? b.textContent : '', live = /live/.test(s), a = s.split(' • '), S = g('bgS');
+S.textContent = live && a.length > 2 ? a[0] : ''; S.style.color = /^Charg/.test(S.textContent) ? '#4cd964' : /^Disch/.test(S.textContent) ? '#ff8a2b' : '#9fb0c3';
+g('bgV').textContent = live ? (s.match(/[\d.]+ V/) || [''])[0] : '';
+if (b) b.style.visibility = live ? 'hidden' : '';
+}
+var mo = new MutationObserver(up);
+['.batt-row', '#bStatus'].forEach(function (q) { var e = D.querySelector(q); if (e) mo.observe(e, { childList: true, subtree: true, characterData: true }); });
+setInterval(up, 2000); up();
+var st = D.createElement('style');
+st.textContent =
+'#bgDial{display:none}html.camp #bgDial{display:flex;align-items:center;gap:8px;margin-top:6px}html.camp .battcard .batt-row{display:none!important}' +
+'#bgDial .bgw{position:relative;width:196px;flex:none}#bgDial .bgw>svg{display:block;width:100%;height:auto}' +
+'#bgDial .bgc{position:absolute;left:0;right:0;top:53.5%;transform:translateY(-50%);text-align:center;line-height:1}' +
+'#bgP{font-size:62px;line-height:1}#bgP span{font-size:.42em;margin-left:0;color:#cfd8e3}#bgS{font-size:13px;margin-top:6px}#bgV{font-size:13px;color:#9fb0c3;margin-top:3px}' +
+'#bgDial .bgb{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}' +
+'#bgDial .bgx{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#0b0f14;border-radius:12px;padding:8px 6px;min-height:58px}' +
+'#bgDial .bgx svg{width:22px;height:22px;flex:none;fill:none;stroke:#ff8a2b;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}' +
+'#bgDial .bgx span{font-size:30px;font-weight:600;line-height:1}#bgDial .bgx i{font-style:normal;font-size:14px;color:#7f8fa3}' +
+'html.camp .tk{grid-template-columns:112px 1fr 56px!important}html.camp .tk .b{height:18px!important;border-radius:9px!important;margin-right:8px}html.camp .tk .b i{border-radius:9px!important}html.camp .tk .b::after{left:7px!important;right:7px!important;top:2px!important;height:4px!important}html.camp .tk .p{font-size:22px!important;font-weight:500!important}';
+setTimeout(function () { D.head.appendChild(st); }, 500);
 })();
 /* rev 269: GX setup page, wind forecast in place */
 (function () {
@@ -3879,53 +3916,6 @@ var bs = $('bStatus'), bsOld = bs.onclick;
 bs.onclick = function () { if (bsOld) bsOld.apply(this, arguments); if (mq.matches) tkConnect(); };
 var st = D.createElement('style');
 st.textContent =
-'html.camp body{height:100vh;height:100dvh;min-height:0;overflow:hidden;padding:8px 10px;touch-action:auto}' +
-'html.camp #campGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1.05fr);gap:10px;height:100%}' +
-'html.camp #campGrid>div{display:flex!important;flex-direction:column;min-height:0;min-width:0;overflow:hidden;position:relative}' +
-'html.camp #campGrid>.hidden{display:flex!important}' +
-'html.camp body>div[id$="Screen"]:not(#campGrid){position:fixed;left:0;top:0;right:0;bottom:0;z-index:90;background:#000;overflow:auto;padding:8px 24px 40px}' +
-'html.camp #spotBack{visibility:hidden}' +
-'html.camp #spotScreen>.card{flex:none;flex-direction:column!important;align-items:stretch!important;padding:14px}' +
-'html.camp #spArt{width:min(100%,36vh)!important;height:auto!important;aspect-ratio:1;margin:0 auto 12px;border-radius:14px!important}' +
-'html.camp #spT{font-size:22px!important}html.camp #spA{font-size:16px!important}' +
-'html.camp #spCtl button{width:62px!important;height:58px!important}html.camp #spCtl svg{transform:scale(1.3)}' +
-'html.camp #spotScreen #plList{flex:1;min-height:0;overflow:auto}' +
-'html.camp .speedrow,html.camp #tempCard,html.camp #wxCard,html.camp .tripcard,html.camp #mainScreen .grid>.card:not(.locrow):not(.battcard):not(:has(.sunrow)):not(.tankcard){display:none!important}' +
-'html.camp #mainScreen>a[href^="https://192"]{top:auto;bottom:2px;left:2px;width:40px;height:22px;padding:0}' +
-'html.camp #mainScreen .grid{display:flex;flex-direction:column;gap:8px;flex:none}' +
-'html.camp #mainScreen .battcard{order:1!important;padding:14px 18px 16px;position:relative}' +
-'html.camp #mainScreen .battcard .label{font-size:20px}' +
-'html.camp #mainScreen .battcard .bstat{font-size:17px;top:14px;right:18px}' +
-'html.camp .batt-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 10px;margin-top:10px}' +
-'html.camp .batt-row .bsoc{grid-column:1/3;width:auto;min-width:0;flex-wrap:wrap;gap:6px 14px}' +
-'html.camp .batt-row .bsoc .v{width:auto;font-size:92px;letter-spacing:-2px}' +
-'html.camp .batt-row .bsoc svg{width:60px;height:60px}' +
-'html.camp .batt-row .socbar{flex-basis:100%;width:100%;height:30px;border-radius:15px}' +
-'html.camp .batt-row .socbar .fill{border-radius:13px}' +
-'html.camp .batt-row .bamp,html.camp .batt-row .bpow{width:auto;min-width:0;justify-content:flex-start;gap:6px;background:#0b0f14;border-radius:12px;padding:10px 10px}' +
-'html.camp .batt-row .bamp .v,html.camp .batt-row .bpow .v{font-size:46px}' +
-'html.camp .batt-row .bamp .u,html.camp .batt-row .bpow .u{font-size:22px}' +
-'html.camp .batt-row .bamp svg,html.camp .batt-row .bpow svg{width:28px;height:28px}' +
-'html.camp .tankcard{order:2!important;padding:10px 16px 12px}' +
-'html.camp .tankcard .label{font-size:18px}' +
-'html.camp .tk{display:grid;grid-template-columns:130px 1fr 78px;align-items:center;gap:10px;margin-top:8px}' +
-'html.camp .tk .n{font-size:17px;color:#cfd8e3}' +
-'html.camp .tk .b{height:22px;border-radius:11px;background:#2b3542;overflow:hidden}' +
-'html.camp .tk .b i{display:block;height:100%;width:0;border-radius:11px;transition:width .4s,background .4s}' +
-'html.camp .tk .p{font-size:32px;font-weight:700;text-align:right;line-height:1}' +
-'html.camp #mainScreen .locrow{order:4!important}' +
-'html.camp #mainScreen .grid>.card:has(.sunrow){order:3!important;padding:10px 14px}' +
-'html.camp .sunrow .t{font-size:26px}html.camp .sunrow svg{width:46px;height:34px}' +
-'html.camp #mainScreen .vmap{flex:1;height:auto;min-height:120px;margin-top:8px}' +
-'html.camp #mainScreen #status{display:none}' +
-'html.camp #weatherScreen{overflow:auto}' +
-'html.camp #weatherScreen .topbar{padding:2px 0 4px;flex:none}' +
-'html.camp #weatherScreen .nowline{padding:0 0 8px;flex:none}html.camp #weatherScreen .nowline .big{font-size:72px}' +
-'html.camp #weatherScreen .stat-row{margin-bottom:8px;flex:none}html.camp #weatherScreen .stat{padding:6px}' +
-'html.camp #weatherScreen .section-title{margin:0 4px 4px;flex:none}' +
-'html.camp #weatherScreen #forecast{flex:none;padding:0 14px}html.camp #weatherScreen .day{padding:5px 0}' +
-'html.camp #weatherScreen>.card{flex:1;min-height:200px;display:flex;flex-direction:column;margin-top:8px!important}' +
-'html.camp #weatherScreen>.card>div:nth-child(2){flex:1;min-height:0}' +
 'html.camp #weatherScreen #vdRC2{position:absolute;left:0;top:0;height:100%!important}';
 D.head.appendChild(st);
 function unhide() {
@@ -4185,7 +4175,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     };
   }
 })();
-/* ===== Part 5 (rev 269): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 270): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
