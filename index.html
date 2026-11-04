@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 259 -->
+<!-- Van Dash rev 260 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r259</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r260</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,8 +3256,347 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 259): iPad camp layout, weather map picker, Topo layer ===== */
-/* rev 259: iPad landscape camp layout (Spotify | weather + radar | battery + tanks + sun + map) */
+/* ===== Part 4 (rev 260): iPad camp layout, weather map picker, Topo layer ===== */
+/* rev 260 (a): one writer for the weather icons and words, day or night, so nothing flickers */
+(function () {
+var D = document, W = window;
+var pT = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent'), pH = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+var ids = ['wxIcon', 'wBoxIcon', 'wBoxDesc'], els = {}, last = {};
+ids.forEach(function (id) {
+var e = D.getElementById(id);
+if (!e) return;
+els[id] = e;
+Object.defineProperty(e, 'textContent', { configurable: true, get: function () { return pT.get.call(e); }, set: function () {} });
+Object.defineProperty(e, 'innerHTML', { configurable: true, get: function () { return pH.get.call(e); }, set: function () {} });
+});
+function put(id, kind, v) {
+var e = els[id], k = kind + v;
+if (!e || last[id] === k) return;
+last[id] = k;
+if (kind === 'h') pH.set.call(e, v); else pT.set.call(e, v);
+}
+function mins(s) { var m = /(\d+):(\d+)\s*(AM|PM)/i.exec(s || ''); if (!m) return null; var h = +m[1] % 12; if (/PM/i.test(m[3])) h += 12; return h * 60 + (+m[2]); }
+function night() {
+var a = mins((D.getElementById('sunrise') || {}).textContent), b = mins((D.getElementById('sunset') || {}).textContent);
+if (a == null || b == null) return false;
+var n = new Date(), t = n.getHours() * 60 + n.getMinutes();
+return t < a || t >= b;
+}
+var RAIN = ['🌧️', '🌦️', '⛈️', '🌨️', '❄️'];
+var DROPS = '<g stroke="#5fb8ff" stroke-width="3" stroke-linecap="round"><path d="M26 57l-2 5M34 57l-2 5M42 57l-2 5"/></g>';
+var cache = {};
+function svg(kind) {
+if (cache[kind] || !W.__vdMoon) return cache[kind];
+var s = W.__vdMoon(kind !== 'moon');
+if (kind === 'rain') s = s.replace('</svg>', DROPS + '</svg>');
+return (cache[kind] = s);
+}
+function tick() {
+var wd = D.getElementById('wDesc'), d = wd ? (pT.get.call(wd) || '').trim() : '', sp = d.indexOf(' ');
+if (sp < 1) return;
+var ic = d.slice(0, sp), word = d.slice(sp + 1), rl = D.getElementById('vd4Card'), raining = false;
+try { raining = !!(wxLive && rl && /^Raining now/.test(pT.get.call(rl))); } catch (e) {}
+var nt = night(), wetIc = RAIN.indexOf(ic) >= 0, kind = null, plain = ic;
+if (raining) { word = 'Rain'; wetIc = true; if (!nt) plain = RAIN[0]; }
+if (nt) {
+if (wetIc) kind = 'rain';
+else if (ic === '☀️' || ic === '🌤️') kind = 'moon';
+else if (ic === '⛅') kind = 'cloud';
+}
+var s = kind ? svg(kind) : null;
+['wxIcon', 'wBoxIcon'].forEach(function (id) { if (s) put(id, 'h', s); else put(id, 't', plain); });
+put('wBoxDesc', 't', word);
+}
+setInterval(tick, 400);
+tick();
+})();
+/* rev 260 (b): if the device gives no altitude, use the map's ground elevation for the spot */
+(function () {
+var D = document, mine = null, at = null, busy = 0;
+function dist(a, b, c, d) { var x = (c - a) * 111320, y = (d - b) * 111320 * Math.cos(a * Math.PI / 180); return Math.sqrt(x * x + y * y); }
+function tick() {
+var el = D.getElementById('alt');
+if (!el || typeof vGLat === 'undefined' || vGLat == null) return;
+var t = el.textContent.trim();
+if (t !== '--' && t !== mine) return;
+if (busy || (at && dist(at.a, at.o, vGLat, vGLon) < 250 && Date.now() - at.t < 1800000)) return;
+busy = 1;
+var a = vGLat, o = vGLon;
+fetch('https://api.open-meteo.com/v1/elevation?latitude=' + a.toFixed(4) + '&longitude=' + o.toFixed(4)).then(function (r) { return r.json(); }).then(function (j) {
+busy = 0;
+var m = j && j.elevation && j.elevation[0];
+if (m == null) return;
+var cur = el.textContent.trim();
+if (cur !== '--' && cur !== mine) return;
+mine = Math.round(m * 3.28084).toLocaleString();
+el.textContent = mine; at = { a: a, o: o, t: Date.now() };
+var sb = el.parentNode && el.parentNode.querySelector('.sub'); if (sb) sb.textContent = 'feet (map)';
+}).catch(function () { busy = 0; at = { a: a, o: o, t: Date.now() - 1500000 }; });
+}
+setInterval(tick, 3000);
+})();
+/* rev 260 (c): radar on the big map (camp layout) */
+(function () {
+var D = document, W = window, vm = D.getElementById('vmap');
+if (!vm || typeof vDraw !== 'function') return;
+var on = false, fr = [], idx = 0, host = 'https://tilecache.rainviewer.com', play = true, imgs = {}, got = 0, lastT = 0;
+try { on = localStorage.getItem('vdRadOn') === '1'; } catch (e) {}
+var cv = D.createElement('canvas');
+cv.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none';
+vm.insertBefore(cv, D.getElementById('vSat'));
+var bst = 'position:absolute;left:8px;width:40px;height:40px;margin:0;padding:0;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px;display:flex;align-items:center;justify-content:center;';
+var rb = D.createElement('button');
+rb.id = 'vRad'; rb.setAttribute('aria-label', 'Radar');
+rb.style.cssText = bst + 'top:100px';
+rb.innerHTML = '<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M7 16a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 7.5 4.5 4.5 0 0 1 17.5 16z"/><path d="M9 19l-1 2M13 19l-1 2M17 19l-1 2"/></svg>';
+var pb = D.createElement('button');
+pb.id = 'vRadPl'; pb.style.cssText = bst + 'bottom:26px;color:#fff;font-size:16px';
+var tl = D.createElement('div');
+tl.id = 'vRadT'; tl.style.cssText = 'position:absolute;left:54px;bottom:34px;font-size:13px;color:#fff;background:rgba(21,28,37,0.85);padding:3px 8px;border-radius:8px;display:none';
+[rb, pb].forEach(function (b) { ['pointerdown', 'pointerup'].forEach(function (ev) { b.addEventListener(ev, function (e) { e.stopPropagation(); }); }); });
+vm.appendChild(rb); vm.appendChild(pb); vm.appendChild(tl);
+function camp() { return D.documentElement.classList.contains('camp'); }
+function wpx(lat, lon, z) { var n = 256 * Math.pow(2, z), s = Math.sin(lat * Math.PI / 180); return { x: (lon + 180) / 360 * n, y: (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n }; }
+function img(u) {
+var m = imgs[u];
+if (!m) { m = imgs[u] = new Image(); m.onload = function () { this.ok = 1; draw(); }; m.src = u; }
+return m;
+}
+function ui() {
+var show = on && camp();
+rb.style.borderColor = on ? '#4fb06d' : '';
+pb.style.display = tl.style.display = show ? '' : 'none';
+rb.style.display = camp() ? '' : 'none';
+pb.textContent = play ? '❚❚' : '▶';
+var f = fr[idx];
+tl.textContent = f ? new Date(f.time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ' (' + Math.max(0, Math.round((Date.now() - f.time * 1000) / 60000)) + ' min ago)' : 'Loading radar...';
+}
+function draw() {
+if (!on || !camp() || vLat == null || !vW) { if (cv.width) cv.width = cv.width; return; }
+var dpr = window.devicePixelRatio || 1, w = vW, h = vH;
+if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+var ctx = cv.getContext('2d');
+ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+var f = fr[idx];
+if (f) {
+var zt = Math.max(2, Math.min(7, Math.round(vZoom))), s = Math.pow(2, vZoom - zt), c = wpx(vLat, vLon, zt), left = c.x - w / (2 * s), top = c.y - h / (2 * s), n = Math.pow(2, zt), x, y;
+ctx.globalAlpha = 0.72;
+for (y = Math.floor(top / 256); y <= Math.floor((top + h / s) / 256); y++) {
+if (y < 0 || y >= n) continue;
+for (x = Math.floor(left / 256); x <= Math.floor((left + w / s) / 256); x++) {
+var m = img(host + f.path + '/256/' + zt + '/' + (((x % n) + n) % n) + '/' + y + '/2/1_1.png');
+if (m.ok) ctx.drawImage(m, (x * 256 - left) * s, (y * 256 - top) * s, 256 * s + 0.5, 256 * s + 0.5);
+}
+}
+ctx.globalAlpha = 1;
+}
+var g = wpx(vFollow ? vLat : vGLat, vFollow ? vLon : vGLon, vZoom), c0 = wpx(vLat, vLon, vZoom), cx = w / 2 + g.x - c0.x, cy = h / 2 + g.y - c0.y;
+if (vGLat != null) {
+ctx.beginPath(); ctx.arc(cx, cy, 9, 0, 6.2832); ctx.fillStyle = '#ff3b30'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
+}
+}
+var od = vDraw;
+vDraw = function () { od.apply(this, arguments); try { draw(); } catch (e) {} };
+function load() {
+if (Date.now() - lastT < 20000) return;
+lastT = Date.now();
+fetch('https://api.rainviewer.com/public/weather-maps.json').then(function (r) { return r.json(); }).then(function (j) {
+var p = (j.radar && j.radar.past) || [];
+if (!p.length) return;
+host = j.host || host; fr = p.slice(-7); idx = fr.length - 1; got = Date.now(); ui(); draw();
+}).catch(function () {});
+}
+rb.onclick = function () {
+on = !on;
+try { localStorage.setItem('vdRadOn', on ? '1' : '0'); } catch (e) {}
+if (on) load();
+ui(); draw();
+};
+pb.onclick = function () { play = !play; ui(); };
+setInterval(function () {
+if (!on || !camp()) return;
+if (Date.now() - got > 300000) load();
+if (play && fr.length > 1) { idx = (idx + 1) % fr.length; ui(); draw(); }
+}, 700);
+setInterval(ui, 2000);
+if (on) load();
+ui();
+})();
+/* rev 260 (d): iPad landscape camp layout (Spotify | weather + sun | battery + tanks + map) */
+(function () {
+var D = document, W = window;
+function init() {
+var mq = W.matchMedia('(min-width:1000px) and (orientation:landscape)');
+var ids = ['spotScreen', 'weatherScreen', 'mainScreen'], on = false, grid = null, moved = [];
+var tc = D.createElement('div'), tk = {}, tws = null, tid = null;
+tc.className = 'card tankcard';
+var TN = ['Fuel', 'Fresh water', 'Gray water', 'Live well', 'Oil', 'Black water'];
+function row(n, p, c, note) { return '<div class="tk"><div class="n">' + n + '</div><div class="b"><i style="width:' + (p == null ? 0 : p) + '%;background:' + c + '"></i></div><div class="p">' + (p == null ? '--' : Math.round(p) + '%') + '</div></div>'; }
+function tkShow() {
+var ks = Object.keys(tk).filter(function (k) { return tk[k].lv != null && tk[k].ft !== 5; }).sort(function (a, b) { return (tk[a].ft === 1 ? 0 : 1) - (tk[b].ft === 1 ? 0 : 1) || a - b; });
+var h = '<div class="label"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>Tanks' + (ks.length ? '' : '<span class="tkw">waiting for GX</span>') + '</div>';
+if (!ks.length) h += row('Fresh water', null, '#3da5ff') + row('Gray water', null, '#a3afbd');
+else h += ks.map(function (k) {
+var t = tk[k], p = Math.max(0, Math.min(100, t.lv)), fresh = t.ft === 1 || t.ft === 0, c;
+c = fresh ? (p >= 20 ? '#3da5ff' : p >= 10 ? '#ffd34d' : '#ff3b30') : (p >= 90 ? '#ff3b30' : p >= 75 ? '#ffd34d' : '#a3afbd');
+return row(t.nm || TN[t.ft] || 'Tank ' + k, p, c);
+}).join('');
+tc.innerHTML = h;
+}
+tkShow();
+function tkConnect() {
+if (tws && tws.readyState < 2) return;
+var ws;
+try { ws = new WebSocket('wss://192.168.68.120/websocket-mqtt', 'mqtt'); } catch (e) { return; }
+tws = ws; ws.binaryType = 'arraybuffer';
+var send = function (b) { try { ws.send(b); } catch (e) {} };
+ws.onopen = function () {
+send(mqPkt(0x10, mqCat([mqStr('MQTT'), Uint8Array.of(4, 2, 0, 60), mqStr('vdtank' + Math.random().toString(16).slice(2, 8))])));
+var parts = [Uint8Array.of(0, 2)];
+['Level', 'FluidType', 'CustomName'].forEach(function (k) { parts.push(mqStr('N/+/tank/+/' + k)); parts.push(Uint8Array.of(0)); });
+send(mqPkt(0x82, mqCat(parts)));
+var ping = setInterval(function () {
+if (ws.readyState !== 1) { clearInterval(ping); return; }
+send(Uint8Array.of(0xC0, 0)); if (tid) send(mqPkt(0x30, mqStr('R/' + tid + '/keepalive')));
+}, 25000);
+};
+ws.onmessage = function (ev) {
+var u = new Uint8Array(ev.data), i = 0;
+while (i < u.length) {
+var type = u[i] >> 4, n = 0, m = 1, j = i + 1, b;
+do { b = u[j++]; n += (b & 127) * m; m *= 128; } while (b & 128);
+if (type === 3) {
+var tl = (u[j] << 8) | u[j + 1], topic = new TextDecoder().decode(u.slice(j + 2, j + 2 + tl)), k = j + 2 + tl;
+if (((u[i] >> 1) & 3) > 0) k += 2;
+try {
+var v = JSON.parse(new TextDecoder().decode(u.slice(k, j + n))).value, p = topic.split('/');
+if (!tid) { tid = p[1]; send(mqPkt(0x30, mqStr('R/' + tid + '/keepalive'))); }
+if (v != null && p[2] === 'tank') {
+var t = tk[p[3]] || (tk[p[3]] = {});
+if (p[4] === 'Level') t.lv = Number(v); else if (p[4] === 'FluidType') t.ft = Number(v); else if (p[4] === 'CustomName') t.nm = String(v);
+tkShow();
+}
+} catch (e) {}
+}
+i = j + n;
+}
+};
+}
+var bs = $('bStatus'), bsOld = bs.onclick;
+bs.onclick = function () { if (bsOld) bsOld.apply(this, arguments); if (mq.matches) tkConnect(); };
+var LOGO = 'url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%2712%27 fill=%27%231ed760%27/%3E%3Cg fill=%27none%27 stroke=%27%23000%27 stroke-width=%272%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M5.5 8.6c4-1.2 9-.9 13 1.5%27/%3E%3Cpath d=%27M6.3 12.3c3.4-1 7.2-.6 10.4 1.3%27/%3E%3Cpath d=%27M7.2 15.8c2.8-.8 5.4-.5 7.6.9%27/%3E%3C/g%3E%3C/svg%3E")';
+var st = D.createElement('style');
+st.textContent =
+'html.camp body{height:100vh;height:100dvh;min-height:0;overflow:hidden;padding:8px 10px;touch-action:auto}' +
+'html.camp #campGrid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.4fr) minmax(0,1.05fr);gap:10px;height:100%}' +
+'html.camp #campGrid>div{display:flex!important;flex-direction:column;min-height:0;min-width:0;overflow:hidden;position:relative}' +
+'html.camp body>div[id$="Screen"]:not(#campGrid){position:fixed;left:0;top:0;right:0;bottom:0;z-index:90;background:#000;overflow:auto;padding:8px 24px 40px}' +
+'html.camp #spotScreen>.topbar{display:none}' +
+'html.camp #spotScreen #plList{flex:1;min-height:0;overflow:auto}' +
+'html.camp #spotScreen>.card{flex:none;flex-direction:column!important;align-items:stretch!important;padding:12px 14px;margin-bottom:8px!important}' +
+'html.camp #spArt{display:block!important;width:min(100%,30vh)!important;height:auto!important;aspect-ratio:1;margin:0 auto 10px;border-radius:14px!important;background:#0b0f14 ' + LOGO + ' center/34% no-repeat}' +
+'html.camp #spT{font-size:22px!important}html.camp #spT::before{content:"";display:inline-block;width:26px;height:26px;margin-right:10px;vertical-align:-5px;background:' + LOGO + ' center/contain no-repeat}' +
+'html.camp #spA{font-size:16px!important}' +
+'html.camp #spCtl button{width:62px!important;height:58px!important}html.camp #spCtl svg{transform:scale(1.3)}' +
+'html.camp .speedrow,html.camp #tempCard,html.camp #wxCard,html.camp .tripcard,html.camp #mainScreen .grid>.card:not(.locrow):not(.battcard):not(.tankcard){display:none!important}' +
+'html.camp #mainScreen>a[href^="https://192"]{top:auto;bottom:2px;left:2px;width:40px;height:22px;padding:0}' +
+'html.camp #mainScreen .grid{display:flex;flex-direction:column;gap:8px;flex:none}' +
+'html.camp #mainScreen .battcard{order:1!important;padding:14px 18px 16px;position:relative}' +
+'html.camp #mainScreen .battcard .label{font-size:20px}' +
+'html.camp #mainScreen .battcard .bstat{font-size:17px;top:14px;right:18px}' +
+'html.camp .batt-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 10px;margin-top:10px}' +
+'html.camp .batt-row .bsoc{grid-column:1/3;width:auto;min-width:0;flex-wrap:wrap;gap:6px 14px}' +
+'html.camp .batt-row .bsoc .v{width:auto;font-size:84px;letter-spacing:-2px}' +
+'html.camp .batt-row .bsoc svg{width:56px;height:56px}' +
+'html.camp .batt-row .socbar{flex-basis:100%;width:100%;height:28px;border-radius:14px}' +
+'html.camp .batt-row .socbar .fill{border-radius:12px}' +
+'html.camp .batt-row .bamp,html.camp .batt-row .bpow{width:auto;min-width:0;justify-content:flex-start;gap:6px;background:#0b0f14;border-radius:12px;padding:8px 10px}' +
+'html.camp .batt-row .bamp .v,html.camp .batt-row .bpow .v{font-size:42px}' +
+'html.camp .batt-row .bamp .u,html.camp .batt-row .bpow .u{font-size:20px}' +
+'html.camp .batt-row .bamp svg,html.camp .batt-row .bpow svg{width:26px;height:26px}' +
+'html.camp .tankcard{order:2!important;padding:10px 16px 12px}' +
+'html.camp .tankcard .label{font-size:18px}html.camp .tankcard .tkw{float:right;font-size:12px;letter-spacing:0;text-transform:none;color:#7f8fa3;margin-top:3px}' +
+'html.camp .tk{display:grid;grid-template-columns:118px 1fr 72px;align-items:center;gap:10px;margin-top:7px}' +
+'html.camp .tk .n{font-size:16px;color:#cfd8e3}' +
+'html.camp .tk .b{height:20px;border-radius:10px;background:#2b3542;overflow:hidden}' +
+'html.camp .tk .b i{display:block;height:100%;width:0;border-radius:10px;transition:width .4s,background .4s}' +
+'html.camp .tk .p{font-size:30px;font-weight:700;text-align:right;line-height:1}' +
+'html.camp #mainScreen .locrow{order:4!important}' +
+'html.camp #cAlt{font-size:18px;font-weight:600;color:#cfd8e3;white-space:nowrap}' +
+'html.camp #mainScreen .vmap{flex:1;height:auto;min-height:140px;margin-top:8px}' +
+'html.camp #mainScreen #status{display:none}' +
+'html.camp #weatherScreen{overflow:hidden}' +
+'html.camp #weatherScreen>.topbar,html.camp #weatherScreen>.nowline,html.camp #weatherScreen>.card:has(#vdRC2){display:none!important}' +
+'html.camp #weatherScreen>.section-title{margin:0 4px 4px;flex:none}' +
+'html.camp #cwBox{position:relative;display:flex;align-items:center;gap:6px;padding:10px 14px;margin-bottom:8px;flex:none}' +
+'html.camp #cwL{flex:none;width:200px;text-align:left}' +
+'html.camp #cwL #wLiveLbl{text-align:left;font-size:11px}' +
+'html.camp #cwL #wCity{font-size:22px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none}' +
+'html.camp #cwL #wTemp{font-size:62px;line-height:1.05;text-align:left}' +
+'html.camp #cwL #vd4Up{text-align:left;margin:2px 0 0}' +
+'html.camp #cwBox #wBox1{flex:1;min-width:0;border:none!important;background:none!important;padding:0!important;margin:34px 0 0!important;gap:8px!important}' +
+'html.camp #weatherScreen>div:empty{display:none}' +
+'html.camp #cwBox #srchBtn2{top:4px!important;right:4px!important;width:44px!important;height:44px!important}' +
+'html.camp #cwBox #wLiveArrow{top:4px!important;right:46px!important;width:44px!important;height:44px!important}' +
+'html.camp #weatherScreen>#wBox2{flex:none;margin-bottom:8px!important;padding:10px 14px!important}' +
+'html.camp #weatherScreen #forecast{flex:none;padding:0 14px}html.camp #weatherScreen .day{padding:4px 0}' +
+'html.camp #weatherScreen>.card:has(.sunrow){flex:none;margin-top:8px;padding:10px 14px}' +
+'html.camp .sunrow .t{font-size:24px}html.camp .sunrow svg{width:42px;height:32px}';
+D.head.appendChild(st);
+function mv(el, to, before) { if (!el) return; moved.push([el, el.parentNode, el.nextSibling]); if (before) to.insertBefore(el, before); else to.appendChild(el); }
+function restore() { while (moved.length) { var m = moved.pop(); if (m[1]) m[1].insertBefore(m[0], m[2] && m[2].parentNode === m[1] ? m[2] : null); } }
+var cw = null, altT = 0;
+function enter() {
+if (!grid) {
+grid = D.createElement('div'); grid.id = 'campGrid';
+var first = $('mainScreen'); first.parentNode.insertBefore(grid, first);
+ids.forEach(function (i) { grid.appendChild($(i)); });
+}
+on = true; D.documentElement.classList.add('camp');
+['spotScreen', 'weatherScreen', 'mainScreen'].forEach(function (i) { $(i).classList.remove('hidden'); });
+var ws = $('weatherScreen');
+if (!cw) {
+cw = D.createElement('div'); cw.id = 'cwBox'; cw.className = 'card';
+var l = D.createElement('div'); l.id = 'cwL'; cw.appendChild(l);
+}
+if (!cw.parentNode) {
+ws.insertBefore(cw, ws.firstChild);
+var l2 = $('cwL');
+mv($('wLiveLbl'), l2); mv($('wCity'), l2); mv($('wTemp'), l2); mv($('vd4Up'), l2);
+mv($('wBox1'), cw); mv($('srchBtn2'), cw); mv($('wLiveArrow'), cw);
+var sc = $('mainScreen').querySelector('.sunrow'); sc = sc && sc.closest('.card');
+mv(sc, ws);
+var g = $('mainScreen').querySelector('.grid'); mv(tc, g);
+var lr = $('mainScreen').querySelector('.locrow'), ca = D.createElement('div'); ca.id = 'cAlt'; ca.className = 'hidden';
+if (lr) { lr.insertBefore(ca, $('cityRef')); }
+}
+tkShow();
+clearInterval(altT);
+altT = setInterval(function () {
+var a = $('alt'), c = $('cAlt'); if (!a || !c) return;
+var t = a.textContent.trim(); c.classList.toggle('hidden', t === '--'); c.textContent = '▲ ' + t + ' ft';
+}, 1500);
+setTimeout(function () { W.dispatchEvent(new Event('resize')); }, 60);
+}
+function leave() {
+on = false; D.documentElement.classList.remove('camp'); clearInterval(altT);
+restore(); tc.parentNode && tc.parentNode.removeChild(tc); cw && cw.parentNode && cw.parentNode.removeChild(cw);
+var ca = $('cAlt'); if (ca) ca.parentNode.removeChild(ca);
+if (grid) grid.style.display = 'contents';
+var m = $('mainScreen'), w = $('weatherScreen'), s = $('spotScreen');
+w.classList.add('hidden'); s.classList.add('hidden'); m.classList.remove('hidden');
+W.dispatchEvent(new Event('resize'));
+}
+var mo = W.MutationObserver ? new MutationObserver(function () { if (on) ids.forEach(function (i) { var e = $(i); if (e && e.classList.contains('hidden')) e.classList.remove('hidden'); }); }) : null;
+if (mo) ids.forEach(function (i) { mo.observe($(i), { attributes: true, attributeFilter: ['class'] }); });
+function chk() { if (mq.matches) { if (grid) grid.style.display = ''; enter(); } else if (on) leave(); }
+if (mq.addEventListener) mq.addEventListener('change', chk); else if (mq.addListener) mq.addListener(chk);
+chk();
+}
+function go() { try { init(); } catch (e) {} }
+if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('load', function () { setTimeout(go, 0); });
+})();
+/* rev 259 camp layout: replaced by the rev 260 code above and switched off */
 (function () {
 var D = document, W = window;
 function init() {
@@ -3398,7 +3737,7 @@ function chk() { if (mq.matches) { if (grid) grid.style.display = ''; enter(); }
 if (mq.addEventListener) mq.addEventListener('change', chk); else if (mq.addListener) mq.addListener(chk);
 chk();
 }
-function go() { try { init(); } catch (e) {} }
+function go() {}
 if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('load', function () { setTimeout(go, 0); });
 })();
 /* rev 258 and earlier: weather map picker, then Topo layer */
@@ -3626,7 +3965,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     };
   }
 })();
-/* ===== Part 5 (rev 259): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 260): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
