@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 272 -->
+<!-- Van Dash rev 273 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r272</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r273</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,8 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 272): iPad camp layout, weather map picker, Topo layer ===== */
-/* rev 260 (a): one writer for the weather icons and words, day or night, so nothing flickers */
+/* ===== Part 4 (rev 273): iPad camp layout, weather map picker, Topo layer ===== */
 (function () {
 var D = document, W = window;
 var pT = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent'), pH = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
@@ -3310,7 +3309,6 @@ put('wBoxDesc', 't', word);
 setInterval(tick, 400);
 tick();
 })();
-/* rev 260 (b): if the device gives no altitude, use the map's ground elevation for the spot */
 (function () {
 var D = document, mine = null, at = null, busy = 0;
 function dist(a, b, c, d) { var x = (c - a) * 111320, y = (d - b) * 111320 * Math.cos(a * Math.PI / 180); return Math.sqrt(x * x + y * y); }
@@ -3335,7 +3333,6 @@ var sb = el.parentNode && el.parentNode.querySelector('.sub'); if (sb) sb.textCo
 }
 setInterval(tick, 3000);
 })();
-/* rev 260 (c): radar on the big map (camp layout) */
 (function () {
 var D = document, W = window, vm = D.getElementById('vmap');
 if (!vm || typeof vDraw !== 'function') return;
@@ -3422,7 +3419,6 @@ setInterval(ui, 2000);
 if (on) load();
 ui();
 })();
-/* rev 261: sun and moon week table, wind rings fixed with north up (wide layout), softer Spotify art, glossy tank tubes */
 (function () {
 var D = document, W = window;
 function camp() { return D.documentElement.classList.contains('camp'); }
@@ -3498,7 +3494,6 @@ fetch('https://api.open-meteo.com/v1/forecast?latitude=' + p.latitude + '&longit
 setInterval(tick, 2500);
 })();
 
-/* hourly night icons: moon instead of sun after sunset / before sunrise */
 (function () {
 function hrs(id) { var t = ($(id) && $(id).textContent) || '', x = /(\d+):(\d+)\s*([AP]M)/i.exec(t); if (!x) return null; return (+x[1] % 12) + (/p/i.test(x[3]) ? 12 : 0) + x[2] / 60; }
 setInterval(function () {
@@ -3517,223 +3512,249 @@ else if (t.indexOf('🌤') > -1 || t.indexOf('⛅') > -1) ic.innerHTML = window.
 });
 }, 500);
 })();
-/* rev 272: auto connect, Spotify resume, protected area name, keep awake */
-(function () {
-const D = document, W = window, F = W.fetch, API = 'https://api.spotify.com/v1/me/player', Q = i => D.getElementById(i), LS = localStorage;
-let wl = null;
-const aw = () => { if (navigator.wakeLock && !D.hidden && !(wl && !wl.released)) navigator.wakeLock.request('screen').then(l => { wl = l; }).catch(() => {}); };
-aw(); setInterval(aw, 15000); D.addEventListener('visibilitychange', aw); D.addEventListener('touchstart', aw, { passive: true });
-const gx = r => { const b = Q('bStatus'); if (b && !D.hidden && r.test(b.textContent)) b.click(); };
-setTimeout(() => gx(/^GX: tap/), 1500); setInterval(() => gx(/^GX: (tap|refused|no answer)/), 8000);
-const tk = () => { try { return JSON.parse(LS.getItem('vdSp')).a; } catch (e) { return null; } };
-const sp = (m, p, b) => { const a = tk(); return a ? F(API + p, { method: m, headers: { Authorization: 'Bearer ' + a, 'Content-Type': 'application/json' }, body: b && JSON.stringify(b) }) : Promise.reject(); };
-const tr = (body, r0) => sp('GET', '/devices').then(x => x.json()).then(j => {
-const d = j.devices || [], id = LS.getItem('vdSpDev'), t = d.find(x => x.id == id) || d.find(x => x.is_active) || d[0];
-return t ? sp('PUT', '', { device_ids: [t.id], play: !body }).then(y => y.ok ? (body ? sp('PUT', '/play?device_id=' + t.id, body) : y) : r0) : r0;
-}).catch(() => r0);
-W.fetch = function (u, o) {
-const p = F.apply(this, arguments), s = String(u);
-if (o && o.method == 'PUT' && /me\/player\/play$/.test(s)) return p.then(r => r.status == 404 ? tr(null, r).then(x => x.ok ? new Response(null, { status: 204 }) : r) : r);
-if (/me\/player$/.test(s)) p.then(r => r.status == 200 && r.clone().json().then(j => j.device && LS.setItem('vdSpDev', j.device.id))).catch(() => {});
-return p;
+/* rev 273 */
+(function(){
+const D=document,Q=i=>D.getElementById(i),R=()=>{try {vResize();} catch (e){}},vm=Q('vmap');
+let t=0;
+if (vm&&window.ResizeObserver) new ResizeObserver(()=>{clearTimeout(t);t=setTimeout(R,80);}).observe(vm);
+const st=D.createElement('style');
+st.textContent='html.camp .tankcard .tkw{float:right;font-size:12px;letter-spacing:0;text-transform:none;color:#7f8fa3;margin:3px 0 0 8px}#spO{position:absolute;left:0;right:0;top:-12px;height:30px;touch-action:none;z-index:2}';
+setTimeout(()=>D.head.appendChild(st),500);
+const f=Q('spFill'),w=f&&f.parentNode.parentNode;
+if (!w) return;
+w.style.position='relative';
+const o=D.createElement('div');
+o.id='spO';
+w.appendChild(o);
+let dg=0,fr=0;
+const ms=()=>{const m=(Q('spDur').textContent||'0:0').split(':');return (m[0] * 60 + +m[1]) * 1000;},
+mv=e=>{const r=o.getBoundingClientRect(),s=Math.round((fr=Math.max(0,Math.min(1,(e.clientX - r.left) / r.width))) * ms() / 1000);f.style.width=fr * 100 + '%';Q('spCur').textContent=Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2);};
+o.onpointerdown=e=>{if (!ms()) return;dg=1;o.setPointerCapture(e.pointerId);mv(e);};
+o.onpointermove=e=>{if (dg) mv(e);};
+o.onpointerup=o.onpointercancel=()=>{
+if (!dg) return;dg=0;
+let a;try {a=JSON.parse(localStorage.getItem('vdSp')).a;} catch (e){}
+if (a) fetch('https://api.spotify.com/v1/me/player/seek?position_ms=' + Math.round(fr * ms()),{method:'PUT',headers:{Authorization:'Bearer ' + a}}).then(()=>setTimeout(()=>D.dispatchEvent(new Event('visibilitychange')),400)).catch(()=>{});
 };
-D.addEventListener('click', e => {
-const a = e.target.closest && e.target.closest('a.plrow'), m = a && a.getAttribute('href').match(/spotify\.com\/(\w+)\/(\w+)/);
-if (!m || !tk()) return;
-e.preventDefault();
-const b = { context_uri: 'spotify:' + m[1] + ':' + m[2] };
-sp('PUT', '/play', b).then(r => r.status == 404 ? tr(b, r) : r).then(r => r.ok || (location.href = a.href)).catch(() => { location.href = a.href; });
-}, true);
-const ld = Q('city'), tn = D.createElement('div');
-let act = null, lq = null, lt = 0;
-tn.style.cssText = 'display:none;font-size:12px;color:#9fb0c3;margin-top:1px;line-height:1.2';
-if (ld) ld.parentNode.appendChild(tn);
-const show = a => {
-act = a;
-if (!ld) return;
-ld.classList.toggle('pa', !!a); tn.style.display = a && a.t ? 'block' : 'none';
-if (a) { ld.textContent = a.n; tn.textContent = 'Nearest town: ' + a.t; } else { try { ld.textContent = cityName; } catch (e) {} }
-};
-if (ld) new MutationObserver(() => { if (act && ld.textContent != act.n) ld.textContent = act.n; }).observe(ld, { childList: true, characterData: true, subtree: true });
-const hv = (a, b, c, d) => { const r = Math.PI / 180, x = Math.sin((c - a) * r / 2), y = Math.sin((d - b) * r / 2); return 7918 * Math.asin(Math.sqrt(x * x + Math.cos(a * r) * Math.cos(c * r) * y * y)); };
-const ov = q => F('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent('[out:json][timeout:25];' + q)).then(r => r.json()).then(j => j.elements || []);
-const ar = e => e.bounds ? (e.bounds.maxlat - e.bounds.minlat) * (e.bounds.maxlon - e.bounds.minlon) : 9;
-const look = (la, lo) => {
-const f = '["boundary"~"^(national_park|protected_area)$"]["name"]["protect_class"!~"^(7|97|98|99)$"]', c = la + ',' + lo;
-return ov('is_in(' + c + ')->.a;(rel(pivot.a)' + f + ';way(pivot.a)' + f + ';)->.i;(rel(around:1600,' + c + ')' + f + ';way(around:1600,' + c + ')' + f + ';)->.n;.i out tags bb;.i out count;.n out tags bb;').then(el => {
-let k = 0; const i = [], n = [];
-el.forEach(e => e.type == 'count' ? k = 1 : (k ? n : i).push(e));
-const l = (i.length ? i : n).sort((x, y) => ar(x) - ar(y));
-if (!l.length) return null;
-return ov('node(around:70000,' + c + ')[place~"^(city|town)$"];out;').then(t => {
-let b = null, d = 1e9;
-t.forEach(x => { const z = hv(la, lo, x.lat, x.lon); if (z < d) { d = z; b = x; } });
-return { n: l[0].tags.name, t: b ? b.tags.name + ', ' + Math.round(d) + ' mi' : '' };
-});
-});
-};
-const loc = () => {
-let la, lo; try { la = vGLat; lo = vGLon; } catch (e) {}
-if (la == null || D.hidden || Date.now() - lt < 60000 || (lq && hv(lq[0], lq[1], la, lo) < 0.5 && Date.now() - lt < 600000)) return;
-lt = Date.now(); lq = [la, lo];
-look(la, lo).then(a => { LS.setItem('vdArea', JSON.stringify(a)); show(a); }).catch(() => { lq = null; });
-};
-try { const c0 = JSON.parse(LS.getItem('vdArea')); if (c0) setTimeout(() => show(c0), 1200); } catch (e) {}
-setInterval(loc, 20000); setTimeout(loc, 4000);
-const st = D.createElement('style');
-st.textContent = '#city.pa{font-size:15px!important;line-height:1.15;white-space:normal}.loctext{min-width:0;flex:1}html.camp #wBoxDesc{white-space:nowrap!important;margin:0 -16px!important;position:relative;top:8px}html.camp #cwBox #wBox1>div:first-child{margin-left:clamp(0px,1.4vw,22px)!important}';
-setTimeout(() => D.head.appendChild(st), 500);
 })();
-/* rev 271: Spotify shuffle and repeat, 15 sec size, bigger art */
-(function () {
-var D = document, ctl = D.getElementById('spCtl'), pv = D.getElementById('spPrev');
-if (!ctl || !pv) return;
-var sh = false, rp = 'off', lk = 0;
-function put(p) { var a = null; try { a = JSON.parse(localStorage.getItem('vdSp')).a; } catch (e) {} if (a) fetch('https://api.spotify.com/v1/me/player/' + p, { method: 'PUT', headers: { Authorization: 'Bearer ' + a } }).catch(function () {}); }
-function mk(id, d) { var b = D.createElement('button'); b.id = id; b.className = 'spx'; b.style.cssText = pv.getAttribute('style'); b.innerHTML = '<svg viewBox="0 0 24 24">' + d + '</svg><span class="spn">1</span>'; return b; }
-var b1 = mk('spShuf', '<path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>'), b2 = mk('spRep', '<path d="M17 2l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/>');
-ctl.insertBefore(b1, ctl.firstChild); ctl.appendChild(b2);
-function paint() { b1.style.color = sh ? '#ff8a2b' : '#5f7288'; b2.style.color = rp != 'off' ? '#ff8a2b' : '#5f7288'; b2.lastChild.style.display = rp == 'track' ? 'flex' : 'none'; }
-paint();
-b1.onclick = function () { sh = !sh; lk = Date.now() + 3000; paint(); put('shuffle?state=' + sh); };
-b2.onclick = function () { rp = rp == 'off' ? 'context' : rp == 'context' ? 'track' : 'off'; lk = Date.now() + 3000; paint(); put('repeat?state=' + rp); };
-var F = window.fetch;
-window.fetch = function (u) {
-var p = F.apply(this, arguments);
-try { if (/me\/player$/.test(String(u))) p.then(function (r) { if (r.status === 200) r.clone().json().then(function (j) { if (j && j.shuffle_state != null && Date.now() > lk) { sh = j.shuffle_state; rp = j.repeat_state || 'off'; paint(); } }).catch(function () {}); }).catch(function () {}); } catch (e) {}
+/* rev 272 */
+(function(){
+const D=document,W=window,F=W.fetch,API='https://api.spotify.com/v1/me/player',Q=i=>D.getElementById(i),LS=localStorage;
+let wl=null;
+const aw=()=>{if (navigator.wakeLock&&!D.hidden&&!(wl&&!wl.released)) navigator.wakeLock.request('screen').then(l=>{wl=l;}).catch(()=>{});};
+aw(); setInterval(aw,15000); D.addEventListener('visibilitychange',aw); D.addEventListener('touchstart',aw,{passive: true});
+const gx=r=>{const b=Q('bStatus'); if (b&&!D.hidden&&r.test(b.textContent)) b.click();};
+setTimeout(()=>gx(/^GX: tap/),1500); setInterval(()=>gx(/^GX: (tap|refused|no answer)/),8000);
+const tk=()=>{try {return JSON.parse(LS.getItem('vdSp')).a;} catch (e){return null;}};
+const sp=(m,p,b)=>{const a=tk(); return a?F(API + p,{method: m,headers: {Authorization: 'Bearer ' + a,'Content-Type': 'application/json'},body: b&&JSON.stringify(b)}):Promise.reject();};
+const tr=(body,r0)=>sp('GET','/devices').then(x=>x.json()).then(j=>{
+const d=j.devices||[],id=LS.getItem('vdSpDev'),t=d.find(x=>x.id==id)||d.find(x=>x.is_active)||d[0];
+return t?sp('PUT','',{device_ids: [t.id],play: !body}).then(y=>y.ok?(body?sp('PUT','/play?device_id=' + t.id,body):y):r0):r0;
+}).catch(()=>r0);
+W.fetch=function(u,o){
+const p=F.apply(this,arguments),s=String(u);
+if (o&&o.method=='PUT'&&/me\/player\/play$/.test(s)) return p.then(r=>r.status==404?tr(null,r).then(x=>x.ok?new Response(null,{status: 204}):r):r);
+if (/me\/player$/.test(s)) p.then(r=>r.status==200&&r.clone().json().then(j=>j.device&&LS.setItem('vdSpDev',j.device.id))).catch(()=>{});
 return p;
 };
-var E = 0;
-setInterval(function () {
-var art = D.getElementById('spArt'), pl = D.getElementById('plList'), par = art && art.parentNode;
-if (!par || !pl || !D.documentElement.classList.contains('camp') || art.style.display === 'none') return;
-var cs = getComputedStyle(par), cap = par.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), B = Math.min(cap, innerHeight * 0.2);
-var ne = Math.max(0, Math.min(cap - B, (pl.clientHeight - pl.scrollHeight + E) / 2));
-if (Math.abs(ne - E) > 3) { E = ne; art.style.setProperty('width', (B + E) + 'px', 'important'); }
-}, 700);
-var st = D.createElement('style');
+D.addEventListener('click',e=>{
+const a=e.target.closest&&e.target.closest('a.plrow'),m=a&&a.getAttribute('href').match(/spotify\.com\/(\w+)\/(\w+)/);
+if (!m||!tk()) return;
+e.preventDefault();
+const b={context_uri: 'spotify:' + m[1] + ':' + m[2]};
+sp('PUT','/play',b).then(r=>r.status==404?tr(b,r):r).then(r=>r.ok||(location.href=a.href)).catch(()=>{location.href=a.href;});
+},true);
+const ld=Q('city'),tn=D.createElement('div');
+let act=null,lq=null,lt=0;
+tn.style.cssText='display:none;font-size:12px;color:#9fb0c3;margin-top:1px;line-height:1.2';
+if (ld) ld.parentNode.appendChild(tn);
+const show=a=>{
+act=a;
+if (!ld) return;
+ld.classList.toggle('pa',!!a); tn.style.display=a&&a.t?'block':'none';
+if (a){ld.textContent=a.n; tn.textContent='Nearest town: ' + a.t;} else {try {ld.textContent=cityName;} catch (e){}}
+};
+if (ld) new MutationObserver(()=>{if (act&&ld.textContent!=act.n) ld.textContent=act.n;}).observe(ld,{childList: true,characterData: true,subtree: true});
+const hv=(a,b,c,d)=>{const r=Math.PI / 180,x=Math.sin((c - a) * r / 2),y=Math.sin((d - b) * r / 2); return 7918 * Math.asin(Math.sqrt(x * x + Math.cos(a * r) * Math.cos(c * r) * y * y));};
+const ov=q=>F('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent('[out:json][timeout:25];' + q)).then(r=>r.json()).then(j=>j.elements||[]);
+const ar=e=>e.bounds?(e.bounds.maxlat - e.bounds.minlat) * (e.bounds.maxlon - e.bounds.minlon):9;
+const look=(la,lo)=>{
+const f='["boundary"~"^(national_park|protected_area)$"]["name"]["protect_class"!~"^(7|97|98|99)$"]',c=la + ',' + lo;
+return ov('is_in(' + c + ')->.a;(rel(pivot.a)' + f + ';way(pivot.a)' + f + ';)->.i;(rel(around:1600,' + c + ')' + f + ';way(around:1600,' + c + ')' + f + ';)->.n;.i out tags bb;.i out count;.n out tags bb;').then(el=>{
+let k=0; const i=[],n=[];
+el.forEach(e=>e.type=='count'?k=1:(k?n:i).push(e));
+const l=(i.length?i:n).sort((x,y)=>ar(x) - ar(y));
+if (!l.length) return null;
+return ov('node(around:70000,' + c + ')[place~"^(city|town)$"];out;').then(t=>{
+let b=null,d=1e9;
+t.forEach(x=>{const z=hv(la,lo,x.lat,x.lon); if (z<d){d=z; b=x;}});
+return {n: l[0].tags.name,t: b?b.tags.name + ', ' + Math.round(d) + ' mi':''};
+});
+});
+};
+const loc=()=>{
+let la,lo; try {la=vGLat; lo=vGLon;} catch (e){}
+if (la==null||D.hidden||Date.now() - lt<60000||(lq&&hv(lq[0],lq[1],la,lo)<0.5&&Date.now() - lt<600000)) return;
+lt=Date.now(); lq=[la,lo];
+look(la,lo).then(a=>{LS.setItem('vdArea',JSON.stringify(a)); show(a);}).catch(()=>{lq=null;});
+};
+try {const c0=JSON.parse(LS.getItem('vdArea')); if (c0) setTimeout(()=>show(c0),1200);} catch (e){}
+setInterval(loc,20000); setTimeout(loc,4000);
+const st=D.createElement('style');
+st.textContent='#city.pa{font-size:15px!important;line-height:1.15;white-space:normal}.loctext{min-width:0;flex:1}html.camp #wBoxDesc{white-space:nowrap!important;margin:0 -16px!important;position:relative;top:8px}html.camp #cwBox #wBox1>div:first-child{margin-left:clamp(0px,1.4vw,22px)!important}';
+setTimeout(()=>D.head.appendChild(st),500);
+})();
+/* rev 271 */
+(function(){
+var D=document,ctl=D.getElementById('spCtl'),pv=D.getElementById('spPrev');
+if (!ctl||!pv) return;
+var sh=false,rp='off',lk=0;
+function put(p){var a=null; try {a=JSON.parse(localStorage.getItem('vdSp')).a;} catch (e){} if (a) fetch('https://api.spotify.com/v1/me/player/' + p,{method: 'PUT',headers: {Authorization: 'Bearer ' + a}}).catch(function(){});}
+function mk(id,d){var b=D.createElement('button'); b.id=id; b.className='spx'; b.style.cssText=pv.getAttribute('style'); b.innerHTML='<svg viewBox="0 0 24 24">' + d + '</svg><span class="spn">1</span>'; return b;}
+var b1=mk('spShuf','<path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>'),b2=mk('spRep','<path d="M17 2l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/>');
+ctl.insertBefore(b1,ctl.firstChild); ctl.appendChild(b2);
+function paint(){b1.style.color=sh?'#ff8a2b':'#5f7288'; b2.style.color=rp!='off'?'#ff8a2b':'#5f7288'; b2.lastChild.style.display=rp=='track'?'flex':'none';}
+paint();
+b1.onclick=function(){sh=!sh; lk=Date.now() + 3000; paint(); put('shuffle?state=' + sh);};
+b2.onclick=function(){rp=rp=='off'?'context':rp=='context'?'track':'off'; lk=Date.now() + 3000; paint(); put('repeat?state=' + rp);};
+var F=window.fetch;
+window.fetch=function(u){
+var p=F.apply(this,arguments);
+try {if (/me\/player$/.test(String(u))) p.then(function(r){if (r.status===200) r.clone().json().then(function(j){if (j&&j.shuffle_state!=null&&Date.now()>lk){sh=j.shuffle_state; rp=j.repeat_state||'off'; paint();}}).catch(function(){});}).catch(function(){});} catch (e){}
+return p;
+};
+var E=0;
+setInterval(function(){
+var art=D.getElementById('spArt'),pl=D.getElementById('plList'),par=art&&art.parentNode;
+if (!par||!pl||!D.documentElement.classList.contains('camp')||art.style.display==='none') return;
+var cs=getComputedStyle(par),cap=par.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight),B=Math.min(cap,innerHeight * 0.2);
+var ne=Math.max(0,Math.min((cap - B) / 2,pl.clientHeight - pl.scrollHeight + E));
+if (Math.abs(ne - E)>3){E=ne; art.style.setProperty('width',(B + E) + 'px','important');}
+},700);
+var st=D.createElement('style');
 st.textContent =
 '#spCtl .spx{display:none!important}html.camp #spCtl .spx{display:block!important;color:#5f7288}' +
 'html.camp #spCtl button:not(#spPlay){flex:1 1 0!important;width:auto!important;min-width:0!important}html.camp #spCtl #spPlay{flex:none!important;width:52px!important}html.camp #spPlay svg{width:50px!important;height:50px!important}' +
 'html.camp #spPrev svg,html.camp #spNext svg{width:36px!important;height:36px!important}html.camp #spBack svg,html.camp #spFwd svg{width:33px!important;height:33px!important}html.camp #spBack span,html.camp #spFwd span{font-size:9px!important}' +
 '#spCtl .spx svg{display:block;margin:auto;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}#spCtl .spn{position:absolute;left:0;right:0;top:0;bottom:0;display:none;align-items:center;justify-content:center;font-size:9px;font-weight:700}';
-setTimeout(function () { D.head.appendChild(st); }, 500);
+setTimeout(function(){D.head.appendChild(st);},500);
 })();
-/* rev 270: round battery gauge, slimmer tanks */
-(function () {
-var D = document, card = D.querySelector('.battcard');
+/* rev 270 */
+(function(){
+var D=document,card=D.querySelector('.battcard');
 if (!card) return;
-var d = 'M40.6 159.4A84 84 0 1 1 159.4 159.4', I = 'fill="none" stroke-width="13" stroke-linecap="round" pathLength="100"';
-var box = D.createElement('div'); box.id = 'bgDial';
-box.innerHTML = '<div class="bgw"><svg viewBox="0 8 200 172"><defs><linearGradient id="bgG" gradientUnits="userSpaceOnUse" x1="16" y1="0" x2="184" y2="0"><stop offset="0" stop-color="#ff3b30"/><stop offset=".5" stop-color="#ffd34d"/><stop offset="1" stop-color="#4cd964"/></linearGradient></defs><path d="' + d + '" ' + I + ' stroke="#2b3542"/><path id="bgF" d="' + d + '" ' + I + ' stroke="url(#bgG)" style="stroke-dasharray:0 100;transition:stroke-dasharray .5s"/><text x="40" y="177" text-anchor="middle" font-size="11" fill="#7f8fa3">E</text><text x="160" y="177" text-anchor="middle" font-size="11" fill="#7f8fa3">F</text></svg><div class="bgc"><div id="bgP">--</div><div id="bgS"></div><div id="bgV"></div></div></div>' +
+var d='M40.6 159.4A84 84 0 1 1 159.4 159.4',I='fill="none" stroke-width="13" stroke-linecap="round" pathLength="100"';
+var box=D.createElement('div'); box.id='bgDial';
+box.innerHTML='<div class="bgw"><svg viewBox="0 8 200 172"><defs><linearGradient id="bgG" gradientUnits="userSpaceOnUse" x1="16" y1="0" x2="184" y2="0"><stop offset="0" stop-color="#ff3b30"/><stop offset=".5" stop-color="#ffd34d"/><stop offset="1" stop-color="#4cd964"/></linearGradient></defs><path d="' + d + '" ' + I + ' stroke="#2b3542"/><path id="bgF" d="' + d + '" ' + I + ' stroke="url(#bgG)" style="stroke-dasharray:0 100;transition:stroke-dasharray .5s"/><text x="40" y="177" text-anchor="middle" font-size="11" fill="#7f8fa3">E</text><text x="160" y="177" text-anchor="middle" font-size="11" fill="#7f8fa3">F</text></svg><div class="bgc"><div id="bgP">--</div><div id="bgS"></div><div id="bgV"></div></div></div>' +
 '<div class="bgb"><div class="bgx"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span id="bgA">--</span><i>A</i></div><div class="bgx"><svg viewBox="0 0 24 24"><path d="M9 3v5M15 3v5"/><path d="M6 8h12v3a6 6 0 0 1-12 0z"/><path d="M12 17v4"/></svg><span id="bgW">--</span><i>W</i></div></div>';
-card.insertBefore(box, card.querySelector('.batt-row'));
-function g(i) { return D.getElementById(i); }
-function up() {
-var p = parseFloat((g('bSoc') || {}).textContent), ok = !isNaN(p), P = g('bgP'), f = g('bgF'), t = g('wTemp');
-P.innerHTML = ok ? Math.round(p) + '<span>%</span>' : '--';
-f.style.opacity = ok && p > 0 ? 1 : 0; f.style.strokeDasharray = (ok ? Math.max(0, Math.min(100, p)) : 0) + ' 100';
-if (t) P.style.fontWeight = getComputedStyle(t).fontWeight;
-g('bgA').textContent = (g('bAmps') || {}).textContent; g('bgW').textContent = (g('bWatts') || {}).textContent;
-var b = g('bStatus'), s = b ? b.textContent : '', live = /live/.test(s), a = s.split(' • '), S = g('bgS');
-S.textContent = live && a.length > 2 ? a[0] : ''; S.style.color = /^Charg/.test(S.textContent) ? '#4cd964' : /^Disch/.test(S.textContent) ? '#ff8a2b' : '#9fb0c3';
-g('bgV').textContent = live ? (s.match(/[\d.]+ V/) || [''])[0] : '';
-if (b) b.style.visibility = live ? 'hidden' : '';
+card.insertBefore(box,card.querySelector('.batt-row'));
+function g(i){return D.getElementById(i);}
+function up(){
+var p=parseFloat((g('bSoc')||{}).textContent),ok=!isNaN(p),P=g('bgP'),f=g('bgF'),t=g('wTemp');
+P.innerHTML=ok?Math.round(p) + '<span>%</span>':'--';
+f.style.opacity=ok&&p>0?1:0; f.style.strokeDasharray=(ok?Math.max(0,Math.min(100,p)):0) + ' 100';
+if (t) P.style.fontWeight=getComputedStyle(t).fontWeight;
+['bgA:bAmps','bgW:bWatts'].forEach(function(x){x=x.split(':'); var e=g(x[0]),t=(g(x[1])||{}).textContent||''; e.textContent=t; e.style.fontSize=''; for (var z=26; z>11&&e.scrollWidth>e.clientWidth; z--) e.style.fontSize=z + 'px';});
+P.style.fontSize=Math.round(f.ownerSVGElement.parentNode.clientWidth * .295) + 'px';
+var b=g('bStatus'),s=b?b.textContent:'',live=/live/.test(s),a=s.split(' • '),S=g('bgS');
+S.textContent=live&&a.length>2?a[0]:''; S.style.color=/^Charg/.test(S.textContent)?'#4cd964':/^Disch/.test(S.textContent)?'#ff8a2b':'#9fb0c3';
+g('bgV').textContent=live?(s.match(/[\d.]+ V/)||[''])[0]:'';
+if (b) b.style.visibility=live?'hidden':'';
 }
-var mo = new MutationObserver(up);
-['.batt-row', '#bStatus'].forEach(function (q) { var e = D.querySelector(q); if (e) mo.observe(e, { childList: true, subtree: true, characterData: true }); });
-setInterval(up, 2000); up();
-var st = D.createElement('style');
+var mo=new MutationObserver(up);
+['.batt-row','#bStatus'].forEach(function(q){var e=D.querySelector(q); if (e) mo.observe(e,{childList: true,subtree: true,characterData: true});});
+setInterval(up,2000); up();
+var st=D.createElement('style');
 st.textContent =
 '#bgDial{display:none}html.camp #bgDial{display:flex;align-items:center;gap:8px;margin-top:6px}html.camp .battcard .batt-row{display:none!important}' +
-'#bgDial .bgw{position:relative;width:196px;flex:none}#bgDial .bgw>svg{display:block;width:100%;height:auto}' +
+'#bgDial .bgw{position:relative;width:clamp(130px,52%,176px);flex:none}#bgDial .bgw>svg{display:block;width:100%;height:auto}' +
 '#bgDial .bgc{position:absolute;left:0;right:0;top:53.5%;transform:translateY(-50%);text-align:center;line-height:1}' +
-'#bgP{font-size:52px;line-height:1;position:relative;display:inline-block}#bgP span{position:absolute;left:100%;top:.1em;font-size:.45em;color:#cfd8e3}#bgS{font-size:13px;margin-top:6px}#bgV{font-size:13px;color:#9fb0c3;margin-top:3px}' +
+'#bgP{font-size:52px;line-height:1;white-space:nowrap}#bgP span{font-size:.45em;color:#cfd8e3;vertical-align:top;position:relative;top:.12em;margin-left:2px}#bgS{font-size:13px;margin-top:6px}#bgV{font-size:13px;color:#9fb0c3;margin-top:3px}' +
 '#bgDial .bgb{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}' +
-'#bgDial .bgx{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#0b0f14;border-radius:12px;padding:8px 6px;min-height:58px}' +
+'#bgDial .bgx{flex:1;display:flex;align-items:center;gap:5px;background:#0b0f14;border-radius:12px;padding:8px 10px;min-height:58px}' +
 '#bgDial .bgx svg{width:22px;height:22px;flex:none;fill:none;stroke:#ff8a2b;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}' +
-'#bgDial .bgx span{font-size:30px;font-weight:600;line-height:1}#bgDial .bgx i{font-style:normal;font-size:14px;color:#7f8fa3}' +
+'#bgDial .bgx span{flex:1;min-width:0;text-align:right;white-space:nowrap;font-size:26px;font-weight:600;line-height:1}#bgDial .bgx i{font-style:normal;font-size:14px;color:#7f8fa3}' +
 'html.camp .tk{grid-template-columns:112px 1fr 56px!important}html.camp .tk .b{height:18px!important;border-radius:9px!important;margin-right:8px}html.camp .tk .b i{border-radius:9px!important}html.camp .tk .b::after{left:7px!important;right:7px!important;top:2px!important;height:4px!important}html.camp .tk .p{font-size:22px!important;font-weight:500!important}';
-setTimeout(function () { D.head.appendChild(st); }, 500);
+setTimeout(function(){D.head.appendChild(st);},500);
 })();
-/* rev 269: GX setup page, wind forecast in place */
-(function () {
-var D = document, W = window, K = 'vdGx', DEF = '192.168.68.132', OLD = '192.168.68.120';
-function camp() { return D.documentElement.classList.contains('camp'); }
-function ld() { var o = null; try { o = JSON.parse(localStorage.getItem(K) || 'null'); } catch (e) { o = null; } if (!o || !o.cur) o = { cur: DEF, list: [{ n: 'Home', h: DEF }] }; return o; }
-function sv(o) { try { localStorage.setItem(K, JSON.stringify(o)); } catch (e) {} }
-var NW = W.WebSocket;
-function WS(u, p) { u = String(u).replace(OLD, ld().cur); return p === undefined ? new NW(u) : new NW(u, p); }
-WS.prototype = NW.prototype;
-W.WebSocket = WS;
-function fixLink() { var a = D.querySelector('#mainScreen > a[href^="https://192"]'); if (a) a.href = 'https://' + ld().cur; }
+/* rev 269 */
+(function(){
+var D=document,W=window,K='vdGx',DEF='192.168.68.132',OLD='192.168.68.120';
+function camp(){return D.documentElement.classList.contains('camp');}
+function ld(){var o=null; try {o=JSON.parse(localStorage.getItem(K)||'null');} catch (e){o=null;} if (!o||!o.cur) o={cur: DEF,list: [{n: 'Home',h: DEF}]}; return o;}
+function sv(o){try {localStorage.setItem(K,JSON.stringify(o));} catch (e){}}
+var NW=W.WebSocket;
+function WS(u,p){u=String(u).replace(OLD,ld().cur); return p===undefined?new NW(u):new NW(u,p);}
+WS.prototype=NW.prototype;
+W.WebSocket=WS;
+function fixLink(){var a=D.querySelector('#mainScreen > a[href^="https://192"]'); if (a) a.href='https://' + ld().cur;}
 fixLink();
-var ov = null;
-function esc(s) { return String(s).replace(/</g, '&lt;'); }
-function chips() {
-var o = ld();
-return o.list.map(function (x, i) {
-return '<div data-i="' + i + '" class="gxc" style="display:inline-flex;gap:8px;margin:0 8px 8px 0;padding:8px 12px;border-radius:12px;border:1px solid ' + (x.h === o.cur ? '#ff8a2b' : '#3a4658') + ';background:#0b0f14;color:#e8eef5"><span class="gxp">' + esc(x.n) + ' · ' + esc(x.h) + '</span><span class="gxd" style="color:#7f8fa3;font-size:16px;padding:0 2px">✕</span></div>';
+var ov=null;
+function esc(s){return String(s).replace(/</g,'&lt;');}
+function chips(){
+var o=ld();
+return o.list.map(function(x,i){
+return '<div data-i="' + i + '" class="gxc" style="display:inline-flex;gap:8px;margin:0 8px 8px 0;padding:8px 12px;border-radius:12px;border:1px solid ' + (x.h===o.cur?'#ff8a2b':'#3a4658') + ';background:#0b0f14;color:#e8eef5"><span class="gxp">' + esc(x.n) + ' · ' + esc(x.h) + '</span><span class="gxd" style="color:#7f8fa3;font-size:16px;padding:0 2px">✕</span></div>';
 }).join('');
 }
-function build() {
+function build(){
 if (ov) return;
-ov = D.createElement('div'); ov.id = 'gxSetup';
-ov.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:300;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:14px';
-var inp = 'width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border-radius:10px;border:1px solid #3a4658;background:#0b0f14;color:#fff;font-size:18px;outline:0';
-var btn = 'display:block;text-align:center;padding:13px;border-radius:12px;font-size:16px;font-weight:600;text-decoration:none;margin-top:10px;';
-ov.innerHTML = '<div style="width:100%;max-width:520px;max-height:92vh;overflow:auto;background:#151c25;border:0.5px solid #8a96a6;border-radius:16px;padding:16px 18px;color:#e8eef5;font-size:14px">' +
+ov=D.createElement('div'); ov.id='gxSetup';
+ov.style.cssText='position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:14px';
+var inp='width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border-radius:10px;border:1px solid #3a4658;background:#0b0f14;color:#fff;font-size:18px;outline:0';
+var btn='display:block;text-align:center;padding:13px;border-radius:12px;font-size:16px;font-weight:600;text-decoration:none;margin-top:10px;';
+ov.innerHTML='<div style="width:100%;max-width:520px;max-height:92vh;overflow:auto;background:#151c25;border:0.5px solid #8a96a6;border-radius:16px;padding:16px 18px;color:#e8eef5;font-size:14px">' +
 '<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:18px;font-weight:600">Connect to your GX</div><div id="gxX" style="font-size:22px;color:#9fb0c3;padding:4px 8px;cursor:pointer">✕</div></div>' +
 '<div class="gxl" style="margin-top:14px">GX address</div><input id="gxIp" inputmode="decimal" autocomplete="off" autocapitalize="off" style="' + inp + '" placeholder="192.168.68.132">' +
-'<div class="gxl" style="margin-top:12px">Name (optional)</div><input id="gxNm"  style="' + inp + '" placeholder="Home, Van">' +
+'<div class="gxl" style="margin-top:12px">Name (optional)</div><input id="gxNm" style="' + inp + '" placeholder="Home, Van">' +
 '<div id="gxSave" style="' + btn + 'background:#ff8a2b;color:#000">Save and connect</div>' +
 '<a id="gxOpen" target="_blank" style="' + btn + 'border:1px solid #3a4658;color:#ff8a2b">Open the GX page to trust it</a>' +
 '<div class="gxl" style="margin-top:16px">Saved networks</div><div id="gxList" style="margin-top:8px"></div>' +
 '<div class="gxl" style="margin-top:12px">How to find the address</div>' +
 '<ol style="margin:8px 0 0;padding-left:20px;color:#cfd8e3">' +
-'<li>Same Wi-Fi as the GX.</li><li>GX: Menu, Settings, Wi-Fi, your network, read the IP address. Each Wi-Fi gives a different one.</li><li>Settings, Services: MQTT Access on.</li><li>Tap Open the GX page; if Safari warns, Show Details, visit the website (once per address).</li><li>Save and connect.</li></ol></div>';
+'<li>Same Wi-Fi as the GX.</li><li>GX: Settings, Wi-Fi, your network: read the IP address.</li><li>Settings, Services: MQTT Access on.</li><li>Tap Open the GX page; if Safari warns, Show Details, visit the website.</li><li>Save and connect.</li></ol></div>';
 D.body.appendChild(ov);
-function close() { ov.style.display = 'none'; }
-ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
-ov.querySelector('#gxX').onclick = close;
-var ip = ov.querySelector('#gxIp'), nm = ov.querySelector('#gxNm'), op = ov.querySelector('#gxOpen');
-ip.addEventListener('input', function () { op.href = 'https://' + (ip.value.trim() || ld().cur); });
-ov.querySelector('#gxSave').onclick = function () {
-var h = ip.value.trim().replace(/\b0+(\d)/g, '$1');
-if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(h)) { ip.style.borderColor = '#ff3b30'; return; }
-var o = ld(), n = nm.value.trim() || ('GX ' + h), f = false;
-o.list.forEach(function (x) { if (x.h === h) { f = true; if (nm.value.trim()) x.n = n; } });
-if (!f) o.list.push({ n: n, h: h });
-o.cur = h; sv(o); fixLink(); close();
-var b = D.getElementById('bStatus'); if (b) b.click();
+function close(){ov.style.display='none';}
+ov.addEventListener('click',function(e){if (e.target===ov) close();});
+ov.querySelector('#gxX').onclick=close;
+var ip=ov.querySelector('#gxIp'),nm=ov.querySelector('#gxNm'),op=ov.querySelector('#gxOpen');
+ip.addEventListener('input',function(){op.href='https://' + (ip.value.trim()||ld().cur);});
+ov.querySelector('#gxSave').onclick=function(){
+var h=ip.value.trim().replace(/\b0+(\d)/g,'$1');
+if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(h)){ip.style.borderColor='#ff3b30'; return;}
+var o=ld(),n=nm.value.trim()||('GX ' + h),f=false;
+o.list.forEach(function(x){if (x.h===h){f=true; if (nm.value.trim()) x.n=n;}});
+if (!f) o.list.push({n: n,h: h});
+o.cur=h; sv(o); fixLink(); close();
+var b=D.getElementById('bStatus'); if (b) b.click();
 };
-ov.querySelector('#gxList').addEventListener('click', function (e) {
-var c = e.target.closest ? e.target.closest('.gxc') : null; if (!c) return;
-var i = +c.getAttribute('data-i'), o = ld();
-if (e.target.classList.contains('gxd')) { o.list.splice(i, 1); if (!o.list.length) o.list.push({ n: 'Home', h: DEF }); if (!o.list.some(function (x) { return x.h === o.cur; })) o.cur = o.list[0].h; sv(o); show(); return; }
-o.cur = o.list[i].h; sv(o); fixLink(); close();
-var b = D.getElementById('bStatus'); if (b) b.click();
+ov.querySelector('#gxList').addEventListener('click',function(e){
+var c=e.target.closest?e.target.closest('.gxc'):null; if (!c) return;
+var i=+c.getAttribute('data-i'),o=ld();
+if (e.target.classList.contains('gxd')){o.list.splice(i,1); if (!o.list.length) o.list.push({n: 'Home',h: DEF}); if (!o.list.some(function(x){return x.h===o.cur;})) o.cur=o.list[0].h; sv(o); show(); return;}
+o.cur=o.list[i].h; sv(o); fixLink(); close();
+var b=D.getElementById('bStatus'); if (b) b.click();
 });
 }
-function show() {
+function show(){
 build();
-var o = ld();
-ov.querySelector('#gxIp').value = o.cur; ov.querySelector('#gxNm').value = '';
-ov.querySelector('#gxOpen').href = 'https://' + o.cur;
-ov.querySelector('#gxList').innerHTML = chips();
-ov.style.display = 'flex';
+var o=ld();
+ov.querySelector('#gxIp').value=o.cur; ov.querySelector('#gxNm').value='';
+ov.querySelector('#gxOpen').href='https://' + o.cur;
+ov.querySelector('#gxList').innerHTML=chips();
+ov.style.display='flex';
 }
-var gear = null;
-setInterval(function () {
-var lab = D.querySelector('.battcard .label');
-if (!lab || (gear && gear.parentNode === lab)) return;
-gear = D.createElement('span'); gear.id = 'gxCfg'; gear.setAttribute('role', 'button');
-gear.style.cssText = 'display:inline-block;margin:-9px 0 -9px 2px;padding:9px 8px;vertical-align:middle;line-height:0';
-gear.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="17" r="2"/></svg>';
-gear.addEventListener('click', function (e) { e.stopPropagation(); show(); });
+var gear=null;
+setInterval(function(){
+var lab=D.querySelector('.battcard .label');
+if (!lab||(gear&&gear.parentNode===lab)) return;
+gear=D.createElement('span'); gear.id='gxCfg'; gear.setAttribute('role','button');
+gear.style.cssText='display:inline-block;margin:-9px 0 -9px 2px;padding:9px 8px;vertical-align:middle;line-height:0';
+gear.innerHTML='<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="17" r="2"/></svg>';
+gear.addEventListener('click',function(e){e.stopPropagation(); show();});
 lab.appendChild(gear);
-}, 1000);
-var st = D.createElement('style');
+},1000);
+var st=D.createElement('style');
 st.textContent =
 '#wpHdr{display:none}' +
 '#gxSetup .gxl{font-size:12px;letter-spacing:1px;color:#7f8fa3;text-transform:uppercase}' +
@@ -3747,36 +3768,35 @@ st.textContent =
 'html.camp.windx #weatherScreen>#wBox2{margin-bottom:0!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;border-bottom-color:#26303c!important}' +
 'html.camp.windx #weatherScreen>.section-title,html.camp.windx #weatherScreen>#forecast,html.camp.windx #weatherScreen>.card:has(#forecast){display:none!important}';
 D.head.appendChild(st);
-var X = null, lastH = 0;
-function hdr(pg) {
+var X=null,lastH=0;
+function hdr(pg){
 if (X) return;
-X = D.createElement('div'); X.id = 'wpHdr';
-X.innerHTML = '<span>7-day wind forecast</span><span id="wpX">✕</span>';
-pg.insertBefore(X, pg.firstChild);
-X.lastChild.onclick = function () { D.getElementById('wpBack').click(); };
+X=D.createElement('div'); X.id='wpHdr';
+X.innerHTML='<span>7-day wind forecast</span><span id="wpX">✕</span>';
+pg.insertBefore(X,pg.firstChild);
+X.lastChild.onclick=function(){D.getElementById('wpBack').click();};
 }
-setInterval(function () {
-var pg = D.getElementById('windScreen'), b2 = D.getElementById('wBox2'), ws = D.getElementById('weatherScreen'), de = D.documentElement;
-if (!pg || !b2 || !ws) return;
+setInterval(function(){
+var pg=D.getElementById('windScreen'),b2=D.getElementById('wBox2'),ws=D.getElementById('weatherScreen'),de=D.documentElement;
+if (!pg||!b2||!ws) return;
 hdr(pg);
-var cp = camp(), fc = D.getElementById('forecast');
-if (cp && b2.parentNode === ws && pg.parentNode !== ws) ws.insertBefore(pg, b2.nextSibling);
-if (!cp) { if (pg.parentNode === ws) D.body.insertBefore(pg, ws.nextSibling); de.classList.remove('windx'); pg.style.height = ''; return; }
-var open = !pg.classList.contains('hidden');
-if (!open) {
+var cp=camp(),fc=D.getElementById('forecast');
+if (cp&&b2.parentNode===ws&&pg.parentNode!==ws) ws.insertBefore(pg,b2.nextSibling);
+if (!cp){if (pg.parentNode===ws) D.body.insertBefore(pg,ws.nextSibling); de.classList.remove('windx'); pg.style.height=''; return;}
+var open=!pg.classList.contains('hidden');
+if (!open){
 de.classList.remove('windx');
-if (fc) { while (fc.parentNode && fc.parentNode !== ws) fc = fc.parentNode; var h = fc.getBoundingClientRect().bottom - b2.getBoundingClientRect().bottom; if (h > 150 && h < 900) lastH = h; }
+if (fc){while (fc.parentNode&&fc.parentNode!==ws) fc=fc.parentNode; var h=fc.getBoundingClientRect().bottom - b2.getBoundingClientRect().bottom; if (h>150&&h<900) lastH=h;}
 return;
 }
-if (!de.classList.contains('windx') && lastH) { pg.style.height = lastH + 'px'; de.classList.add('windx'); }
-}, 120);
-D.addEventListener('click', function (e) {
+if (!de.classList.contains('windx')&&lastH){pg.style.height=lastH + 'px'; de.classList.add('windx');}
+},120);
+D.addEventListener('click',function(e){
 if (!camp()) return;
-var t = e.target && e.target.closest ? e.target.closest('#wBox2') : null, pg = D.getElementById('windScreen');
-if (t && pg && !pg.classList.contains('hidden')) { e.stopImmediatePropagation(); e.preventDefault(); D.getElementById('wpBack').click(); }
-}, true);
+var t=e.target&&e.target.closest?e.target.closest('#wBox2'):null,pg=D.getElementById('windScreen');
+if (t&&pg&&!pg.classList.contains('hidden')){e.stopImmediatePropagation(); e.preventDefault(); D.getElementById('wpBack').click();}
+},true);
 })();
-/* rev 260 (d): iPad landscape camp layout (Spotify | weather + sun | battery + tanks + map) */
 (function () {
 var D = document, W = window;
 function init() {
@@ -3926,8 +3946,6 @@ chk();
 function go() { try { init(); } catch (e) {} }
 if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('load', function () { setTimeout(go, 0); });
 })();
-/* rev 258 and earlier: weather map picker, then Topo layer */
-/* rev 258: search results open a crosshair map; Show weather or Save and show; Street/Satellite/Topo; find-me; rename saved spots */
 (function () {
   var D = document, W = window, sl = D.getElementById('srchList');
   if (!sl || typeof favs === 'undefined') return;
@@ -4100,7 +4118,6 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
   };
   W.addEventListener('resize', function () { if (pk.style.display !== 'none') draw(); });
 })();
-/* ---- rev 255: Topo map layer on the small and full-screen maps; Altitude card opens the big map on Topo ---- */
 (function () {
   var W = window, D = document, topo = false, G = '#4fb06d';
   try { topo = localStorage.getItem('vdTopo') === '1'; } catch (e) {}
@@ -4151,7 +4168,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     };
   }
 })();
-/* ===== Part 5 (rev 272): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 273): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
