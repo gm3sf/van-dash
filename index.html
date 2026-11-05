@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 271 -->
+<!-- Van Dash rev 272 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r271</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r272</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3256,7 +3256,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 271): iPad camp layout, weather map picker, Topo layer ===== */
+/* ===== Part 4 (rev 272): iPad camp layout, weather map picker, Topo layer ===== */
 /* rev 260 (a): one writer for the weather icons and words, day or night, so nothing flickers */
 (function () {
 var D = document, W = window;
@@ -3428,27 +3428,22 @@ var D = document, W = window;
 function camp() { return D.documentElement.classList.contains('camp'); }
 var st = D.createElement('style');
 st.textContent =
-'html.camp #campGrid{gap:16px}html.camp #mainScreen .grid{gap:12px}html.camp #mainScreen .vmap{margin-top:12px}html.camp #spotScreen>.card{margin-bottom:12px!important}html.camp .plrow{margin-top:7px;padding-top:5px;padding-bottom:5px}html.camp .plrow .pi{width:36px;height:36px}html.camp .plrow .pn{font-size:17px}html.camp #weatherScreen>#wBox2{margin-bottom:12px!important}html.camp #cwBox{margin-bottom:12px}html.camp #weatherScreen>.card:has(.sunrow){margin-top:12px}' +
-'html.camp #spCtl{display:flex!important}html.camp #spCtl svg{transform:none!important}html.camp #spPrev svg,html.camp #spNext svg{width:34px!important;height:34px!important}html.camp #spBack svg,html.camp #spFwd svg{width:50px!important;height:50px!important}html.camp #spPlay svg{width:58px!important;height:58px!important}html.camp #spBack span,html.camp #spFwd span{top:0!important;bottom:0!important;display:flex!important;align-items:center;justify-content:center;font-size:13px!important;padding-top:1px}html.camp #spotScreen>.card{margin-bottom:0!important;border-radius:14px 14px 0 0!important;border-bottom:0!important}html.camp #spotScreen #plList{background:#151c25;border:0.5px solid #8a96a6;border-top:0;border-radius:0 0 14px 14px;padding:0 14px 8px}html.camp #spotScreen #plList .plrow{background:none!important;box-shadow:none!important;border:0!important;border-top:1px solid #26303c!important;border-radius:0!important;margin:0!important;padding:6px 2px!important}html.camp #spotScreen #plList .plrow .pi{width:34px;height:34px;border-width:1px;background:transparent}html.camp #spotScreen #plList .plrow .pn{font-size:17px}html.camp #spArt{border:0!important;outline:0!important;box-shadow:none!important;border-radius:14px!important;clip-path:inset(3px round 14px)!important;width:min(100%,20vh)!important;background-color:transparent!important}' +
+'html.camp #campGrid{gap:16px}html.camp #mainScreen .grid{gap:12px}html.camp #mainScreen .vmap{margin-top:12px}html.camp #weatherScreen>#wBox2{margin-bottom:12px!important}html.camp #cwBox{margin-bottom:12px}html.camp #weatherScreen>.card:has(.sunrow){margin-top:12px}' +
+'html.camp #spCtl svg{transform:none!important}html.camp #spBack span,html.camp #spFwd span{top:0!important;bottom:0!important;display:flex!important;align-items:center;justify-content:center;font-size:13px!important;padding-top:1px}html.camp #spotScreen>.card{margin-bottom:0!important;border-radius:14px 14px 0 0!important;border-bottom:0!important}html.camp #spotScreen #plList{background:#151c25;border:0.5px solid #8a96a6;border-top:0;border-radius:0 0 14px 14px;padding:0 14px 8px}html.camp #spotScreen #plList .plrow{background:none!important;box-shadow:none!important;border:0!important;border-top:1px solid #26303c!important;border-radius:0!important;margin:0!important;padding:6px 2px!important}html.camp #spotScreen #plList .plrow .pi{width:34px;height:34px;border-width:1px;background:transparent}html.camp #spArt{border:0!important;outline:0!important;box-shadow:none!important;border-radius:14px!important;clip-path:inset(3px round 14px)!important;width:min(100%,20vh)!important;background-color:transparent!important}' +
 'html.camp .tk{grid-template-columns:112px 1fr 70px;margin-top:9px}' +
 'html.camp .tk .b{position:relative;height:26px;border-radius:13px;background:linear-gradient(#04070b,#161d27);box-shadow:inset 0 2px 5px rgba(0,0,0,.8),0 0 0 1px #3a4658,0 1px 0 rgba(255,255,255,.1)}' +
 'html.camp .tk .b i{height:100%;border-radius:13px;background-image:linear-gradient(to bottom,rgba(255,255,255,.5) 0,rgba(255,255,255,.14) 36%,rgba(0,0,0,0) 54%,rgba(0,0,0,.3) 100%)!important;box-shadow:inset 0 -2px 4px rgba(0,0,0,.35)}' +
 'html.camp .tk .b::after{content:"";position:absolute;left:9px;right:9px;top:3px;height:6px;border-radius:3px;background:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,.05));pointer-events:none}' +
-'html.camp #wBoxRing,html.camp .wpRing{transform:none!important;transition:none!important}' +
-'html:not(.camp) .cmpL{display:none}' +
-'html.camp #wBox2 svg{width:92px!important;height:92px!important}' +
-'html.camp .vdWd>div:first-child svg{width:64px!important;height:64px!important}' +
 'html.camp #weatherScreen #forecast{padding:0 14px}html.camp #weatherScreen .day{padding:1px 0}' +
 'html.camp #weatherScreen .day .ic{height:30px;width:44px}' +
 'html.camp #weatherScreen>#wBox2{padding:6px 14px!important}' +
 'html.camp #weatherScreen>.card:has(.sunrow) .sunrow,html.camp #weatherScreen>.card:has(.sunrow) .label span{display:none!important}' +
 'html.camp #weatherScreen>.card:has(.sunrow){padding:8px 14px 8px}' +
 'html.camp #cSunT .sr{display:grid;grid-template-columns:62px 1fr 1fr 1.8fr;align-items:center;gap:8px;font-size:13px;line-height:19px;border-top:1px solid #26303c}' +
-'html:not(.camp) #cSunT{display:none}' +
 'html.camp #cSunT .sr:first-child{border-top:0}' +
-'html.camp #cSunT .sr b{font-weight:600}html.camp #cSunT .sr i{font-style:normal;color:#ffb84d;margin-right:3px}' +
+'html.camp #cSunT .sr i{font-style:normal;color:#ffb84d;margin-right:3px}' +
 'html.camp #cSunT .mn{display:flex;align-items:center;gap:6px;color:#9fb0c3;font-size:13px;white-space:nowrap}' +
-'html.camp #cSunT .mn span{font-size:20px;line-height:1;display:block}@media (min-height:861px){html.camp #cSunT .sr{line-height:27px}html.camp #weatherScreen .day{padding:5px 0}}html.camp #cwL{flex:1 1 auto;min-width:150px;display:flex;flex-direction:column;align-items:center;text-align:center}html.camp #cwL #vd4Up{text-align:center!important;margin:4px 0 0!important}html.camp #cwBox #wBox1{flex:none!important;margin-left:auto!important;gap:20px!important}html.camp #cwBox #wBox1>div:first-child{width:84px!important}html.camp #cwBox #wBox1>div:last-child{flex:none!important;grid-template-columns:auto auto!important;gap:10px 18px!important}html.camp #weatherScreen>.card:has(.sunrow){flex:1 1 auto!important;display:flex;flex-direction:column;min-height:0}html.camp #cSunT{flex:1;display:flex;flex-direction:column;min-height:0}html.camp #cSunT .sr{flex:1 1 0;font-size:15px;line-height:normal!important}html.camp #cSunT .mn{font-size:15px}html.camp #cSunT .mn span{font-size:24px}html.camp #spCtl svg{stroke-width:1.15!important}html.camp #spPrev svg,html.camp #spNext svg{stroke-width:1.6!important}html.camp #spPlay svg{stroke-width:1!important}html.camp .batt-row .bsoc svg{stroke-width:1.2!important}html.camp #mainScreen .vmap{margin-bottom:-12px!important}html.camp body,html.camp body *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}html.camp #spT,html.camp #plList .plrow .pn,html.camp #weatherScreen .day .d,html.camp #cSunT .sr b{font-weight:500!important}html.camp .tk .b{box-shadow:inset 0 2px 5px rgba(0,0,0,.8),0 0 0 .5px #3a4658,0 1px 0 rgba(255,255,255,.08)!important}html.camp #cwL{flex:none!important;min-width:0!important;align-items:flex-start!important;text-align:left!important}html.camp #cwL #vd4Up{align-self:stretch;text-align:center!important}html.camp #cwBox #wBox1{flex:1 1 auto!important;margin-left:0!important;gap:0!important}html.camp #cwBox #wBox1>div:first-child{margin-left:clamp(14px,3vw,48px)!important}html.camp #cwBox #wBox1>div:last-child{margin-left:auto!important}html.camp #mainScreen .card .label,html.camp #weatherScreen .card .label{font-size:12px!important;font-weight:500!important;letter-spacing:1px!important}html.camp .card .label svg{width:15px!important;height:15px!important}html.camp #cwL{width:fit-content!important}html.camp #cwL #vd4Up{width:0!important;min-width:100%!important;white-space:nowrap!important;font-size:11px!important;align-self:flex-start!important}html.camp #plList .plrow .pn{font-weight:400!important;color:#e8eef5!important}html.camp .tk .n{color:#fff!important}html.camp #mainScreen .battcard{margin-bottom:0!important;border-radius:14px 14px 0 0!important;border-bottom:0!important;padding-bottom:14px!important}html.camp #mainScreen .tankcard{position:relative;margin-top:-12px!important;border-radius:0 0 14px 14px!important;border-top:0!important;padding:16px 18px 14px!important}html.camp #mainScreen .tankcard::before{content:"";position:absolute;left:18px;right:18px;top:0;height:1px;background:#26303c}html.camp #mainScreen .tankcard .tk:first-of-type{margin-top:10px}';
+'html.camp #cSunT .mn span{font-size:20px;line-height:1;display:block}@media (min-height:861px){html.camp #cSunT .sr{line-height:27px}html.camp #weatherScreen .day{padding:5px 0}}html.camp #cwL #vd4Up{text-align:center!important;margin:4px 0 0!important}html.camp #cwBox #wBox1>div:first-child{width:84px!important}html.camp #cwBox #wBox1>div:last-child{flex:none!important;grid-template-columns:auto auto!important;gap:10px 18px!important}html.camp #weatherScreen>.card:has(.sunrow){flex:1 1 auto!important;display:flex;flex-direction:column;min-height:0}html.camp #cSunT{flex:1;display:flex;flex-direction:column;min-height:0}html.camp #cSunT .sr{flex:1 1 0;font-size:15px;line-height:normal!important}html.camp #cSunT .mn{font-size:15px}html.camp #cSunT .mn span{font-size:24px}html.camp #spCtl svg{stroke-width:1.15!important}html.camp #spPrev svg,html.camp #spNext svg{stroke-width:1.6!important}html.camp #spPlay svg{stroke-width:1!important}html.camp #mainScreen .vmap{margin-bottom:-12px!important}html.camp body,html.camp body *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}html.camp #spT,html.camp #plList .plrow .pn,html.camp #weatherScreen .day .d,html.camp #cSunT .sr b{font-weight:500!important}html.camp .tk .b{box-shadow:inset 0 2px 5px rgba(0,0,0,.8),0 0 0 .5px #3a4658,0 1px 0 rgba(255,255,255,.08)!important}html.camp #cwL{flex:none!important;min-width:0!important;align-items:flex-start!important;text-align:left!important}html.camp #cwL #vd4Up{align-self:stretch;text-align:center!important}html.camp #cwBox #wBox1{flex:1 1 auto!important;margin-left:0!important;gap:0!important}html.camp #cwBox #wBox1>div:first-child{margin-left:clamp(14px,3vw,48px)!important}html.camp #cwBox #wBox1>div:last-child{margin-left:auto!important}html.camp #mainScreen .card .label,html.camp #weatherScreen .card .label{font-size:12px!important;font-weight:500!important;letter-spacing:1px!important}html.camp .card .label svg{width:15px!important;height:15px!important}html.camp #cwL{width:fit-content!important}html.camp #cwL #vd4Up{width:0!important;min-width:100%!important;white-space:nowrap!important;font-size:11px!important;align-self:flex-start!important}html.camp #plList .plrow .pn{font-weight:400!important;color:#e8eef5!important}html.camp .tk .n{color:#fff!important}html.camp #mainScreen .battcard{margin-bottom:0!important;border-radius:14px 14px 0 0!important;border-bottom:0!important;padding-bottom:14px!important}html.camp #mainScreen .tankcard{position:relative;margin-top:-12px!important;border-radius:0 0 14px 14px!important;border-top:0!important;padding:16px 18px 14px!important}html.camp #mainScreen .tankcard::before{content:"";position:absolute;left:18px;right:18px;top:0;height:1px;background:#26303c}html.camp #mainScreen .tankcard .tk:first-of-type{margin-top:10px}';
 function att() { setTimeout(function () { D.head.appendChild(st); }, 150); }
 if (D.readyState === 'complete') att(); else W.addEventListener('load', att);
 function addL(svg) {
@@ -3521,6 +3516,73 @@ if (t.indexOf('☀') > -1) ic.innerHTML = window.__vdMoon(false);
 else if (t.indexOf('🌤') > -1 || t.indexOf('⛅') > -1) ic.innerHTML = window.__vdMoon(true);
 });
 }, 500);
+})();
+/* rev 272: auto connect, Spotify resume, protected area name, keep awake */
+(function () {
+const D = document, W = window, F = W.fetch, API = 'https://api.spotify.com/v1/me/player', Q = i => D.getElementById(i), LS = localStorage;
+let wl = null;
+const aw = () => { if (navigator.wakeLock && !D.hidden && !(wl && !wl.released)) navigator.wakeLock.request('screen').then(l => { wl = l; }).catch(() => {}); };
+aw(); setInterval(aw, 15000); D.addEventListener('visibilitychange', aw); D.addEventListener('touchstart', aw, { passive: true });
+const gx = r => { const b = Q('bStatus'); if (b && !D.hidden && r.test(b.textContent)) b.click(); };
+setTimeout(() => gx(/^GX: tap/), 1500); setInterval(() => gx(/^GX: (tap|refused|no answer)/), 8000);
+const tk = () => { try { return JSON.parse(LS.getItem('vdSp')).a; } catch (e) { return null; } };
+const sp = (m, p, b) => { const a = tk(); return a ? F(API + p, { method: m, headers: { Authorization: 'Bearer ' + a, 'Content-Type': 'application/json' }, body: b && JSON.stringify(b) }) : Promise.reject(); };
+const tr = (body, r0) => sp('GET', '/devices').then(x => x.json()).then(j => {
+const d = j.devices || [], id = LS.getItem('vdSpDev'), t = d.find(x => x.id == id) || d.find(x => x.is_active) || d[0];
+return t ? sp('PUT', '', { device_ids: [t.id], play: !body }).then(y => y.ok ? (body ? sp('PUT', '/play?device_id=' + t.id, body) : y) : r0) : r0;
+}).catch(() => r0);
+W.fetch = function (u, o) {
+const p = F.apply(this, arguments), s = String(u);
+if (o && o.method == 'PUT' && /me\/player\/play$/.test(s)) return p.then(r => r.status == 404 ? tr(null, r).then(x => x.ok ? new Response(null, { status: 204 }) : r) : r);
+if (/me\/player$/.test(s)) p.then(r => r.status == 200 && r.clone().json().then(j => j.device && LS.setItem('vdSpDev', j.device.id))).catch(() => {});
+return p;
+};
+D.addEventListener('click', e => {
+const a = e.target.closest && e.target.closest('a.plrow'), m = a && a.getAttribute('href').match(/spotify\.com\/(\w+)\/(\w+)/);
+if (!m || !tk()) return;
+e.preventDefault();
+const b = { context_uri: 'spotify:' + m[1] + ':' + m[2] };
+sp('PUT', '/play', b).then(r => r.status == 404 ? tr(b, r) : r).then(r => r.ok || (location.href = a.href)).catch(() => { location.href = a.href; });
+}, true);
+const ld = Q('city'), tn = D.createElement('div');
+let act = null, lq = null, lt = 0;
+tn.style.cssText = 'display:none;font-size:12px;color:#9fb0c3;margin-top:1px;line-height:1.2';
+if (ld) ld.parentNode.appendChild(tn);
+const show = a => {
+act = a;
+if (!ld) return;
+ld.classList.toggle('pa', !!a); tn.style.display = a && a.t ? 'block' : 'none';
+if (a) { ld.textContent = a.n; tn.textContent = 'Nearest town: ' + a.t; } else { try { ld.textContent = cityName; } catch (e) {} }
+};
+if (ld) new MutationObserver(() => { if (act && ld.textContent != act.n) ld.textContent = act.n; }).observe(ld, { childList: true, characterData: true, subtree: true });
+const hv = (a, b, c, d) => { const r = Math.PI / 180, x = Math.sin((c - a) * r / 2), y = Math.sin((d - b) * r / 2); return 7918 * Math.asin(Math.sqrt(x * x + Math.cos(a * r) * Math.cos(c * r) * y * y)); };
+const ov = q => F('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent('[out:json][timeout:25];' + q)).then(r => r.json()).then(j => j.elements || []);
+const ar = e => e.bounds ? (e.bounds.maxlat - e.bounds.minlat) * (e.bounds.maxlon - e.bounds.minlon) : 9;
+const look = (la, lo) => {
+const f = '["boundary"~"^(national_park|protected_area)$"]["name"]["protect_class"!~"^(7|97|98|99)$"]', c = la + ',' + lo;
+return ov('is_in(' + c + ')->.a;(rel(pivot.a)' + f + ';way(pivot.a)' + f + ';)->.i;(rel(around:1600,' + c + ')' + f + ';way(around:1600,' + c + ')' + f + ';)->.n;.i out tags bb;.i out count;.n out tags bb;').then(el => {
+let k = 0; const i = [], n = [];
+el.forEach(e => e.type == 'count' ? k = 1 : (k ? n : i).push(e));
+const l = (i.length ? i : n).sort((x, y) => ar(x) - ar(y));
+if (!l.length) return null;
+return ov('node(around:70000,' + c + ')[place~"^(city|town)$"];out;').then(t => {
+let b = null, d = 1e9;
+t.forEach(x => { const z = hv(la, lo, x.lat, x.lon); if (z < d) { d = z; b = x; } });
+return { n: l[0].tags.name, t: b ? b.tags.name + ', ' + Math.round(d) + ' mi' : '' };
+});
+});
+};
+const loc = () => {
+let la, lo; try { la = vGLat; lo = vGLon; } catch (e) {}
+if (la == null || D.hidden || Date.now() - lt < 60000 || (lq && hv(lq[0], lq[1], la, lo) < 0.5 && Date.now() - lt < 600000)) return;
+lt = Date.now(); lq = [la, lo];
+look(la, lo).then(a => { LS.setItem('vdArea', JSON.stringify(a)); show(a); }).catch(() => { lq = null; });
+};
+try { const c0 = JSON.parse(LS.getItem('vdArea')); if (c0) setTimeout(() => show(c0), 1200); } catch (e) {}
+setInterval(loc, 20000); setTimeout(loc, 4000);
+const st = D.createElement('style');
+st.textContent = '#city.pa{font-size:15px!important;line-height:1.15;white-space:normal}.loctext{min-width:0;flex:1}html.camp #wBoxDesc{white-space:nowrap!important;margin:0 -16px!important;position:relative;top:8px}html.camp #cwBox #wBox1>div:first-child{margin-left:clamp(0px,1.4vw,22px)!important}';
+setTimeout(() => D.head.appendChild(st), 500);
 })();
 /* rev 271: Spotify shuffle and repeat, 15 sec size, bigger art */
 (function () {
@@ -3782,57 +3844,33 @@ st.textContent =
 'html.camp body{height:100vh;height:100dvh;min-height:0;overflow:hidden;padding:8px 10px;touch-action:auto}' +
 'html.camp #campGrid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.4fr) minmax(0,1.05fr);gap:10px;height:100%}' +
 'html.camp #campGrid>div{display:flex!important;flex-direction:column;min-height:0;min-width:0;overflow:hidden;position:relative}' +
-'html.camp body>div[id$="Screen"]:not(#campGrid){position:fixed;left:0;top:0;right:0;bottom:0;z-index:90;background:#000;overflow:auto;padding:8px 24px 40px}' +
 'html.camp #spotScreen>.topbar{display:none}' +
 'html.camp #spotScreen #plList{flex:1;min-height:0;overflow:auto}' +
 'html.camp #spotScreen>.card{flex:none;flex-direction:column!important;align-items:stretch!important;padding:12px 14px;margin-bottom:8px!important}' +
 'html.camp #spArt{display:block!important;width:min(100%,30vh)!important;height:auto!important;aspect-ratio:1;margin:0 auto 10px;border-radius:14px!important;background:#0b0f14 ' + LOGO + ' center/34% no-repeat}' +
 'html.camp #spT{font-size:22px!important}html.camp #spT::before{content:"";display:inline-block;width:26px;height:26px;margin-right:10px;vertical-align:-5px;background:' + LOGO + ' center/contain no-repeat}' +
 'html.camp #spA{font-size:16px!important}' +
-'html.camp #spCtl button{width:62px!important;height:58px!important}html.camp #spCtl svg{transform:scale(1.3)}' +
+'html.camp #spCtl button{width:62px!important;height:58px!important}' +
 'html.camp .speedrow,html.camp #tempCard,html.camp #wxCard,html.camp .tripcard,html.camp #mainScreen .grid>.card:not(.locrow):not(.battcard):not(.tankcard){display:none!important}' +
-'html.camp #mainScreen>a[href^="https://192"]{top:auto;bottom:2px;left:2px;width:40px;height:22px;padding:0}' +
 'html.camp #mainScreen .grid{display:flex;flex-direction:column;gap:8px;flex:none}' +
 'html.camp #mainScreen .battcard{order:1!important;padding:14px 18px 16px;position:relative}' +
-'html.camp #mainScreen .battcard .label{font-size:20px}' +
-'html.camp #mainScreen .battcard .bstat{font-size:17px;top:14px;right:18px}' +
-'html.camp .batt-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 10px;margin-top:10px}' +
-'html.camp .batt-row .bsoc{grid-column:1/3;width:auto;min-width:0;flex-wrap:wrap;gap:6px 14px}' +
-'html.camp .batt-row .bsoc .v{width:auto;font-size:84px;letter-spacing:-2px}' +
-'html.camp .batt-row .bsoc svg{width:56px;height:56px}' +
-'html.camp .batt-row .socbar{flex-basis:100%;width:100%;height:28px;border-radius:14px}' +
-'html.camp .batt-row .socbar .fill{border-radius:12px}' +
-'html.camp .batt-row .bamp,html.camp .batt-row .bpow{width:auto;min-width:0;justify-content:flex-start;gap:6px;background:#0b0f14;border-radius:12px;padding:8px 10px}' +
-'html.camp .batt-row .bamp .v,html.camp .batt-row .bpow .v{font-size:42px}' +
-'html.camp .batt-row .bamp .u,html.camp .batt-row .bpow .u{font-size:20px}' +
-'html.camp .batt-row .bamp svg,html.camp .batt-row .bpow svg{width:26px;height:26px}' +
 'html.camp .tankcard{order:2!important;padding:10px 16px 12px}' +
-'html.camp .tankcard .label{font-size:18px}html.camp .tankcard .tkw{float:right;font-size:12px;letter-spacing:0;text-transform:none;color:#7f8fa3;margin-top:3px}' +
 'html.camp .tk{display:grid;grid-template-columns:118px 1fr 72px;align-items:center;gap:10px;margin-top:7px}' +
-'html.camp .tk .n{font-size:16px;color:#cfd8e3}' +
-'html.camp .tk .b{height:20px;border-radius:10px;background:#2b3542;overflow:hidden}' +
 'html.camp .tk .b i{display:block;height:100%;width:0;border-radius:10px;transition:width .4s,background .4s}' +
 'html.camp .tk .p{font-size:30px;font-weight:700;text-align:right;line-height:1}' +
 'html.camp #mainScreen .locrow{order:4!important}' +
 'html.camp #cAlt{font-size:18px;font-weight:600;color:#cfd8e3;white-space:nowrap}' +
 'html.camp #mainScreen .vmap{flex:1;height:auto;min-height:140px;margin-top:8px}' +
 'html.camp #mainScreen #status{display:none}' +
-'html.camp #weatherScreen{overflow:hidden}' +
 'html.camp #weatherScreen>.topbar,html.camp #weatherScreen>.nowline,html.camp #weatherScreen>.card:has(#vdRC2){display:none!important}' +
 'html.camp #weatherScreen>.section-title{margin:0 4px 4px;flex:none}' +
 'html.camp #cwBox{position:relative;display:flex;align-items:center;gap:6px;padding:10px 14px;margin-bottom:8px;flex:none}' +
-'html.camp #cwL{flex:none;width:200px;text-align:left}' +
-'html.camp #cwL #wLiveLbl{text-align:left;font-size:11px}' +
 'html.camp #cwL #wCity{font-size:22px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none}' +
 'html.camp #cwL #wTemp{font-size:62px;line-height:1.05;text-align:left}' +
-'html.camp #cwL #vd4Up{text-align:left;margin:2px 0 0}' +
 'html.camp #cwBox #wBox1{flex:1;min-width:0;border:none!important;background:none!important;padding:0!important;margin:34px 0 0!important;gap:8px!important}' +
 'html.camp #weatherScreen>div:empty{display:none}' +
 'html.camp #cwBox #srchBtn2{top:4px!important;right:4px!important;width:44px!important;height:44px!important}' +
 'html.camp #cwBox #wLiveArrow{top:4px!important;right:46px!important;width:44px!important;height:44px!important}' +
-'html.camp #weatherScreen>#wBox2{flex:none;margin-bottom:8px!important;padding:10px 14px!important}' +
-'html.camp #weatherScreen #forecast{flex:none;padding:0 14px}html.camp #weatherScreen .day{padding:4px 0}' +
-'html.camp #weatherScreen>.card:has(.sunrow){flex:none;margin-top:8px;padding:10px 14px}' +
 'html.camp .sunrow .t{font-size:24px}html.camp .sunrow svg{width:42px;height:32px}';
 D.head.appendChild(st);
 function mv(el, to, before) { if (!el) return; moved.push([el, el.parentNode, el.nextSibling]); if (before) to.insertBefore(el, before); else to.appendChild(el); }
@@ -4113,7 +4151,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     };
   }
 })();
-/* ===== Part 5 (rev 271): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 272): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
