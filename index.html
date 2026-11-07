@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 274 -->
+<!-- Van Dash rev 275 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r274</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r275</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3253,7 +3253,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 274): iPad camp layout, weather map picker, Topo layer ===== */
+/* ===== Part 4 (rev 275): iPad camp layout, weather map picker, Topo layer ===== */
 (function () {
 var D = document, W = window;
 var pT = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent'), pH = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
@@ -3545,7 +3545,7 @@ setTimeout(()=>gx(/^GX: tap/),1500); setInterval(()=>gx(/^GX: (tap|refused|no an
 const tk=()=>{try {return JSON.parse(LS.getItem('vdSp')).a;} catch (e){return null;}};
 const sp=(m,p,b)=>{const a=tk(); return a?F(API + p,{method: m,headers: {Authorization: 'Bearer ' + a,'Content-Type': 'application/json'},body: b&&JSON.stringify(b)}):Promise.reject();};
 const tr=(body,r0)=>sp('GET','/devices').then(x=>x.json()).then(j=>{
-const d=j.devices||[],id=LS.getItem('vdSpDev'),t=d.find(x=>x.id==id)||d.find(x=>x.is_active)||d[0];
+const d=j.devices||[],id=LS.getItem('vdSpDev'),t=(W.vdDev&&W.vdDev(d))||d.find(x=>x.id==id)||d.find(x=>x.is_active)||d[0];
 return t?sp('PUT','',{device_ids: [t.id],play: !body}).then(y=>y.ok?(body?sp('PUT','/play?device_id=' + t.id,body):y):r0):r0;
 }).catch(()=>r0);
 W.fetch=function(u,o){
@@ -3556,7 +3556,7 @@ return p;
 };
 D.addEventListener('click',e=>{
 const a=e.target.closest&&e.target.closest('a.plrow'),m=a&&a.getAttribute('href').match(/spotify\.com\/(\w+)\/(\w+)/);
-if (!m||!tk()) return;
+if (!m||!tk()||W.vdGo) return;
 e.preventDefault();
 const b={context_uri: 'spotify:' + m[1] + ':' + m[2]};
 sp('PUT','/play',b).then(r=>r.status==404?tr(b,r):r).then(r=>r.ok||(location.href=a.href)).catch(()=>{location.href=a.href;});
@@ -5244,7 +5244,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 274): 10-day forecast from several models, scrolling forecast cards ===== */
+/* ===== Part 6 (rev 275): 10-day forecast, device pick, song lists, phone shuffle/repeat ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -5276,6 +5276,86 @@ if (n > 7 && k != kf && f.offsetHeight) { kf = k; f.style.maxHeight = ''; f.styl
 const c = Q('cSunT');
 if (c && c.children.length > 7 && c.clientHeight) { const h = Math.max(24, c.clientHeight / 7) + 'px'; c.querySelectorAll('.sr').forEach(e => { if (e.style.height != h) { e.style.flex = 'none'; e.style.height = h; } }); }
 }, 700);
+})();
+(function () {
+const W = window, D = document, LS = localStorage, Q = i => D.getElementById(i), API = 'https://api.spotify.com/v1/', F = W.fetch;
+const tk = () => { try { return JSON.parse(LS.getItem('vdSp')).a; } catch (e) { return null; } };
+const sp = (m, p, b) => { const a = tk(); return a ? F(API + 'me/player' + p, { method: m, headers: { Authorization: 'Bearer ' + a, 'Content-Type': 'application/json' }, body: b && JSON.stringify(b) }) : Promise.reject(); };
+const ua = navigator.userAgent, kd = /iPhone/.test(ua) ? 'iphone' : (/iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) ? 'ipad' : /Macintosh/.test(ua) ? 'mac' : '';
+const ty = { iphone: 'Smartphone', ipad: 'Tablet', mac: 'Computer' }[kd];
+W.vdDev = d => { if (!kd) return null; const h = d.filter(x => (x.name || '').toLowerCase().indexOf(kd == 'mac' ? 'mac' : kd) >= 0), p = h.length ? h : d.filter(x => x.type == ty); return p.find(x => x.is_active) || p[0] || null; };
+const mv = (t, b) => sp('PUT', '', { device_ids: [t.id], play: false }).then(y => y.ok ? sp('PUT', '/play?device_id=' + t.id, b).then(r => r.ok ? r : new Promise(z => setTimeout(z, 900)).then(() => sp('PUT', '/play?device_id=' + t.id, b))) : y);
+W.vdGo = b => sp('GET', '/devices').then(x => x.json()).then(j => j.devices || []).catch(() => []).then(d => {
+const t = W.vdDev(d);
+if (t && !t.is_active) return mv(t, b);
+return sp('PUT', '/play', b).then(r => { const f = d.find(x => x.id == LS.getItem('vdSpDev')) || d[0]; return r.status == 404 && f ? mv(f, b) : r; });
+});
+const st = D.createElement('style');
+st.textContent = 'html #spCtl .spx{display:block!important}html:not(.camp) #spCtl button:not(#spPlay){flex:1 1 0!important;width:auto!important;min-width:0!important}html:not(.camp) #spCtl #spPlay{flex:none!important;width:44px!important}' +
+'.plst{flex:none;width:44px;height:44px;margin-left:auto;display:flex;align-items:center;justify-content:center}.plst svg{width:26px;height:26px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}' +
+'#vdTr{display:none;flex-direction:column;overflow:hidden;padding:0;margin-top:0}#vdTr .h{flex:none;display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #2b3542}#vdTr .h b{flex:1;min-width:0;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#vdTr .h button{flex:none;background:none;border:1.5px solid #cfd8e3;color:#fff;border-radius:18px;padding:6px 14px;font-size:15px}' +
+'#vdTr .b{position:relative;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}#vdTr .t{padding:9px 14px;border-bottom:1px solid #1d2630}#vdTr .t div:first-child{font-size:16px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#vdTr .t div:last-child{font-size:13px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}#vdTr .t.on div:first-child{color:#ff8a2b;font-weight:700}#vdTr .m{padding:18px 14px;color:#9fb0c3;font-size:15px;line-height:1.4}#vdTr .m button{display:block;margin-top:12px;background:none;border:1.5px solid #ff8a2b;color:#ff8a2b;border-radius:18px;padding:8px 16px;font-size:15px}';
+D.head.appendChild(st);
+let box = null, cu = '', open = '', C = {};
+const pl = () => Q('plList');
+const fit = () => { if (box && box.style.display == 'flex') box.style.height = Math.max(160, innerHeight - box.getBoundingClientRect().top - 12) + 'px'; };
+const hl = () => { if (box) box.querySelectorAll('.t').forEach(e => e.classList.toggle('on', e.dataset.u == cu)); };
+const close = () => { if (box) box.style.display = 'none'; pl().style.display = ''; open = ''; };
+const relog = async () => {
+const b = u => btoa(String.fromCharCode.apply(null, new Uint8Array(u))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''), v = b(crypto.getRandomValues(new Uint8Array(48)));
+LS.setItem('vdSpV', v);
+const ch = b(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v)));
+location.href = 'https://accounts.spotify.com/authorize?response_type=code&client_id=322720d14efb4c4992d38812daeca636&scope=' + encodeURIComponent('user-read-playback-state user-modify-playback-state user-read-currently-playing streaming playlist-read-private playlist-read-collaborative') + '&redirect_uri=' + encodeURIComponent('https://gm3sf.github.io/van-dash/') + '&code_challenge_method=S256&code_challenge=' + ch;
+};
+const msg = (t, rl) => { const b = box.querySelector('.b'); b.innerHTML = ''; const m = D.createElement('div'); m.className = 'm'; m.textContent = t; if (rl) { const x = D.createElement('button'); x.textContent = 'Log in to Spotify again'; x.onclick = relog; m.appendChild(x); } b.appendChild(m); };
+const load = async id => {
+let seg = 'items', u = API + 'playlists/' + id + '/' + seg + '?limit=100', out = [];
+for (let i = 0; i < 5 && u; i++) {
+let r = await F(u, { headers: { Authorization: 'Bearer ' + tk() } });
+if (r.status == 404 && !i && seg == 'items') { seg = 'tracks'; u = u.replace('/items', '/tracks'); r = await F(u, { headers: { Authorization: 'Bearer ' + tk() } }); }
+if (!r.ok) { if (i) break; throw r.status; }
+const j = await r.json();
+(j.items || []).forEach(x => { const t = x.item || x.track; if (t && t.uri) out.push([t.name, (t.artists || []).map(a => a.name).join(', ') || (t.show && t.show.name) || '', t.uri]); });
+u = j.next;
+}
+return out;
+};
+const fill = (id, L) => {
+const b = box.querySelector('.b');
+if (!L.length) return msg('Spotify only lists songs for playlists you own or share. No songs came back for this one.');
+b.innerHTML = '';
+L.forEach(t => { const e = D.createElement('div'); e.className = 't'; e.dataset.u = t[2]; e.innerHTML = '<div></div><div></div>'; e.firstChild.textContent = t[0]; e.lastChild.textContent = t[1]; e.onclick = () => { cu = t[2]; hl(); W.vdGo({ context_uri: 'spotify:playlist:' + id, offset: { uri: t[2] } }).then(() => setTimeout(() => D.dispatchEvent(new Event('visibilitychange')), 900)).catch(() => {}); }; b.appendChild(e); });
+hl();
+const c = b.querySelector('.on'); if (c) b.scrollTop = Math.max(0, c.offsetTop - b.clientHeight / 3);
+};
+const show = (id, name) => {
+if (!box) {
+box = D.createElement('div'); box.id = 'vdTr'; box.className = 'card';
+box.innerHTML = '<div class="h"><b></b><button>Close</button></div><div class="b"></div>';
+box.querySelector('button').onclick = close;
+pl().after(box);
+}
+open = id; box.querySelector('b').textContent = name;
+pl().style.display = 'none'; box.style.display = 'flex'; fit();
+if (C[id]) return fill(id, C[id]);
+msg('Loading songs...');
+load(id).then(L => { C[id] = L; if (open == id) fill(id, L); }).catch(s => { if (open == id) msg(s == 401 || s == 403 ? 'Spotify needs permission to list songs. Log in again to allow it. (Spotify only lists playlists you own or share.)' : 'Could not load the songs (' + s + ').', s == 401 || s == 403); });
+};
+const addIc = () => D.querySelectorAll('a.plrow[href*="/playlist/"]').forEach(a => { if (!a.querySelector('.plst')) { const s = D.createElement('span'); s.className = 'plst'; s.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>'; a.appendChild(s); } });
+addIc(); setInterval(addIc, 2000); addEventListener('resize', fit);
+D.addEventListener('click', e => {
+const a = e.target.closest && e.target.closest('a.plrow'), m = a && a.getAttribute('href').match(/spotify\.com\/(\w+)\/(\w+)/);
+if (!m || !tk()) return;
+e.preventDefault(); e.stopImmediatePropagation();
+if (e.target.closest('.plst')) return show(m[2], a.querySelector('.pn').textContent);
+const b = { context_uri: 'spotify:' + m[1] + ':' + m[2] };
+W.vdGo(b).then(r => r.ok || (location.href = a.href)).catch(() => { location.href = a.href; });
+}, true);
+W.fetch = function (u) {
+const p = F.apply(this, arguments);
+try { if (/me\/player$/.test(String(u))) p.then(r => { if (r.status == 200) r.clone().json().then(j => { if (j && j.item) { cu = j.item.uri; hl(); } }).catch(() => {}); }).catch(() => {}); } catch (e) {}
+return p;
+};
 })();
 </script>
 </body>
