@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 273 -->
+<!-- Van Dash rev 274 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r273</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r274</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -408,7 +408,7 @@
     <div class="stat"><div class="label">Rain today</div><div class="v" id="wRain">--</div></div>
   </div>
 
-  <div class="section-title">7-day forecast</div>
+  <div class="section-title">10-day forecast</div>
   <div id="forecast"></div>
 </div>
 
@@ -1759,14 +1759,11 @@ function decorateResults() {
   var spdEl = $("speed");
   function mix(a, b, t) { return Math.round(a + (b - a) * t); }
   function spdColor() {
-    var lim = (typeof limShown !== "undefined") ? limShown : null;
-    var mph = (typeof gpsMph !== "undefined") ? gpsMph : 0;
-    if (lim == null) return "";
-    var t = (mph - (lim - 5)) / 5;
-    if (t <= 0) return "";
-    if (t > 1) t = 1;
-    // orange (255,138,43) -> deep red (200,0,0)
-    return "rgb(" + mix(255, 200, t) + "," + mix(138, 0, t) + "," + mix(43, 0, t) + ")";
+    var m = typeof gpsMph != "undefined" ? gpsMph : 0, S = [[50, 76, 217, 100], [62, 200, 220, 70], [68, 255, 211, 77], [72, 255, 138, 43], [75, 255, 59, 48]], i = 1;
+    if (m < 50) return "";
+    while (i < 4 && m > S[i][0]) i++;
+    var a = S[i - 1], b = S[i], t = Math.min(1, (m - a[0]) / (b[0] - a[0]));
+    return "rgb(" + [1, 2, 3].map(function (k) { return mix(a[k], b[k], t); }) + ")";
   }
   var lastC = null;
   setInterval(function () {
@@ -3256,7 +3253,7 @@ if (W.__fCen) W.__fCen(true);
     if (m) m.textContent = "Sharing isn't available here.";
   }
 })();
-/* ===== Part 4 (rev 273): iPad camp layout, weather map picker, Topo layer ===== */
+/* ===== Part 4 (rev 274): iPad camp layout, weather map picker, Topo layer ===== */
 (function () {
 var D = document, W = window;
 var pT = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent'), pH = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
@@ -3772,7 +3769,7 @@ var X=null,lastH=0;
 function hdr(pg){
 if (X) return;
 X=D.createElement('div'); X.id='wpHdr';
-X.innerHTML='<span>7-day wind forecast</span><span id="wpX">✕</span>';
+X.innerHTML='<span>10-day wind forecast</span><span id="wpX">✕</span>';
 pg.insertBefore(X,pg.firstChild);
 X.lastChild.onclick=function(){D.getElementById('wpBack').click();};
 }
@@ -4168,7 +4165,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     };
   }
 })();
-/* ===== Part 5 (rev 273): radar-based rain status and faster weather refresh ===== */
+/* ===== Part 5 (rev 274): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -5246,6 +5243,39 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   // tapping anywhere on the Wind / Gusts box opens it
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
+})();
+/* ===== Part 6 (rev 274): 10-day forecast from several models, scrolling forecast cards ===== */
+(function () {
+const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
+const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
+const T = p => Promise.race([p, new Promise(r => setTimeout(() => r(null), 6000))]);
+const avg = a => { a = a.filter(x => x != null); return a.length ? Math.round(a.reduce((p, c) => p + c, 0) / a.length * 10) / 10 : null; };
+const mode = a => { let b = null, c = {}; a.forEach(x => { if (x != null) { c[x] = (c[x] || 0) + 1; if (b == null || c[x] > c[b]) b = x; } }); return b; };
+W.fetch = function (u, o) {
+let s = typeof u == 'string' ? u : '', main;
+if (/api\.open-meteo\.com\/v1\/forecast/.test(s)) { s = s.replace('forecast_days=7', 'forecast_days=10'); arguments[0] = s; main = /&current=/.test(s) && /&daily=weather_code/.test(s); }
+const p = F.apply(this, arguments);
+if (!main) return p;
+const b = s.replace(/&current=[^&]*/, '').replace(/&daily=[^&]*/, '&daily=' + K.join(','));
+return p.then(r => r.ok ? r.clone().json().then(d => Promise.all(M.map(m => T(F(b + '&models=' + m).then(x => x.ok ? x.json() : null).catch(() => null)))).then(ms => {
+const y = d.daily;
+if (y) K.forEach(k => y[k].forEach((v, i) => {
+const a = ms.map(m => m && m.daily && m.daily[k] ? m.daily[k][i] : null), n = (k == 'weather_code' ? mode : avg)(a);
+if (n != null) y[k][i] = n;
+}));
+return new Response(JSON.stringify(d), { status: 200, headers: { 'Content-Type': 'application/json' } });
+})) : r).catch(() => p);
+};
+const st = D.createElement('style');
+st.textContent = '#forecast,#cSunT{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}#forecast::-webkit-scrollbar,#cSunT::-webkit-scrollbar{display:none}';
+D.head.appendChild(st);
+let kf = '';
+setInterval(() => {
+const f = Q('forecast'), n = f ? f.children.length : 0, k = n + ',' + innerWidth + ',' + innerHeight;
+if (n > 7 && k != kf && f.offsetHeight) { kf = k; f.style.maxHeight = ''; f.style.maxHeight = (f.children[7].offsetTop - f.children[0].offsetTop + 10) + 'px'; }
+const c = Q('cSunT');
+if (c && c.children.length > 7 && c.clientHeight) { const h = Math.max(24, c.clientHeight / 7) + 'px'; c.querySelectorAll('.sr').forEach(e => { if (e.style.height != h) { e.style.flex = 'none'; e.style.height = h; } }); }
+}, 700);
 })();
 </script>
 </body>
