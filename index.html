@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 277 -->
+<!-- Van Dash rev 278 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r277</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r278</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5244,7 +5244,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 277): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 278): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -5412,6 +5412,27 @@ C + '.spx:not(#spPlay){flex:0 1 auto!important;width:30px!important;height:44px!
 N + '#spPrev svg,' + N + '#spNext svg,' + N + '#spBack svg,' + N + '#spFwd svg{width:40px!important;height:40px!important}' + N + '#spPlay svg{width:64px!important;height:64px!important}' +
 N + '#spBack span,' + N + '#spFwd span{top:25px!important;font-size:12px!important}';
 document.head.appendChild(st);
+})();
+(function () {
+const D = document, Q = i => D.getElementById(i), card = D.querySelector('.battcard'), b = Q('bStatus'), row = card && card.querySelector('.batt-row');
+if (!card || !b || !row) return;
+const btn = D.createElement('button'), st = D.createElement('style');
+btn.id = 'gxBtn'; btn.textContent = 'Connect to GX'; row.after(btn);
+st.textContent = '#gxBtn{display:none}html:not(.camp) .battcard.gxoff .batt-row{display:none!important}html:not(.camp) .battcard.gxoff #gxBtn{display:block;width:100%;margin:10px 0 4px}#gxBtn:disabled{opacity:.6}';
+D.head.appendChild(st);
+let fails = 0, rw = 0;
+const camp = () => D.documentElement.classList.contains('camp');
+const upd = () => {
+let t = b.textContent;
+const live = /live/.test(t);
+if (!live && !camp() && fails >= 3 && /^GX: (tap|refused|no answer|blocked)/.test(t)) { rw = 1; b.textContent = 'GX not connected'; rw = 0; t = b.textContent; }
+card.classList.toggle('gxoff', !live);
+btn.disabled = /connecting|waiting/i.test(t);
+btn.textContent = btn.disabled ? 'Connecting...' : 'Connect to GX';
+};
+btn.onclick = () => b.click();
+new MutationObserver(() => { if (rw) return; const t = b.textContent; if (/live/.test(t)) fails = 0; else if (/^GX: (refused|no answer|blocked)/.test(t)) fails++; upd(); }).observe(b, { childList: true, subtree: true, characterData: true });
+setInterval(upd, 2000); upd();
 })();
 </script>
 </body>
