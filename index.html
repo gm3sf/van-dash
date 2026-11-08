@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 276 -->
+<!-- Van Dash rev 277 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r276</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r277</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -4164,7 +4164,8 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
       delete c.setPointerCapture;
     };
   }
-})();/* ===== Part 5 (rev 274): radar-based rain status and faster weather refresh ===== */
+})();
+/* ===== Part 5 (rev 274): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -5243,7 +5244,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 276): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 277): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -5397,6 +5398,20 @@ if (b == cand) cnt++; else { cand = b; cnt = 1; }
 if (cnt >= 2) { showLimit(b); cand = null; cnt = 0; ls.textContent = ''; } else ls.textContent = 'Checking speed limit...';
 }).catch(e => { ls.textContent = 'Limit lookup failed' + (e ? ' (' + (e.name == 'AbortError' ? 'timeout' : e) + ')' : ''); }).then(() => { busy = false; });
 }, () => {}, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+})();
+(function () {
+const st = document.createElement('style'), N = 'html:not(.camp) ', C = N + '#spCtl button';
+st.textContent = N + '.card:has(>#spArt){display:grid!important;grid-template-columns:84px minmax(0,1fr);column-gap:12px;row-gap:0;align-items:center}' +
+N + '#spArt{width:84px!important;height:84px!important;grid-column:1;grid-row:1/3}' + N + '#spArt+div{display:contents}' +
+N + '#spT{grid-column:2;grid-row:1;align-self:end;min-width:0}' + N + '#spA{grid-column:2;grid-row:2;align-self:start;min-width:0}' +
+N + '#spCtl{grid-column:1/-1;grid-row:3;margin:2px 0 0!important}' + N + '#spA+div{grid-column:1/-1;grid-row:4;margin:4px 0 0!important}' + N + '#spA+div>div:first-child{height:10px!important;border-radius:5px!important}' +
+C + '#spPrev,' + C + '#spNext{flex:0 1 auto!important;width:62px!important;height:64px!important}' +
+C + '#spBack,' + C + '#spFwd{flex:0 1 auto!important;width:44px!important;height:64px!important}' +
+C + '#spPlay{flex:0 1 auto!important;width:78px!important;height:78px!important}' +
+C + '.spx:not(#spPlay){flex:0 1 auto!important;width:30px!important;height:44px!important}' +
+N + '#spPrev svg,' + N + '#spNext svg,' + N + '#spBack svg,' + N + '#spFwd svg{width:40px!important;height:40px!important}' + N + '#spPlay svg{width:64px!important;height:64px!important}' +
+N + '#spBack span,' + N + '#spFwd span{top:25px!important;font-size:12px!important}';
+document.head.appendChild(st);
 })();
 </script>
 </body>
