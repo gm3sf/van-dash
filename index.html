@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 275 -->
+<!-- Van Dash rev 276 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r275</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r276</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -4164,8 +4164,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
       delete c.setPointerCapture;
     };
   }
-})();
-/* ===== Part 5 (rev 274): radar-based rain status and faster weather refresh ===== */
+})();/* ===== Part 5 (rev 274): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -5244,7 +5243,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 275): 10-day forecast, device pick, song lists, phone shuffle/repeat ===== */
+/* ===== Part 6 (rev 276): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -5285,10 +5284,14 @@ const ua = navigator.userAgent, kd = /iPhone/.test(ua) ? 'iphone' : (/iPad/.test
 const ty = { iphone: 'Smartphone', ipad: 'Tablet', mac: 'Computer' }[kd];
 W.vdDev = d => { if (!kd) return null; const h = d.filter(x => (x.name || '').toLowerCase().indexOf(kd == 'mac' ? 'mac' : kd) >= 0), p = h.length ? h : d.filter(x => x.type == ty); return p.find(x => x.is_active) || p[0] || null; };
 const mv = (t, b) => sp('PUT', '', { device_ids: [t.id], play: false }).then(y => y.ok ? sp('PUT', '/play?device_id=' + t.id, b).then(r => r.ok ? r : new Promise(z => setTimeout(z, 900)).then(() => sp('PUT', '/play?device_id=' + t.id, b))) : y);
+const nm = { iphone: 'iPhone', ipad: 'iPad', mac: 'Mac' }[kd], sd = D.createElement('div');
+sd.style.cssText = 'display:none;font-size:12px;line-height:1.3;color:#9fb0c3;margin:0 4px 8px';
+const note = t => { if (!sd.parentNode) { const l = Q('plList'); if (l) l.parentNode.insertBefore(sd, l); } sd.textContent = t; sd.style.display = t ? 'block' : 'none'; };
 W.vdGo = b => sp('GET', '/devices').then(x => x.json()).then(j => j.devices || []).catch(() => []).then(d => {
-const t = W.vdDev(d);
-if (t && !t.is_active) return mv(t, b);
-return sp('PUT', '/play', b).then(r => { const f = d.find(x => x.id == LS.getItem('vdSpDev')) || d[0]; return r.status == 404 && f ? mv(f, b) : r; });
+const t = W.vdDev(d), ls = d.map(x => x.name + (x.is_active ? '*' : '') + ' (' + x.type + ')').join(', ') || 'nothing', fin = (p, w) => p.then(r => { note((r.ok ? 'Playing on ' : 'Failed (' + r.status + ') on ') + w + '. Spotify lists: ' + ls); return r; });
+if (t) return fin(t.is_active ? sp('PUT', '/play', b) : mv(t, b), t.name);
+const f = d.find(x => x.id == LS.getItem('vdSpDev')) || d[0];
+return sp('PUT', '/play', b).then(r => { const g = r.status == 404 && f ? mv(f, b) : Promise.resolve(r), a = d.find(x => x.is_active) || f; return g.then(z => { note((nm ? 'No ' + nm + ' in Spotify\'s list. ' : '') + (z.ok ? 'Played on ' : 'Failed (' + z.status + ') on ') + (a ? a.name : '?') + '. Spotify lists: ' + ls); return z; }); });
 });
 const st = D.createElement('style');
 st.textContent = 'html #spCtl .spx{display:block!important}html:not(.camp) #spCtl button:not(#spPlay){flex:1 1 0!important;width:auto!important;min-width:0!important}html:not(.camp) #spCtl #spPlay{flex:none!important;width:44px!important}' +
@@ -5356,6 +5359,44 @@ const p = F.apply(this, arguments);
 try { if (/me\/player$/.test(String(u))) p.then(r => { if (r.status == 200) r.clone().json().then(j => { if (j && j.item) { cu = j.item.uri; hl(); } }).catch(() => {}); }).catch(() => {}); } catch (e) {}
 return p;
 };
+})();
+(function () {
+const W = window, D = document, Q = i => D.getElementById(i), sr = D.querySelector('.speedrow'), ls = D.createElement('div'), st = D.createElement('style');
+ls.id = 'vdLs'; if (sr) sr.appendChild(ls);
+st.textContent = '.speedrow{position:relative}#vdLs{position:absolute;left:0;right:0;bottom:-2px;text-align:center;font-size:11px;line-height:1;color:#5f7288;pointer-events:none}' +
+'#limSign{width:44px!important;height:54px!important;right:18px!important;bottom:30px!important;border:2px solid #fff!important;border-radius:7px!important;box-shadow:inset 0 0 0 2px #111,0 2px 8px #000a}#limSign>div:first-child{font-size:8px!important;margin-top:5px!important;line-height:1!important}#limNum{font-size:24px!important;margin-top:2px!important}';
+D.head.appendChild(st);
+const U = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+const pm = v => { const m = String(v || '').match(/(\d+)\s*(mph)?/i); if (!m) return null; let n = +m[1]; if (!m[2]) n = Math.round(n * 0.621371); return n >= 5 && n <= 85 ? n : null; };
+const ask = (q, i) => { i = i || 0; const c = new AbortController(), t = setTimeout(() => c.abort(), 8000); return fetch(U[i], { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(q), signal: c.signal }).then(r => { clearTimeout(t); return r.ok ? r.json() : Promise.reject(r.status); }).catch(e => { clearTimeout(t); return i + 1 < U.length ? ask(q, i + 1) : Promise.reject(e); }); };
+const look = (lat, lon, hd) => ask('[out:json][timeout:10];way(around:30,' + lat + ',' + lon + ')[highway][maxspeed];out geom tags;').then(j => {
+let best = null, bs = 1e9;
+(j.elements || []).forEach(w => {
+const lim = pm(w.tags && w.tags.maxspeed), g = w.geometry;
+if (lim == null || !g || g.length < 2 || /_link$/.test(w.tags.highway || '')) return;
+let md = 1e9, sb = 0;
+for (let i = 0; i < g.length - 1; i++) { const d = distMeters({ latitude: lat, longitude: lon }, { latitude: (g[i].lat + g[i + 1].lat) / 2, longitude: (g[i].lon + g[i + 1].lon) / 2 }); if (d < md) { md = d; sb = bearing(g[i].lat, g[i].lon, g[i + 1].lat, g[i + 1].lon); } }
+const df = Math.min(angDiff(hd, sb), angDiff(hd, (sb + 180) % 360));
+if (df > 30) return;
+if (md + df < bs) { bs = md + df; best = lim; }
+});
+return best;
+});
+let busy = false, last = 0, cand = null, cnt = 0, miss = 0, hd = null;
+const clear = () => { showLimit(null); const s = D.querySelectorAll('#arcG stop'); if (s.length > 2) { s[1].setAttribute('offset', '0.5'); s[2].setAttribute('offset', '0.87'); } };
+navigator.geolocation.watchPosition(p => {
+const c = p.coords, mph = c.speed != null ? c.speed * 2.23694 : 0;
+if (c.heading != null && !isNaN(c.heading) && mph > 5) hd = c.heading;
+if (hd == null || mph <= 5 || busy || Date.now() - last < 6000) return;
+last = Date.now(); busy = true;
+look(c.latitude, c.longitude, hd).then(b => {
+if (b == null) { cand = null; cnt = 0; miss++; if (limShown != null && miss >= 6) clear(); ls.textContent = limShown == null ? 'No posted limit on the map here' : ''; return; }
+miss = 0;
+if (b == limShown) { cand = null; cnt = 0; ls.textContent = ''; return; }
+if (b == cand) cnt++; else { cand = b; cnt = 1; }
+if (cnt >= 2) { showLimit(b); cand = null; cnt = 0; ls.textContent = ''; } else ls.textContent = 'Checking speed limit...';
+}).catch(e => { ls.textContent = 'Limit lookup failed' + (e ? ' (' + (e.name == 'AbortError' ? 'timeout' : e) + ')' : ''); }).then(() => { busy = false; });
+}, () => {}, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
 })();
 </script>
 </body>
