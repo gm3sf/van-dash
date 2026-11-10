@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 278 -->
+<!-- Van Dash rev 279 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r278</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r279</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5244,7 +5244,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 278): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 279): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -5261,7 +5261,7 @@ return p.then(r => r.ok ? r.clone().json().then(d => Promise.all(M.map(m => T(F(
 const y = d.daily;
 if (y) K.forEach(k => y[k].forEach((v, i) => {
 const a = ms.map(m => m && m.daily && m.daily[k] ? m.daily[k][i] : null), n = (k == 'weather_code' ? mode : avg)(a);
-if (n != null) y[k][i] = n;
+if (n != null) y[k][i] = k == 'precipitation_probability_max' ? Math.round(n) : n;
 }));
 return new Response(JSON.stringify(d), { status: 200, headers: { 'Content-Type': 'application/json' } });
 })) : r).catch(() => p);
@@ -5287,7 +5287,7 @@ W.vdDev = d => { if (!kd) return null; const h = d.filter(x => (x.name || '').to
 const mv = (t, b) => sp('PUT', '', { device_ids: [t.id], play: false }).then(y => y.ok ? sp('PUT', '/play?device_id=' + t.id, b).then(r => r.ok ? r : new Promise(z => setTimeout(z, 900)).then(() => sp('PUT', '/play?device_id=' + t.id, b))) : y);
 const nm = { iphone: 'iPhone', ipad: 'iPad', mac: 'Mac' }[kd], sd = D.createElement('div');
 sd.style.cssText = 'display:none;font-size:12px;line-height:1.3;color:#9fb0c3;margin:0 4px 8px';
-const note = t => { if (!sd.parentNode) { const l = Q('plList'); if (l) l.parentNode.insertBefore(sd, l); } sd.textContent = t; sd.style.display = t ? 'block' : 'none'; };
+const note = t => { if (!sd.parentNode) { const l = Q('vdPlW') || Q('plList'); if (l) l.parentNode.insertBefore(sd, l); } sd.textContent = t; sd.style.display = t ? 'block' : 'none'; };
 W.vdGo = b => sp('GET', '/devices').then(x => x.json()).then(j => j.devices || []).catch(() => []).then(d => {
 const t = W.vdDev(d), ls = d.map(x => x.name + (x.is_active ? '*' : '') + ' (' + x.type + ')').join(', ') || 'nothing', fin = (p, w) => p.then(r => { note((r.ok ? 'Playing on ' : 'Failed (' + r.status + ') on ') + w + '. Spotify lists: ' + ls); return r; });
 if (t) return fin(t.is_active ? sp('PUT', '/play', b) : mv(t, b), t.name);
@@ -5301,7 +5301,7 @@ st.textContent = 'html #spCtl .spx{display:block!important}html:not(.camp) #spCt
 '#vdTr .b{position:relative;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}#vdTr .t{padding:9px 14px;border-bottom:1px solid #1d2630}#vdTr .t div:first-child{font-size:16px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#vdTr .t div:last-child{font-size:13px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}#vdTr .t.on div:first-child{color:#ff8a2b;font-weight:700}#vdTr .m{padding:18px 14px;color:#9fb0c3;font-size:15px;line-height:1.4}#vdTr .m button{display:block;margin-top:12px;background:none;border:1.5px solid #ff8a2b;color:#ff8a2b;border-radius:18px;padding:8px 16px;font-size:15px}';
 D.head.appendChild(st);
 let box = null, cu = '', open = '', C = {};
-const pl = () => Q('plList');
+const pl = () => Q('vdPlW') || Q('plList');
 const fit = () => { if (box && box.style.display == 'flex') box.style.height = Math.max(160, innerHeight - box.getBoundingClientRect().top - 12) + 'px'; };
 const hl = () => { if (box) box.querySelectorAll('.t').forEach(e => e.classList.toggle('on', e.dataset.u == cu)); };
 const close = () => { if (box) box.style.display = 'none'; pl().style.display = ''; open = ''; };
@@ -5349,7 +5349,7 @@ const addIc = () => D.querySelectorAll('a.plrow[href*="/playlist/"]').forEach(a 
 addIc(); setInterval(addIc, 2000); addEventListener('resize', fit);
 D.addEventListener('click', e => {
 const a = e.target.closest && e.target.closest('a.plrow'), m = a && a.getAttribute('href').match(/spotify\.com\/(\w+)\/(\w+)/);
-if (!m || !tk()) return;
+if (!m || !tk() || (Q('vdPlW') && Q('vdPlW').classList.contains('ed'))) return;
 e.preventDefault(); e.stopImmediatePropagation();
 if (e.target.closest('.plst')) return show(m[2], a.querySelector('.pn').textContent);
 const b = { context_uri: 'spotify:' + m[1] + ':' + m[2] };
@@ -5367,9 +5367,9 @@ ls.id = 'vdLs'; if (sr) sr.appendChild(ls);
 st.textContent = '.speedrow{position:relative}#vdLs{position:absolute;left:0;right:0;bottom:-2px;text-align:center;font-size:11px;line-height:1;color:#5f7288;pointer-events:none}' +
 '#limSign{width:44px!important;height:54px!important;right:18px!important;bottom:30px!important;border:2px solid #fff!important;border-radius:7px!important;box-shadow:inset 0 0 0 2px #111,0 2px 8px #000a}#limSign>div:first-child{font-size:8px!important;margin-top:5px!important;line-height:1!important}#limNum{font-size:24px!important;margin-top:2px!important}';
 D.head.appendChild(st);
-const U = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+const U = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
 const pm = v => { const m = String(v || '').match(/(\d+)\s*(mph)?/i); if (!m) return null; let n = +m[1]; if (!m[2]) n = Math.round(n * 0.621371); return n >= 5 && n <= 85 ? n : null; };
-const ask = (q, i) => { i = i || 0; const c = new AbortController(), t = setTimeout(() => c.abort(), 8000); return fetch(U[i], { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(q), signal: c.signal }).then(r => { clearTimeout(t); return r.ok ? r.json() : Promise.reject(r.status); }).catch(e => { clearTimeout(t); return i + 1 < U.length ? ask(q, i + 1) : Promise.reject(e); }); };
+const ask = (q, i) => { i = i || 0; const c = new AbortController(), t = setTimeout(() => c.abort(), 12000); return fetch(U[i], { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(q), signal: c.signal }).then(r => { clearTimeout(t); return r.ok ? r.json() : Promise.reject(r.status); }).catch(e => { clearTimeout(t); return i + 1 < U.length ? ask(q, i + 1) : Promise.reject(e); }); };
 const look = (lat, lon, hd) => ask('[out:json][timeout:10];way(around:30,' + lat + ',' + lon + ')[highway][maxspeed];out geom tags;').then(j => {
 let best = null, bs = 1e9;
 (j.elements || []).forEach(w => {
@@ -5383,20 +5383,21 @@ if (md + df < bs) { bs = md + df; best = lim; }
 });
 return best;
 });
+const KC = {}, look2 = (lat, lon, hd) => { const k = Math.floor(lat / 0.002) + ',' + Math.floor(lon / 0.002) + ',' + (Math.round(hd / 90) % 4); return k in KC ? Promise.resolve(KC[k]) : look(lat, lon, hd).then(r => { if (r != null) KC[k] = r; return r; }); };
 let busy = false, last = 0, cand = null, cnt = 0, miss = 0, hd = null;
 const clear = () => { showLimit(null); const s = D.querySelectorAll('#arcG stop'); if (s.length > 2) { s[1].setAttribute('offset', '0.5'); s[2].setAttribute('offset', '0.87'); } };
 navigator.geolocation.watchPosition(p => {
 const c = p.coords, mph = c.speed != null ? c.speed * 2.23694 : 0;
 if (c.heading != null && !isNaN(c.heading) && mph > 5) hd = c.heading;
-if (hd == null || mph <= 5 || busy || Date.now() - last < 6000) return;
+if (hd == null || mph <= 5 || busy || Date.now() - last < 10000) return;
 last = Date.now(); busy = true;
-look(c.latitude, c.longitude, hd).then(b => {
+look2(c.latitude, c.longitude, hd).then(b => {
 if (b == null) { cand = null; cnt = 0; miss++; if (limShown != null && miss >= 6) clear(); ls.textContent = limShown == null ? 'No posted limit on the map here' : ''; return; }
 miss = 0;
 if (b == limShown) { cand = null; cnt = 0; ls.textContent = ''; return; }
 if (b == cand) cnt++; else { cand = b; cnt = 1; }
 if (cnt >= 2) { showLimit(b); cand = null; cnt = 0; ls.textContent = ''; } else ls.textContent = 'Checking speed limit...';
-}).catch(e => { ls.textContent = 'Limit lookup failed' + (e ? ' (' + (e.name == 'AbortError' ? 'timeout' : e) + ')' : ''); }).then(() => { busy = false; });
+}).catch(e => { ls.textContent = limShown != null ? '' : 'Limit lookup failed' + (e ? ' (' + (e.name == 'AbortError' ? 'timeout' : e) + ')' : ''); }).then(() => { busy = false; });
 }, () => {}, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
 })();
 (function () {
@@ -5418,7 +5419,7 @@ const D = document, Q = i => D.getElementById(i), card = D.querySelector('.battc
 if (!card || !b || !row) return;
 const btn = D.createElement('button'), st = D.createElement('style');
 btn.id = 'gxBtn'; btn.textContent = 'Connect to GX'; row.after(btn);
-st.textContent = '#gxBtn{display:none}html:not(.camp) .battcard.gxoff .batt-row{display:none!important}html:not(.camp) .battcard.gxoff #gxBtn{display:block;width:100%;margin:10px 0 4px}#gxBtn:disabled{opacity:.6}';
+st.textContent = '#gxBtn{display:none}html:not(.camp) .battcard.gxoff .bamp,html:not(.camp) .battcard.gxoff .bpow{visibility:hidden}html:not(.camp) .battcard.gxoff #gxBtn{display:block;position:absolute;right:12px;bottom:6px;width:auto;min-width:0;min-height:0;padding:5px 14px;font-size:14px;line-height:1.3}#gxBtn:disabled{opacity:.6}';
 D.head.appendChild(st);
 let fails = 0, rw = 0;
 const camp = () => D.documentElement.classList.contains('camp');
@@ -5433,6 +5434,83 @@ btn.textContent = btn.disabled ? 'Connecting...' : 'Connect to GX';
 btn.onclick = () => b.click();
 new MutationObserver(() => { if (rw) return; const t = b.textContent; if (/live/.test(t)) fails = 0; else if (/^GX: (refused|no answer|blocked)/.test(t)) fails++; upd(); }).observe(b, { childList: true, subtree: true, characterData: true });
 setInterval(upd, 2000); upd();
+})();
+(function () {
+const D = document, Q = i => D.getElementById(i), L = Q('plList');
+if (!L || typeof PL == 'undefined') return;
+const LS = localStorage, ICON = '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>';
+const ld = () => { try { const a = JSON.parse(LS.getItem('vdPL')); if (Array.isArray(a)) return a; } catch (e) {} return PL.slice(1).map(p => ({ n: p[0], p: p[1], s: p[2] })); };
+let data = ld(), drag = null;
+const sv = () => { try { LS.setItem('vdPL', JSON.stringify(data)); } catch (e) {} };
+const first = PL[0], wr = D.createElement('div'), st = D.createElement('style');
+wr.id = 'vdPlW'; wr.className = 'card';
+wr.innerHTML = '<div class="vh"><b>Playlists</b><button id="vdEd">Edit</button></div>';
+L.before(wr); wr.appendChild(L);
+const SV = (c, d) => '<svg viewBox="0 0 24 24">' + d + '</svg>';
+st.textContent = '#vdPlW{display:flex;flex-direction:column;overflow:hidden;padding:0;margin-top:0}#vdPlW .vh{flex:none;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #2b3542}#vdPlW .vh b{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#9fb0c3;font-weight:600}#vdPlW .vh button{background:none;border:1.5px solid #cfd8e3;color:#fff;border-radius:18px;padding:5px 14px;font-size:15px}' +
+'#vdPlW #plList{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 12px 6px}#vdPlW .plrow{margin:0;background:none;border:0;border-bottom:1px solid #1d2630;border-radius:0;box-shadow:none;padding:8px 0}' +
+'#vdPlW .plrow .pn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}html.camp #vdPlW{flex:1;min-height:0;height:auto!important}' +
+'#vdPlW .ph,#vdPlW .pe,#vdPlW .pd,#vdPlW .vdAdd{display:none}#vdPlW.ed .plrow{gap:8px}#vdPlW.ed .ph,#vdPlW.ed .pe,#vdPlW.ed .pd{display:flex;flex:none;align-items:center;justify-content:center;height:44px}#vdPlW.ed .ph{width:28px;touch-action:none}#vdPlW.ed .pe,#vdPlW.ed .pd{width:38px}#vdPlW.ed .plst{display:none}' +
+'#vdPlW .ph svg,#vdPlW .pe svg,#vdPlW .pd svg{width:24px;height:24px;fill:none;stroke:#9fb0c3;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}#vdPlW .pe svg{stroke:#ff8a2b}#vdPlW .pd svg{stroke:#ff6b5e}#vdPlW .plrow.drg{background:#202a36}' +
+'#vdPlW.ed .vdAdd{display:block;width:100%;margin:12px 0 4px;padding:10px;background:none;border:1.5px solid #ff8a2b;color:#ff8a2b;border-radius:14px;font-size:16px}' +
+'#vdDlg{position:fixed;inset:0;background:#000b;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}#vdDlg .b{width:100%;max-width:420px;background:#151c25;border:1px solid #2b3542;border-radius:14px;padding:16px}#vdDlg h3{margin:0 0 12px;font-size:18px;color:#fff}#vdDlg label{display:block;font-size:12px;color:#9fb0c3;margin:10px 0 4px}#vdDlg input{width:100%;box-sizing:border-box;font-size:16px;padding:10px;border-radius:10px;border:1px solid #3a4756;background:#0d1219;color:#fff}#vdDlg .m{color:#ff6b5e;font-size:13px;margin-top:8px;min-height:16px}#vdDlg .r{display:flex;gap:10px;margin-top:12px}#vdDlg .r button{flex:1;padding:10px;font-size:16px;border-radius:12px}';
+D.head.appendChild(st);
+const render = () => {
+L.innerHTML = '';
+const mk = (p, i) => {
+const a = D.createElement('a'); a.className = 'card plrow'; a.href = 'https://open.spotify.com/' + p[1]; if (i != null) a.dataset.i = i;
+a.innerHTML = (i != null ? '<span class="ph">' + SV(0, '<path d="M4 8h16M4 12h16M4 16h16"/>') + '</span>' : '') + '<div class="pi">' + SV(0, p[2]) + '</div><div class="pn"></div>' + (i != null ? '<span class="pe">' + SV(0, '<path d="M4 20l4-1 11-11-3-3L5 16z"/>') + '</span><span class="pd">' + SV(0, '<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>') + '</span>' : '');
+a.querySelector('.pn').textContent = p[0]; L.appendChild(a);
+};
+mk(first); data.forEach((x, i) => mk([x.n, x.p, x.s || ICON], i));
+const b = D.createElement('button'); b.className = 'vdAdd'; b.textContent = '+ Add playlist'; L.appendChild(b);
+};
+render();
+const fit = () => { if (D.documentElement.classList.contains('camp')) { wr.style.height = ''; return; } if (wr.offsetParent) wr.style.height = Math.max(220, innerHeight - wr.getBoundingClientRect().top - 12) + 'px'; };
+setInterval(fit, 700); addEventListener('resize', fit); fit();
+Q('vdEd').onclick = () => { const on = wr.classList.toggle('ed'); Q('vdEd').textContent = on ? 'Done' : 'Edit'; };
+const parse = s => { const m = String(s).match(/(?:open\.spotify\.com\/(?:intl-[a-z]+\/)?|spotify:)(playlist|artist|album|show)[\/:]([A-Za-z0-9]+)/); return m ? m[1] + '/' + m[2] : null; };
+const dlg = i => {
+const x = i == null ? { n: '', p: '' } : data[i], o = D.createElement('div');
+o.id = 'vdDlg'; o.innerHTML = '<div class="b"><h3></h3><label>Name</label><input id="vdN" autocapitalize="words"><label>Spotify link (Share, then Copy link)</label><input id="vdU" inputmode="url" autocapitalize="off" autocorrect="off"><div class="m"></div><div class="r"><button>Cancel</button><button style="background:#ff8a2b;border:0;color:#000;font-weight:700">Save</button></div></div>';
+o.querySelector('h3').textContent = i == null ? 'Add playlist' : 'Edit playlist';
+o.querySelector('#vdN').value = x.n; o.querySelector('#vdU').value = x.p ? 'https://open.spotify.com/' + x.p : '';
+D.body.appendChild(o);
+const bs = o.querySelectorAll('button');
+bs[0].onclick = () => o.remove();
+bs[1].onclick = () => {
+const p = parse(o.querySelector('#vdU').value), n = o.querySelector('#vdN').value.trim();
+if (!p) { o.querySelector('.m').textContent = 'That does not look like a Spotify link. Use Share, then Copy link, in Spotify.'; return; }
+if (i == null) data.push({ n: n || 'Playlist', p: p, s: ICON }); else { data[i].n = n || data[i].n; data[i].p = p; }
+sv(); render(); o.remove();
+};
+};
+L.addEventListener('click', e => {
+if (!wr.classList.contains('ed')) return;
+const r = e.target.closest('.plrow'), i = r && r.dataset.i;
+if (e.target.closest('.vdAdd')) return dlg(null);
+if (!r) return;
+e.preventDefault();
+if (i == null) return;
+if (e.target.closest('.pe')) dlg(+i);
+else if (e.target.closest('.pd') && confirm('Remove "' + data[+i].n + '" from the list?')) { data.splice(+i, 1); sv(); render(); }
+}, true);
+L.addEventListener('pointerdown', e => {
+const h = e.target.closest('.ph'); if (!h || !wr.classList.contains('ed')) return;
+e.preventDefault(); drag = h.closest('.plrow'); drag.classList.add('drg');
+});
+D.addEventListener('pointermove', e => {
+if (!drag) return;
+const lr = L.getBoundingClientRect(); if (e.clientY < lr.top + 40) L.scrollTop -= 8; else if (e.clientY > lr.bottom - 40) L.scrollTop += 8;
+const rs = [].slice.call(L.querySelectorAll('.plrow[data-i]'));
+for (let k = 0; k < rs.length; k++) { const o = rs[k]; if (o == drag) continue; const b = o.getBoundingClientRect(); if (e.clientY > b.top && e.clientY < b.bottom) { if (rs.indexOf(o) < rs.indexOf(drag)) L.insertBefore(drag, o); else L.insertBefore(drag, o.nextSibling); break; } }
+});
+const end = () => {
+if (!drag) return;
+const ord = [].slice.call(L.querySelectorAll('.plrow[data-i]')).map(r => data[+r.dataset.i]);
+drag = null; data = ord; sv(); render();
+};
+D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
 })();
 </script>
 </body>
