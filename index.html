@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 280 -->
+<!-- Van Dash rev 286 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r280</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r286</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -958,7 +958,7 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) chec
   if (!unit) return;
   var sign = document.createElement("div");
   sign.id = "limSign";
-  sign.style.cssText = "position:absolute;right:22px;bottom:34px;width:34px;height:42px;background:#fff;border:2px solid #111;border-radius:5px;color:#111;font-weight:800;text-align:center;line-height:1;display:none;z-index:3";
+  sign.style.cssText = "position:absolute;right:22px;bottom:34px;width:34px;height:42px;background:#fff;border:2px solid #111;border-radius:5px;color:#111;font-weight:800;text-align:center;line-height:1;display:block;opacity:.25;transition:opacity .6s;z-index:3";
   sign.innerHTML = '<div style="font-size:7px;margin-top:3px">SPEED<br>LIMIT</div><div id="limNum" style="font-size:17px;margin-top:2px">--</div>';
   document.querySelector(".speed").appendChild(sign);
 })();
@@ -976,9 +976,9 @@ function setRedZone(lim) {
 function showLimit(lim) {
   limShown = lim;
   var s = document.getElementById("limSign");
-  if (lim == null) { if (s) s.style.display = "none"; return; }
+  if (lim == null) { if (s) { s.style.display = "block"; s.style.opacity = ".25"; var ln0 = document.getElementById("limNum"); if (ln0) ln0.textContent = "--"; } return; }
   s.style.display = "block";
-  document.getElementById("limNum").textContent = lim;
+  document.getElementById("limNum").textContent = lim; s.style.opacity = "1";
   setRedZone(lim);
   if (typeof setArc === "function" && !revT) setArc(gpsMph);
 }
@@ -1760,7 +1760,7 @@ function decorateResults() {
   function mix(a, b, t) { return Math.round(a + (b - a) * t); }
   function spdColor() {
     var m = typeof gpsMph != "undefined" ? gpsMph : 0, S = [[50, 76, 217, 100], [62, 200, 220, 70], [68, 255, 211, 77], [72, 255, 138, 43], [75, 255, 59, 48]], i = 1;
-    if (m < 50) return "";
+    return ""; /* rev 281: speed number stays white */
     while (i < 4 && m > S[i][0]) i++;
     var a = S[i - 1], b = S[i], t = Math.min(1, (m - a[0]) / (b[0] - a[0]));
     return "rgb(" + [1, 2, 3].map(function (k) { return mix(a[k], b[k], t); }) + ")";
@@ -2331,7 +2331,7 @@ function decorateResults() {
   function pos() { try { return lastWeatherPos || null; } catch (e) { return null; } }
   function hidden() { return sc.classList.contains('hidden'); }
 
-  // 15-second skip buttons on the Spotify page: put the "15" in the middle of the arrow
+  //
   ['spBack', 'spFwd'].forEach(function (id) {
     var b = document.getElementById(id), s = b && b.querySelector('span');
     if (s) { s.style.top = '16px'; s.style.lineHeight = '12px'; s.style.textAlign = 'center'; }
@@ -2718,26 +2718,26 @@ function decorateResults() {
   function render() {
     var pk = peek(), h = '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 12px">' +
       '<button id="trBack" style="margin:0;background:#26303c;padding:8px 14px;font-size:15px">&lsaquo; Back</button>' +
-      '<div style="font-size:20px;font-weight:600;color:#e8eef5">Trails</div><div style="width:70px"></div></div>' +
+      '<div style="font-size:20px;font-weight:600;color:#e8eef5">Tracks &amp; Trails</div><div style="width:70px"></div></div>' +
       '<button id="trSave" style="width:100%;margin:0 0 12px;padding:13px;font-size:16px;background:#c9651a">Save current track (' + pk.length + ' points, ' + miles(pk).toFixed(2) + ' mi)</button>';
     if (!trails.length) h += '<div style="text-align:center;color:#7f8fa3;padding:30px 0">No saved trails yet.<br>Record one with Start track, then save it here.</div>';
     trails.forEach(function (tr, i) {
       var on = shown.indexOf(tr.id) >= 0;
-      h += '<div style="background:#151c25;border:0.5px solid ' + (on ? '#ff8a2b' : '#8a96a6') + ';border-radius:14px;padding:12px;margin-bottom:8px">' +
+      h += '<div data-card="' + i + '" style="cursor:pointer;background:#151c25;border:0.5px solid ' + (on ? '#ff8a2b' : '#8a96a6') + ';border-radius:14px;padding:12px;margin-bottom:8px">' +
         '<div style="font-size:17px;font-weight:600;color:#e8eef5">' + esc(tr.name) + '</div>' +
         '<div style="font-size:13px;color:#9fb0c3;margin:3px 0 10px">' + when(tr.t0) + ' &middot; ' + tr.mi.toFixed(2) + ' mi &middot; ' + dur(tr.secs) + (tr.max ? ' &middot; max ' + Math.round(tr.max) + ' mph' : '') + '</div>' +
         '<div style="display:flex;gap:8px">' +
-        '<button data-a="show" data-i="' + i + '" style="flex:1;margin:0;padding:10px 6px;font-size:14px;background:' + (on ? '#26303c' : '#c9651a') + '">' + (on ? 'Hide from map' : 'Show on map') + '</button>' +
-        '<button data-a="share" data-i="' + i + '" style="margin:0;padding:10px 12px;font-size:14px;background:#26303c">Share</button>' +
-        '<button data-a="ren" data-i="' + i + '" style="margin:0;padding:10px 12px;font-size:14px;background:#26303c">Rename</button>' +
-        '<button data-a="del" data-i="' + i + '" style="margin:0;padding:10px 12px;font-size:16px;background:none;color:#ff8a2b">&times;</button></div></div>';
+        '<button data-a="show" data-i="' + i + '" style="flex:1;margin:0;padding:14px 6px;font-size:16px;background:' + (on ? '#26303c' : '#c9651a') + '">' + (on ? 'Hide from map' : 'Show on map') + '</button>' +
+        '<button data-a="share" data-i="' + i + '" style="margin:0;padding:14px 14px;font-size:16px;background:#26303c">Share</button>' +
+        '<button data-a="ren" data-i="' + i + '" style="margin:0;padding:14px 14px;font-size:16px;background:#26303c">Rename</button>' +
+        '<button data-a="del" data-i="' + i + '" style="margin:0;padding:12px 14px;font-size:22px;background:none;color:#ff8a2b">&times;</button></div></div>';
     });
     panel.innerHTML = h;
     mark();
   }
   panel.onclick = function (e) {
     var b = e.target && e.target.closest ? e.target.closest('button') : null;
-    if (!b) return;
+    if (!b) { var cd = e.target && e.target.closest ? e.target.closest('[data-card]') : null, t2 = cd && trails[+cd.getAttribute('data-card')]; if (t2) { if (shown.indexOf(t2.id) < 0) { shown.push(t2.id); persist(); } mark(); panel.style.display = 'none'; focus(t2); if (window.__vdTrInfo) window.__vdTrInfo(t2); } return; }
     if (b.id === 'trBack') { panel.style.display = 'none'; return; }
     if (b.id === 'trSave') { saveCur(); return; }
     var i = +b.getAttribute('data-i'), a = b.getAttribute('data-a'), tr = trails[i], k;
@@ -2745,7 +2745,7 @@ function decorateResults() {
     if (a === 'show') {
       k = shown.indexOf(tr.id);
       if (k >= 0) { shown.splice(k, 1); persist(); render(); redraw(); }
-      else { shown.push(tr.id); persist(); mark(); panel.style.display = 'none'; focus(tr); }
+      else { shown.push(tr.id); persist(); mark(); panel.style.display = 'none'; focus(tr); if (window.__vdTrInfo) window.__vdTrInfo(tr); }
     } else if (a === 'share') {
       share(tr);
     } else if (a === 'ren') {
@@ -2883,13 +2883,13 @@ function decorateResults() {
     var a = window.__fCen ? window.__fCen() : null;
     if (!a || a[0] == null) { msg = 'The map has no location yet.'; render(); return; }
     panel.style.display = 'none';
-    if (window.__fGo) window.__fGo(a[0], a[1]); // stop following the GPS so the map stays where you put it
+    if (window.__fGo) window.__fGo(a[0], a[1]); //
     cross.style.display = 'block'; bar.style.display = 'flex';
     bar.style.height = Math.max(40, (st && st.offsetHeight) || 0) + 'px';
     clearInterval(hold);
     hold = setInterval(function () {
       if (fm.classList.contains('hidden')) { endPick(); return; }
-      if (window.__fCen) window.__fCen(true); // keep the map from snapping back while you line it up
+      if (window.__fCen) window.__fCen(true); //
     }, 4000);
   }
   ['pnNo', 'pnYes'].forEach(function (id) {
@@ -3225,7 +3225,7 @@ if (W.__fCen) W.__fCen(true);
     if (cb) cb.onclick = function () { if (confirm("Clear all " + shots.length + " queued photos?")) { shots = []; saveShots(); sync(); renderList(); } };
   }
 
-  // rev 246: sending never removes photos; they stay until you delete them yourself
+  //
   function afterSend(msg) {
     var m = document.getElementById("shMsg");
     if (m) m.textContent = msg + " They stay here until you delete them.";
@@ -5244,7 +5244,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 280): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 286): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -5519,6 +5519,260 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   d.id = 'vdRot';
   d.innerHTML = '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#ff8a2b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18.5h2"/></svg><div>Turn your phone upright</div><div style="font-size:14px;font-weight:400;color:#8a96a6">Van Dash keeps running. It is built for portrait.</div>';
   D.head.appendChild(st); D.body.appendChild(d);
+})();
+/* ===== rev 282: info bar when a track is opened on the big map ===== */
+(function () {
+  var D = document, fm = D.getElementById('fullMap'), bar = null;
+  if (!fm) return;
+  window.__vdTrHide = function () { if (bar) bar.style.display = 'none'; };
+  window.__vdTrInfo = function (tr) {
+    if (window.__vdPinHide) window.__vdPinHide();
+    if (!bar) {
+      bar = D.createElement('div');
+      bar.style.cssText = 'position:absolute;left:12px;right:70px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:6;display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(21,28,37,0.97);border:0.5px solid #ff8a2b;border-radius:12px';
+      bar.innerHTML = '<div style="flex:1;min-width:0"><div id="vdTN" style="font-size:15px;color:#e8eef5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div id="vdTS" style="font-size:12px;color:#9fb0c3"></div></div><button id="vdTX" aria-label="Close" style="margin:0;padding:0;width:36px;height:36px;font-size:18px;background:#26303c;border:0;border-radius:8px;flex:none">&times;</button>';
+      fm.appendChild(bar);
+      ['pointerdown', 'pointerup', 'click'].forEach(function (ev) { bar.addEventListener(ev, function (e) { e.stopPropagation(); }); });
+      bar.querySelector('#vdTX').onclick = function () { bar.style.display = 'none'; };
+    }
+    var m = Math.round(tr.secs / 60), t = m >= 60 ? Math.floor(m / 60) + ' h ' + (m % 60) + ' min' : m + ' min';
+    bar.querySelector('#vdTN').textContent = tr.name;
+    bar.querySelector('#vdTS').textContent = tr.mi.toFixed(2) + ' mi · ' + t + (tr.max ? ' · max ' + Math.round(tr.max) + ' mph' : '');
+    bar.style.display = 'flex';
+  };
+  setInterval(function () { if (bar && fm.classList.contains('hidden')) bar.style.display = 'none'; }, 500);
+})();
+
+/* ===== rev 284-286: search pin + Directions, recent searches, voice, nearby places ===== */
+(function () {
+  var D = document, W = window;
+  var fm = D.getElementById('fullMap'), bar = D.getElementById('fSrchBar'), sIn = D.getElementById('fSrchIn'), sList = D.getElementById('fSrchList');
+  if (!fm || !bar || !sIn || !sList) return;
+  var HK = 'vdSrchHist', pos = null, head = null, lastFix = null, pin = null, cityPick = null, seq = 0, cache = {};
+  var R = 3958.8, rad = Math.PI / 180;
+  function dist(a, b) { var dl = (b.lat - a.lat) * rad, dn = (b.lon - a.lon) * rad, x = Math.sin(dl / 2) * Math.sin(dl / 2) + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dn / 2) * Math.sin(dn / 2); return 2 * R * Math.asin(Math.sqrt(x)); }
+  function brg(a, b) { var y = Math.sin((b.lon - a.lon) * rad) * Math.cos(b.lat * rad), x = Math.cos(a.lat * rad) * Math.sin(b.lat * rad) - Math.sin(a.lat * rad) * Math.cos(b.lat * rad) * Math.cos((b.lon - a.lon) * rad); return (Math.atan2(y, x) / rad + 360) % 360; }
+  function adiff(a, b) { var d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  try {
+    navigator.geolocation.watchPosition(function (p) {
+      var c = p.coords, cur = { lat: c.latitude, lon: c.longitude };
+      if (lastFix && dist(lastFix, cur) > 0.015) { head = brg(lastFix, cur); lastFix = cur; } else if (!lastFix) lastFix = cur;
+      if (c.heading != null && !isNaN(c.heading) && c.speed > 1) head = c.heading;
+      pos = cur;
+    }, function () {}, { enableHighAccuracy: true, maximumAge: 5000 });
+  } catch (e) {}
+
+  // ---- recent searches (last 15) ----
+  function hist() { try { return JSON.parse(localStorage.getItem(HK) || '[]'); } catch (e) { return []; } }
+  function addHist(q) {
+    q = (q || '').trim(); if (q.length < 3) return;
+    var h = hist().filter(function (x) { return x.toLowerCase() !== q.toLowerCase(); }); h.unshift(q);
+    try { localStorage.setItem(HK, JSON.stringify(h.slice(0, 15))); } catch (e) {}
+  }
+  var poi = D.createElement('div');
+  poi.id = 'vdPoi';
+  poi.style.cssText = 'margin-top:6px;background:rgba(21,28,37,0.96);border:0.5px solid #8a96a6;border-radius:10px;display:none;overflow:auto;max-height:46vh;-webkit-overflow-scrolling:touch';
+  bar.appendChild(poi);
+  var ROW = 'padding:12px 14px;font-size:16px;color:#fff;border-bottom:0.5px solid #2a3442';
+  function say(h) { poi.innerHTML = h; poi.style.display = h ? 'block' : 'none'; }
+  function showHist() {
+    var h = hist();
+    if (!h.length) { say(''); return; }
+    poi.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:13px;color:#7f8fa3;border-bottom:0.5px solid #2a3442"><span>Recent searches</span><button id="vdHClr" style="margin:0;padding:4px 8px;background:none;border:0;color:#ff8a2b;font-size:13px">Clear</button></div>' +
+      h.map(function (x, i) { return '<div data-h="' + i + '" style="' + ROW + '">' + esc(x) + '</div>'; }).join('');
+    poi.style.display = 'block';
+  }
+  poi.addEventListener('click', function (e) {
+    var t = e.target; if (!t || !t.closest) return;
+    if (t.closest('#vdHClr')) { try { localStorage.removeItem(HK); } catch (er) {} say(''); return; }
+    var hr = t.closest('[data-h]');
+    if (hr) { run(hist()[+hr.getAttribute('data-h')]); return; }
+    var pr = t.closest('[data-p]');
+    if (pr) { var p = list[+pr.getAttribute('data-p')]; if (p) pick(p); return; }
+    var gm = t.closest('[data-g]');
+    if (gm) { openUrl('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(gm.getAttribute('data-g'))); }
+  });
+
+  // ---- places: categories and names, from OpenStreetMap, ahead of you first ----
+  var CATS = [
+    [/\b(gas|fuel|petrol|diesel)\b/, 'Gas stations', ['"amenity"="fuel"']],
+    [/\b(restaurants?|food|eat|lunch|dinner|breakfast|diner)\b/, 'Food', ['"amenity"="restaurant"', '"amenity"="fast_food"']],
+    [/\b(coffee|cafe|espresso)\b/, 'Coffee', ['"amenity"="cafe"']],
+    [/\b(grocery|groceries|supermarket)\b/, 'Groceries', ['"shop"="supermarket"', '"shop"="convenience"']],
+    [/\bhardware\b/, 'Hardware stores', ['"shop"="hardware"', '"shop"="doityourself"']],
+    [/\b(camp|campgrounds?|camping)\b/, 'Campgrounds', ['"tourism"="camp_site"', '"tourism"="caravan_site"']],
+    [/\b(hospital|emergency room)\b/, 'Hospitals', ['"amenity"="hospital"']],
+    [/\b(rest area|rest stop)\b/, 'Rest areas', ['"highway"="rest_area"', '"highway"="services"']]
+  ];
+  var FILL = /\b(find|me|the|a|an|next|nearest|closest|nearby|near|please|show|where|where's|is|are|for|to|go|navigate|take|get|some|any|i|need|want)\b/g;
+  function norm(q) { return q.toLowerCase().replace(FILL, ' ').replace(/\s+/g, ' ').trim(); }
+  function kind(q) {
+    var n = norm(q);
+    for (var i = 0; i < CATS.length; i++) if (CATS[i][0].test(n)) return { cat: CATS[i], n: n };
+    return { cat: null, n: n };
+  }
+  var U = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
+  async function op(q) {
+    for (var i = 0; i < U.length; i++) {
+      try {
+        var c = new AbortController(), t = setTimeout(function () { c.abort(); }, 14000);
+        var r = await fetch(U[i] + '?data=' + encodeURIComponent(q), { signal: c.signal }); clearTimeout(t);
+        if (!r.ok) continue;
+        var j = await r.json(); return j.elements || [];
+      } catch (e) {}
+    }
+    throw new Error('down');
+  }
+  async function fetchPlaces(k, rad) {
+    var around = '(around:' + rad + ',' + pos.lat.toFixed(5) + ',' + pos.lon.toFixed(5) + ')', body;
+    if (k.cat) body = k.cat[2].map(function (f) { return 'nwr[' + f + ']' + around + ';'; }).join('');
+    else body = 'nwr["name"~"' + k.n.replace(/[^a-z0-9 ]/g, '.') + '",i]' + around + ';';
+    var els = await op('[out:json][timeout:20];(' + body + ');out center 120;');
+    var out = [], seen = {};
+    els.forEach(function (el) {
+      var la = el.lat != null ? el.lat : el.center && el.center.lat, lo = el.lon != null ? el.lon : el.center && el.center.lon, tg = el.tags || {};
+      if (la == null || lo == null) return;
+      var nm = tg.name || tg.brand || tg.operator || (k.cat ? k.cat[1].replace(/s$/, '') : '');
+      if (!nm) return;
+      var key = nm.toLowerCase() + '|' + la.toFixed(3) + '|' + lo.toFixed(3); if (seen[key]) return; seen[key] = 1;
+      var p = { name: nm, lat: la, lon: lo, d: dist(pos, { lat: la, lon: lo }), town: tg['addr:city'] || '' };
+      p.ahead = head == null ? null : adiff(brg(pos, p), head) <= 70;
+      out.push(p);
+    });
+    out.sort(function (a, b) { return (a.ahead === false ? 1 : 0) - (b.ahead === false ? 1 : 0) || a.d - b.d; });
+    return out;
+  }
+  var list = [];
+  async function runPlaces(q, forceShow) {
+    var k = kind(q), id = ++seq;
+    if (k.n.length < 3) { if (!sIn.value) showHist(); else say(''); return; }
+    if (!pos) { if (forceShow || k.cat) say('<div style="' + ROW + ';color:#7f8fa3">Waiting for GPS...</div>'); return; }
+    say('<div style="' + ROW + ';color:#7f8fa3">Looking nearby...</div>');
+    var ck = k.n + '|' + pos.lat.toFixed(2) + '|' + pos.lon.toFixed(2), res = cache[ck] && Date.now() - cache[ck].t < 180000 ? cache[ck].r : null;
+    try {
+      if (!res) {
+        res = await fetchPlaces(k, 30000);
+        if (!res.length || (head != null && !res.some(function (p) { return p.ahead; }))) { var more = await fetchPlaces(k, 100000); if (more.length) res = more; }
+        cache[ck] = { t: Date.now(), r: res };
+      }
+    } catch (e) { if (id === seq) say('<div style="' + ROW + ';color:#7f8fa3">Nearby search is busy. Try again in a moment.</div><div data-g="' + esc(q) + '" style="' + ROW + ';color:#ff8a2b">Search in Google Maps</div>'); return; }
+    if (id !== seq) return;
+    list = res.slice(0, 6);
+    if (!list.length) { if (k.cat || forceShow) say('<div style="' + ROW + ';color:#7f8fa3">No match nearby</div><div data-g="' + esc(q) + '" style="' + ROW + ';color:#ff8a2b">Search in Google Maps</div>'); else say(''); return; }
+    say('<div style="padding:8px 14px;font-size:13px;color:#7f8fa3;border-bottom:0.5px solid #2a3442">' + (k.cat ? k.cat[1] : 'Places nearby') + (head != null ? ', ahead of you first' : '') + '</div>' +
+      list.map(function (p, i) {
+        return '<div data-p="' + i + '" style="' + ROW + '"><div>' + esc(p.name) + '</div><div style="font-size:13px;color:#9fb0c3;margin-top:2px">' + p.d.toFixed(1) + ' mi' + (p.ahead === true ? ' ahead' : p.ahead === false ? ' behind' : '') + (p.town ? ' &middot; ' + esc(p.town) : '') + '</div></div>';
+      }).join('') + '<div data-g="' + esc(q) + '" style="padding:10px 14px;font-size:14px;color:#ff8a2b">Not here? Search in Google Maps</div>');
+  }
+
+  // ---- pin + Directions ----
+  function openUrl(u) { var a = D.createElement('a'); a.href = u; a.target = '_blank'; a.rel = 'noopener'; D.body.appendChild(a); a.click(); a.remove(); }
+  var dbar = null;
+  window.__vdPinHide = function () { if (dbar) dbar.style.display = "none"; };
+  function drawPin(ctx, left, top, z) {
+    if (!pin || typeof vWorld !== 'function') return;
+    var w = vWorld(pin.lat, pin.lon, z), x = w.x - left, y = w.y - top;
+    ctx.save(); ctx.translate(x, y); ctx.rotate((W.__mapHead || 0) * Math.PI / 180);
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(-19, -20, -17, -44, 0, -44); ctx.bezierCurveTo(17, -44, 19, -20, 0, 0);
+    ctx.fillStyle = '#e53935'; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = '#fff'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, -28, 6.5, 0, 6.2832); ctx.fillStyle = '#fff'; ctx.fill(); ctx.restore();
+  }
+  var prevOver = W.__fOver;
+  W.__fOver = function (ctx, l, t, z) { if (prevOver) prevOver(ctx, l, t, z); drawPin(ctx, l, t, z); };
+  function redraw() { try { W.dispatchEvent(new Event('resize')); } catch (e) {} }
+  function setPin(lat, lon, name, sub) {
+    pin = { lat: lat, lon: lon, name: name };
+    if (window.__vdTrHide) window.__vdTrHide();
+    if (!dbar) {
+      dbar = D.createElement('div');
+      dbar.style.cssText = 'position:absolute;left:12px;right:70px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:6;display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(21,28,37,0.97);border:0.5px solid #ff8a2b;border-radius:12px';
+      dbar.innerHTML = '<div style="flex:1;min-width:0"><div id="vdDN" style="font-size:15px;color:#e8eef5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div id="vdDS" style="font-size:12px;color:#9fb0c3"></div></div>' +
+        '<button id="vdDGo" style="margin:0;padding:0 14px;height:40px;font-size:15px;background:#c9651a;border:0;border-radius:8px;flex:none">Directions</button>' +
+        '<button id="vdDX" aria-label="Remove pin" style="margin:0;padding:0;width:36px;height:40px;font-size:18px;background:#26303c;border:0;border-radius:8px;flex:none">&times;</button>';
+      fm.appendChild(dbar);
+      ['pointerdown', 'pointerup', 'click'].forEach(function (ev) { dbar.addEventListener(ev, function (e) { e.stopPropagation(); }); });
+      dbar.querySelector('#vdDGo').onclick = function () { if (pin) openUrl('https://www.google.com/maps/dir/?api=1&destination=' + pin.lat + ',' + pin.lon + '&travelmode=driving'); };
+      dbar.querySelector('#vdDX').onclick = function () { pin = null; dbar.style.display = 'none'; redraw(); };
+    }
+    dbar.querySelector('#vdDN').textContent = name; dbar.querySelector('#vdDS').textContent = sub || '';
+    dbar.style.display = 'flex'; redraw();
+  }
+  function closeSearch() { if (bar.style.display === 'block') { var b = D.getElementById('fSrch'); if (b) b.click(); } }
+  function pick(p) {
+    addHist(sIn.value);
+    closeSearch();
+    W.__fSetCenter(p.lat, p.lon);
+    if (W.__fGetZoom && W.__fGetZoom() < 14) { W.__fSetZoom(14); if (W.__fDraw) W.__fDraw(); }
+    setPin(p.lat, p.lon, p.name, p.d.toFixed(1) + ' mi' + (p.ahead === true ? ' ahead' : p.ahead === false ? ' behind' : ''));
+  }
+  // picking a city from the existing list also drops a pin there
+  var oc = W.__fSetCenter;
+  if (oc) W.__fSetCenter = function (a, o) { oc.apply(this, arguments); if (cityPick) { var c = cityPick; cityPick = null; setPin(a, o, c, 'Tap Directions to navigate'); } };
+  sList.addEventListener('click', function (e) {
+    var row = e.target && e.target.closest ? e.target.closest('div[style*="padding:12px 14px"]') : null;
+    if (!row || row.parentNode !== sList) return;
+    cityPick = row.textContent; addHist(sIn.value); setTimeout(function () { cityPick = null; }, 800);
+  }, true);
+
+  // ---- typing, history and Go ----
+  var tm = 0;
+  sIn.addEventListener('input', function () { clearTimeout(tm); if (!sIn.value.trim()) { showHist(); return; } if (sIn.value.trim().length < 3) { say(''); return; } tm = setTimeout(function () { runPlaces(sIn.value); }, 900); });
+  sIn.addEventListener('focus', function () { if (!sIn.value.trim()) showHist(); });
+  var go = D.getElementById('fSrchGo');
+  if (go) go.addEventListener('click', function () { addHist(sIn.value); runPlaces(sIn.value, true); });
+  sIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') { addHist(sIn.value); runPlaces(sIn.value, true); } });
+  new MutationObserver(function () { if (bar.style.display === 'block' && !sIn.value.trim()) showHist(); else if (bar.style.display !== 'block') say(''); }).observe(bar, { attributes: true, attributeFilter: ['style'] });
+  function run(q) { sIn.value = q; sIn.dispatchEvent(new Event('input', { bubbles: true })); var k = kind(q); if (k.cat) { runPlaces(q, true); } }
+
+  // ---- voice ----
+  var STATES = /,?\s+(alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|virginia|washington|west virginia|wisconsin|wyoming)$/i;
+  var mics = [];
+  function micState(on) { mics.forEach(function (b) { b.style.borderColor = on ? '#ff8a2b' : '#8a96a6'; b.style.background = on ? '#c9651a' : 'rgba(21,28,37,0.92)'; }); if (on) sIn.placeholder = 'Listening...'; else sIn.placeholder = 'City, zip, or place'; }
+  function listen() {
+    var SR = W.SpeechRecognition || W.webkitSpeechRecognition;
+    if (!SR) { alert('Voice search is not available in this browser. You can type instead.'); return; }
+    try {
+      var r = new SR(); r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1;
+      micState(true);
+      r.onresult = function (e) {
+        var t = (e.results[0][0].transcript || '').replace(/[.?!]+$/, '').trim(); if (!t) return;
+        var k = kind(t);
+        if (k.cat) { sIn.value = t; addHist(t); runPlaces(t, true); }
+        else { sIn.value = t.replace(STATES, ''); addHist(t); sIn.dispatchEvent(new Event('input', { bubbles: true })); runPlaces(t, false); }
+      };
+      r.onerror = function () { micState(false); sIn.placeholder = 'Could not hear that. Try again or type.'; };
+      r.onend = function () { micState(false); };
+      r.start();
+    } catch (e) { micState(false); }
+  }
+  var MIC = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;margin:auto"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>';
+  function showBar() { if (bar.style.display !== 'block') { var b = D.getElementById('fSrch'); if (b) b.click(); } }
+  sIn.placeholder = 'City, zip, or place';
+  var row1 = bar.firstElementChild;
+  if (row1) {
+    var m2 = D.createElement('button'); m2.id = 'vdMic2'; m2.setAttribute('aria-label', 'Speak a search'); m2.innerHTML = MIC;
+    m2.style.cssText = 'margin:0;padding:0;width:48px;background:rgba(21,28,37,0.96);border:0.5px solid #8a96a6;flex:none';
+    m2.onclick = function (e) { e.stopPropagation(); listen(); };
+    row1.appendChild(m2); mics.push(m2);
+  }
+  var zb = D.querySelector('#vmap .zbtns');
+  if (zb) {
+    var m1 = D.createElement('button'); m1.id = 'vdMic'; m1.setAttribute('aria-label', 'Search by voice'); m1.innerHTML = MIC;
+    ['pointerdown', 'pointerup'].forEach(function (ev) { m1.addEventListener(ev, function (e) { e.stopPropagation(); }); });
+    m1.onclick = function (e) {
+      e.stopPropagation();
+      listen();
+      if (fm.classList.contains('hidden')) {
+        var c = D.getElementById('vmapCanvas'), o = { bubbles: true, clientX: 5, clientY: 5, pointerId: 1 };
+        c.setPointerCapture = function () {};
+        c.dispatchEvent(new PointerEvent('pointerdown', o)); c.dispatchEvent(new PointerEvent('pointerup', o));
+        delete c.setPointerCapture;
+      }
+      setTimeout(showBar, 250);
+    };
+    zb.appendChild(m1); mics.push(m1);
+  }
 })();
 </script>
 </body>
