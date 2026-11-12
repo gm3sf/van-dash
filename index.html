@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 289 -->
+<!-- Van Dash rev 296 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r289</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r296</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -4447,7 +4447,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
       h += '<div style="text-align:center;color:#7f8fa3;padding:30px 0">No photos saved.</div>';
     } else {
       h += '<div style="display:flex;gap:8px;margin-bottom:8px">' +
-        '<button id="pxSend" style="flex:1;margin:0;padding:13px;font-size:16px;background:#c9651a">' + (selMode && n ? 'Send selected (' + n + ')' : 'Send all (' + shots.length + ')') + '</button>' +
+        '<button id="pxSend" style="flex:1;margin:0;padding:13px;font-size:16px;background:#c9651a">' + (selMode && n ? 'Share selected (' + n + ')' : 'Send all (' + shots.length + ')') + '</button>' +
         '<button id="pxSel" class="alt" style="margin:0;padding:13px 16px;font-size:16px;' + (selMode ? 'border:0.5px solid #ff8a2b;color:#ff8a2b' : '') + '">' + (selMode ? 'Done' : 'Select') + '</button></div>';
       if (selMode) {
         h += '<div style="display:flex;gap:8px;margin-bottom:8px">' +
@@ -5244,7 +5244,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 289): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 296): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -5790,16 +5790,17 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     var SR = W.SpeechRecognition || W.webkitSpeechRecognition;
     if (!SR) { alert('Voice search is not available in this browser. You can type instead.'); return; }
     try {
-      var r = new SR(); r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1;
-      micState(true); say(''); list = [];
+      var r = new SR(); r.lang = 'en-US'; r.interimResults = true; r.maxAlternatives = 1;
+      micState(true); say(''); list = []; var got = false;
+      r.onspeechstart = function () { got = true; sIn.placeholder = 'Hearing you...'; };
       r.onresult = function (e) {
-        var t = (e.results[0][0].transcript || '').replace(/[.?!]+$/, '').trim(); if (!t) return;
+        got = true; var rs = e.results[e.results.length - 1], t = (rs[0].transcript || '').replace(/[.?!]+$/, '').trim(); if (!t) return; if (rs.isFinal === false) { sIn.value = t; return; }
         var k = kind(t);
         if (k.cat) { sIn.value = t; addHist(t); runPlaces(t, true); }
         else { sIn.value = t.replace(STATES, ''); addHist(t); sIn.dispatchEvent(new Event('input', { bubbles: true })); runPlaces(t, false); }
       };
       r.onerror = function (ev) { micState(false); var er = ev && ev.error; sIn.placeholder = er === 'not-allowed' || er === 'service-not-allowed' ? 'Mic blocked: allow it in Safari settings' : er === 'no-speech' ? 'Did not hear anything. Try again.' : 'Could not hear that (' + (er || 'error') + ')'; };
-      r.onend = function () { micState(false); };
+      r.onend = function () { micState(false); if (!got) sIn.placeholder = 'Heard nothing. Check Dictation in Settings > Keyboard'; };
       r.start();
     } catch (e) { micState(false); }
   }
@@ -5848,10 +5849,11 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
 
 /* ===== rev 288: speed limit fetch-ahead (one bigger request, answered from the phone's memory) ===== */
 (function () {
-  var W = window, F = W.fetch;
-  var S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
-  var cache = [], inflight = null, head = null, backoff = 0, pref = 0, rad = Math.PI / 180;
-  try { pref = (+localStorage.getItem('vdOvPref') || 0) % S.length; } catch (e) {}
+  var W = window, F = W.fetch, D = document;
+  var S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'], N = ['de', 'ku', 'pc', 'fr'];
+  var cache = [], inflight = null, head = null, backoff = 0, rad = Math.PI / 180, diag = {}, vhd = '', dg = D.createElement('div'), sr = D.querySelector('.speedrow'), dst = D.createElement('style');
+  dg.id = 'vdDg'; dst.textContent = '#vdDg{position:absolute;left:6px;width:88px;bottom:8px;text-align:left;font-size:8px;line-height:1.2;color:#56697f;pointer-events:none}'; D.head.appendChild(dst); if (sr) sr.appendChild(dg);
+  function paint() { dg.textContent = 'OP ' + N.map(function (n) { return n + ':' + (diag[n] || '-'); }).join(' ') + (vhd ? ' VH ' + vhd : ''); }
   function dm(a, b, c, d) { var dl = (c - a) * rad, dn = (d - b) * rad, x = Math.sin(dl / 2) * Math.sin(dl / 2) + Math.cos(a * rad) * Math.cos(c * rad) * Math.sin(dn / 2) * Math.sin(dn / 2); return 12742000 * Math.asin(Math.sqrt(x)); }
   function segd(lat, lon, a, b) {
     var k = Math.cos(lat * rad), px = (lon - a.lon) * 111320 * k, py = (lat - a.lat) * 110540, bx = (b.lon - a.lon) * 111320 * k, by = (b.lat - a.lat) * 110540, l2 = bx * bx + by * by, t = l2 ? Math.max(0, Math.min(1, (px * bx + py * by) / l2)) : 0, dx = px - t * bx, dy = py - t * by;
@@ -5867,26 +5869,40 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     for (var i = 0; i < cache.length; i++) { var e = cache[i]; if (now - e.t < 6 * 3600000 && dm(e.lat, e.lon, lat, lon) <= e.r - 300) return e; }
     return null;
   }
-  async function load(lat, lon, r) {
-    var q = '[out:json][timeout:25];way(around:' + r + ',' + lat.toFixed(5) + ',' + lon.toFixed(5) + ')[highway][maxspeed];out geom tags;';
-    for (var n = 0; n < S.length; n++) {
-      var i = (pref + n) % S.length, c = new AbortController(), t = setTimeout(function () { c.abort(); }, 16000);
-      try {
-        var res = await F.call(W, S[i], { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(q), signal: c.signal });
-        clearTimeout(t); if (!res.ok) continue;
-        var j = await res.json(); pref = i; try { localStorage.setItem('vdOvPref', i); } catch (e) {}
-        return (j.elements || []).filter(function (w) { return w.geometry && w.geometry.length > 1; }).map(function (w) { return { tags: w.tags, geometry: w.geometry }; });
-      } catch (e) { clearTimeout(t); }
-    }
-    return null;
+  function oneOp(i, q) {
+    var n = N[i], c = new AbortController(), t0 = Date.now(), t = setTimeout(function () { c.abort(); }, 14000);
+    return F.call(W, S[i], { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(q), signal: c.signal })
+      .then(function (r) { if (!r.ok) throw { st: r.status }; return r.json(); })
+      .then(function (j) { clearTimeout(t); diag[n] = 'ok' + (j.elements || []).length + '/' + Math.round((Date.now() - t0) / 1000) + 's'; paint(); return j; },
+        function (e) { clearTimeout(t); diag[n] = e && e.st ? e.st : (e && e.name === 'AbortError' ? 't/o' : 'err'); paint(); throw e; });
+  }
+  function load(lat, lon, r) {
+    var q = '[out:json][timeout:12];way(around:' + r + ',' + lat.toFixed(5) + ',' + lon.toFixed(5) + ')[highway][maxspeed];out geom tags;';
+    return new Promise(function (res) {
+      var left = S.length;
+      S.forEach(function (u, i) { oneOp(i, q).then(function (j) { res((j.elements || []).filter(function (w) { return w.geometry && w.geometry.length > 1; }).map(function (w) { return { tags: w.tags, geometry: w.geometry }; })); }, function () { if (--left === 0) res(null); }); });
+    });
+  }
+  function valhalla(lat, lon) {
+    var bad = function () { return new Response('x', { status: 503 }); };
+    if (head == null) return Promise.resolve(bad());
+    var a = ahead(lat, lon, -15), b = ahead(lat, lon, 15), c = new AbortController(), t = setTimeout(function () { c.abort(); }, 10000);
+    return F.call(W, 'https://valhalla1.openstreetmap.de/trace_attributes', { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ shape: [a, b], costing: 'auto', shape_match: 'map_snap', filters: { attributes: ['edge.speed_limit'], action: 'include' } }), signal: c.signal })
+      .then(function (r) { if (!r.ok) throw r.status; return r.json(); })
+      .then(function (j) {
+        clearTimeout(t); var e = j.edges && j.edges[0], l = e && e.speed_limit; vhd = l ? l + 'kmh' : 'none'; paint();
+        var out = l ? [{ type: 'way', tags: { highway: 'road', maxspeed: l + ' km/h' }, geometry: [a, b] }] : [];
+        return new Response(JSON.stringify({ elements: out }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      }).catch(function (e) { clearTimeout(t); vhd = e && e.name === 'AbortError' ? 't/o' : (typeof e === 'number' ? e : 'err'); paint(); return bad(); });
   }
   function ensure(lat, lon) {
     if (cov(lat, lon)) return Promise.resolve(true);
+    if (Date.now() < backoff) return Promise.resolve(false);
     if (inflight) return inflight.then(function () { return !!cov(lat, lon); });
-    var c = ahead(lat, lon, 800), r = 3000;
+    var c = ahead(lat, lon, 500), r = 1500;
     inflight = load(c.lat, c.lon, r).then(function (ways) {
       inflight = null;
-      if (!ways) { backoff = Date.now() + 45000; return false; }
+      if (!ways) { backoff = Date.now() + 20000; return false; }
       cache.unshift({ lat: c.lat, lon: c.lon, r: r, t: Date.now(), ways: ways }); if (cache.length > 6) cache.pop();
       return !!cov(lat, lon);
     });
@@ -5907,7 +5923,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
         var m = decodeURIComponent(String(o.body)).match(/way\(around:(\d+),([-\d.]+),([-\d.]+)\)\[highway\]\[maxspeed\]/);
         if (m && +m[1] <= 60) {
           var rr = +m[1], lat = +m[2], lon = +m[3], args = arguments, self = this;
-          return ensure(lat, lon).then(function (ok) { return ok ? build(lat, lon, rr) : F.apply(self, args); });
+          return ensure(lat, lon).then(function (ok) { return ok ? build(lat, lon, rr) : valhalla(lat, lon); });
         }
       }
     } catch (e) {}
@@ -5925,6 +5941,91 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
       if (!cov(a.lat, a.lon)) ensure(a.lat, a.lon);
     }, function () {}, { enableHighAccuracy: true, maximumAge: 2000 });
   } catch (e) {}
+})();
+
+/* ===== rev 290: daily rain % and icon use daylight hours only (sunrise to sunset, highest chance) ===== */
+(function () {
+  var W = window, F = W.fetch;
+  var T = function (p) { return Promise.race([p, new Promise(function (r) { setTimeout(function () { r(null); }, 7000); })]); };
+  var mins = function (t) { return +t.slice(11, 13) * 60 + +t.slice(14, 16); };
+  function mode(a) { var b = null, c = {}; a.forEach(function (x) { if (x != null) { c[x] = (c[x] || 0) + 1; if (b == null || c[x] > c[b]) b = x; } }); return b; }
+  function fix(d, h) {
+    var y = d.daily; if (!y || !h || !h.hourly) return;
+    var H = h.hourly, ts = H.time, pk = [], ck = [];
+    Object.keys(H).forEach(function (k) { if (k.indexOf('precipitation_probability') === 0) pk.push(H[k]); else if (k.indexOf('weather_code') === 0) ck.push(H[k]); });
+    if (!pk.length || !ts) return;
+    y.time.forEach(function (day, i) {
+      var sr = y.sunrise && y.sunrise[i], ss = y.sunset && y.sunset[i]; if (!sr || !ss) return;
+      var a = mins(sr), z = mins(ss), best = -1, bi = -1, hrs = [];
+      for (var j = 0; j < ts.length; j++) {
+        if (ts[j].slice(0, 10) !== day) continue;
+        var m = +ts[j].slice(11, 13) * 60; if (!(m + 60 > a && m < z)) continue;
+        var vals = pk.map(function (arr) { return arr[j]; }).filter(function (v) { return v != null; }); if (!vals.length) continue;
+        var v = vals.reduce(function (p, c) { return p + c; }, 0) / vals.length; hrs.push(j);
+        if (v > best) { best = v; bi = j; }
+      }
+      if (bi < 0) return;
+      y.precipitation_probability_max[i] = Math.round(best);
+      var code = null;
+      if (best >= 40) code = mode(ck.map(function (arr) { return arr[bi]; }));
+      else { var cs = []; hrs.forEach(function (j) { ck.forEach(function (arr) { if (arr[j] != null && arr[j] < 51) cs.push(arr[j]); }); }); code = mode(cs); }
+      if (code != null) y.weather_code[i] = code;
+    });
+  }
+  W.fetch = function (u, o) {
+    var s = typeof u == 'string' ? u : '';
+    var main = /api\.open-meteo\.com\/v1\/forecast/.test(s) && /&current=/.test(s) && /&daily=weather_code/.test(s);
+    var p = F.apply(this, arguments);
+    if (!main) return p;
+    var b = s.replace(/&current=[^&]*/, '').replace(/&daily=[^&]*/, '').replace('forecast_days=7', 'forecast_days=10') + '&hourly=precipitation_probability,weather_code&models=ncep_nbm_conus,ecmwf_ifs,gfs_seamless';
+    return p.then(function (r) {
+      if (!r.ok) return r;
+      return r.clone().json().then(function (d) {
+        return T(F.call(W, b).then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; })).then(function (h) {
+          try { fix(d, h); } catch (e) {}
+          return new Response(JSON.stringify(d), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        });
+      });
+    }).catch(function () { return p; });
+  };
+})();
+
+/* ===== rev 291: speedometer - mph centered, limit sign under it, tiny test gauge under the sign (tap = shows 55) ===== */
+(function () {
+  var D = document, sp = D.querySelector('.speed'), rb = D.getElementById('revBtn'), sg = D.getElementById('limSign');
+  if (!sp || !rb) return;
+  var st = D.createElement('style');
+  st.textContent = '.speed #speed{margin:-4px 0 -12px!important}#vdUR{margin:0!important}' +
+    '.speed #limSign{width:36px!important;height:40px!important;margin:2px auto 0!important}' +
+    '.speed #limSign>div:first-child{font-size:6.5px!important;margin-top:3px!important}.speed #limNum{font-size:19px!important;margin-top:1px!important}' +
+    '.speed #revBtn{display:block!important;width:44px!important;height:18px!important;margin:2px auto 0!important;padding:0!important}' +
+    '.speed #revBtn svg{width:20px!important;height:13px!important;display:block;margin:0 auto}';
+  D.head.appendChild(st);
+  if (sg) sg.parentNode.insertBefore(rb, sg.nextSibling); else sp.appendChild(rb);
+  rb.addEventListener('click', function () {
+    var prev = typeof limShown !== 'undefined' ? limShown : null;
+    try { showLimit(55); } catch (e) { return; }
+    setTimeout(function () { try { if (limShown === 55) showLimit(prev); } catch (e) {} }, 6000);
+  });
+})();
+
+/* ===== rev 292/294: pin and track bars sit above the track controls; bigger photo count badge ===== */
+(function () {
+  var D = document, fm = D.getElementById('fullMap'), C = D.getElementById('fStats');
+  var st = D.createElement('style');
+  st.textContent = '#vCam>span{right:-16px!important;top:-10px!important;min-width:26px!important;height:26px!important;border-radius:13px!important;font-size:16px!important;line-height:26px!important;padding:0 5px!important;box-sizing:border-box}';
+  D.head.appendChild(st);
+  if (!fm || !C) return;
+  setInterval(function () {
+    if (fm.classList.contains('hidden')) return;
+    var box = C.parentElement.getBoundingClientRect(), fr = fm.getBoundingClientRect();
+    if (!box.height) return;
+    var b = Math.round(fr.bottom - box.top + 8) + 'px';
+    ['vdTN', 'vdDN'].forEach(function (id) {
+      var e = D.getElementById(id), bar = e && e.parentElement && e.parentElement.parentElement;
+      if (bar && bar.style.bottom !== b) bar.style.bottom = b;
+    });
+  }, 400);
 })();
 
 </script>
