@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 296 -->
+<!-- Van Dash rev 299 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -238,14 +238,14 @@
         <svg viewBox="0 0 100 100">
           <g id="compassRing">
           <circle cx="50" cy="50" r="46" fill="none" stroke="#ffffff" stroke-width="2"/>
-          <text x="50" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#e53935">N</text>
-          <text x="50" y="94" text-anchor="middle" font-size="9" fill="#7f8fa3">S</text>
-          <text x="90" y="54" text-anchor="middle" font-size="9" fill="#7f8fa3">E</text>
-          <text x="10" y="54" text-anchor="middle" font-size="9" fill="#7f8fa3">W</text>
+          <text x="50" y="20" text-anchor="middle" font-size="17" font-weight="700" fill="#e53935">N</text>
+          <text x="50" y="96" text-anchor="middle" font-size="14" fill="#7f8fa3">S</text>
+          <text x="88" y="55" text-anchor="middle" font-size="14" fill="#7f8fa3">E</text>
+          <text x="12" y="55" text-anchor="middle" font-size="14" fill="#7f8fa3">W</text>
           </g>
           <g>
-            <polygon points="40,50 60,50 50,20" fill="#e53935"/>
-            <polygon points="40,50 60,50 50,80" fill="#cfd8e3"/>
+            <polygon points="42,50 58,50 50,28" fill="#e53935"/>
+            <polygon points="42,50 58,50 50,72" fill="#cfd8e3"/>
             <circle cx="50" cy="50" r="4" fill="#0b0f14" stroke="#2f7bff" stroke-width="1.5"/>
           </g>
         </svg>
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r296</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r299</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5244,7 +5244,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 296): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 299): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -5995,9 +5995,9 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   var D = document, sp = D.querySelector('.speed'), rb = D.getElementById('revBtn'), sg = D.getElementById('limSign');
   if (!sp || !rb) return;
   var st = D.createElement('style');
-  st.textContent = '.speed #speed{margin:-4px 0 -12px!important}#vdUR{margin:0!important}' +
-    '.speed #limSign{width:36px!important;height:40px!important;margin:2px auto 0!important}' +
-    '.speed #limSign>div:first-child{font-size:6.5px!important;margin-top:3px!important}.speed #limNum{font-size:19px!important;margin-top:1px!important}' +
+  st.textContent = '.speed #speed{margin:0 0 -10px!important;font-size:74px!important}#vdUR{margin:0!important}' +
+    '.speed #limSign{width:42px!important;height:42px!important;margin:2px auto 0!important}' +
+    '.speed #limSign>div:first-child{font-size:6.5px!important;margin-top:3px!important}.speed #limNum{font-size:17px!important;margin-top:1px!important}' +
     '.speed #revBtn{display:block!important;width:44px!important;height:18px!important;margin:2px auto 0!important;padding:0!important}' +
     '.speed #revBtn svg{width:20px!important;height:13px!important;display:block;margin:0 auto}';
   D.head.appendChild(st);
@@ -6028,6 +6028,25 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   }, 400);
 })();
 
+/* ===== rev 299: tap the compass card = big compass with a Back button ===== */
+(function () {
+  var D = document, ri = D.getElementById('compassRing'), card = ri && ri.closest('.card'), s0 = ri && ri.ownerSVGElement;
+  if (!s0) return;
+  var o = D.createElement('div'), sv = s0.cloneNode(true), h = D.createElement('div'), b = D.createElement('button'), t;
+  o.style.cssText = 'position:fixed;top:0;right:0;bottom:0;left:0;z-index:100000;background:#0b0f14;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#e8eef6';
+  sv.style.cssText = 'width:min(86vw,56vh);height:min(86vw,56vh)';
+  var rg = sv.querySelector('#compassRing'); rg.id = 'vdBigRing'; rg.style.transformOrigin = '50px 50px'; rg.style.transition = 'transform .25s linear';
+  h.style.cssText = 'font-size:44px;font-weight:700;text-align:center;line-height:1.1';
+  b.textContent = 'Back to main screen'; b.style.cssText = 'font-size:18px;padding:14px 26px;border-radius:14px;margin-top:10px';
+  o.appendChild(sv); o.appendChild(h); o.appendChild(b); D.body.appendChild(o);
+  function upd() {
+    var d = parseInt(D.getElementById('deg').textContent);
+    if (!isNaN(d)) rg.style.transform = 'rotate(' + (-d) + 'deg)';
+    h.textContent = D.getElementById('heading').textContent + (isNaN(d) ? '' : '  ' + d + '°');
+  }
+  card.addEventListener('click', function (e) { if (e.target.closest('button')) return; o.style.display = 'flex'; upd(); clearInterval(t); t = setInterval(upd, 200); });
+  b.onclick = function () { o.style.display = 'none'; clearInterval(t); };
+})();
 </script>
 </body>
 </html>
