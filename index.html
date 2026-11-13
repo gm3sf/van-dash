@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 306 -->
+<!-- Van Dash rev 307 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r306</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r307</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5258,7 +5258,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 306): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 307): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6088,7 +6088,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 306): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 307): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6317,6 +6317,82 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     if (vW == vm.getBoundingClientRect().width) apply();
   }, 400);
   W.addEventListener('resize', function () { if (hu) setTimeout(apply, 80); });
+})();
+(function () { /* rev 307: big compass page - small Back button top left, elevation + distance from home under the heading */
+  var D = document, W = window, rg = D.getElementById('vdBigRing'), sv = rg && rg.ownerSVGElement, o = sv && sv.parentNode;
+  if (!o) return;
+  var h = sv.nextSibling, b = o.querySelector('button'), K = 'vdHome2';
+  b.textContent = 'Back'; b.className = 'alt';
+  b.style.cssText = 'position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;margin:0;width:auto;font-size:14px;padding:6px 14px;border-radius:10px';
+  var w = D.createElement('div'); w.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px';
+  o.insertBefore(w, h); w.appendChild(h);
+  var el = D.createElement('div'); el.style.cssText = 'color:#8a99ad;white-space:nowrap;font-size:14px;line-height:1.2';
+  var hr = D.createElement('div'); hr.style.cssText = 'display:flex;align-items:center;gap:6px;color:#8a99ad;font-size:14px;line-height:1.2;padding:4px 10px;cursor:pointer;white-space:nowrap';
+  hr.innerHTML = '<svg id="vdBird" width="18" height="18" viewBox="0 0 24 24" fill="#8a99ad" style="transition:transform .3s linear;flex:none"><circle cx="12" cy="4.6" r="1.9"/><path d="M12 7.5C9 8 5 9.2 1.5 13c3.6-.6 6.6-.4 8.9.8L12 19l1.6-5.2c2.3-1.2 5.3-1.4 8.9-.8C19 9.2 15 8 12 7.5z"/><path d="M10.4 18.5L12 23l1.6-4.500z"/></svg><span id="vdHmT"></span>';
+  w.appendChild(el); w.appendChild(hr);
+  var bird = hr.firstChild, tx = hr.lastChild;
+  function ld() { try { return JSON.parse(localStorage.getItem(K)); } catch (e) { return null; } }
+  function sv2(v) { try { if (v) localStorage.setItem(K, JSON.stringify(v)); else localStorage.removeItem(K); } catch (e) {} }
+  var home = ld();
+  function R(x) { return x * Math.PI / 180; }
+  function calc(p) {
+    var a1 = R(p.latitude), a2 = R(home.lat), dl = R(home.lon - p.longitude), dp = a2 - a1;
+    var s = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(a1) * Math.cos(a2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+    var mi = 3958.8 * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
+    var br = (Math.atan2(Math.sin(dl) * Math.cos(a2), Math.cos(a1) * Math.sin(a2) - Math.sin(a1) * Math.cos(a2) * Math.cos(dl)) * 180 / Math.PI + 360) % 360;
+    return { mi: mi, br: br };
+  }
+  function fit() {
+    var hw = h.offsetWidth, ew = el.scrollWidth, fs = parseFloat(el.style.fontSize) || 14;
+    if (hw > 0 && ew > 0) el.style.fontSize = Math.max(11, Math.min(18, fs * hw / ew)).toFixed(1) + 'px';
+  }
+  function upd() {
+    if (o.style.display == 'none') return;
+    var a = (D.getElementById('alt') || {}).textContent;
+    el.textContent = 'Elevation: ' + (a && a != '--' ? a : '--') + ' ft'; fit();
+    if (!home) { tx.textContent = 'Set home'; hr.style.opacity = '.55'; bird.style.transform = ''; return; }
+    hr.style.opacity = '1';
+    var nm = home.name || 'home', p = typeof lastPos != 'undefined' ? lastPos : null;
+    if (!p || p.latitude == null) { tx.textContent = '-- mi from ' + nm; return; }
+    var r = calc(p), ft = r.mi * 5280, d = W.__vdHd;
+    tx.textContent = r.mi < 0.02 ? (home.name ? 'At ' + home.name : 'At home') : (r.mi < 0.1 ? Math.round(ft / 10) * 10 + ' ft' : r.mi < 10 ? r.mi.toFixed(1) + ' mi' : Math.round(r.mi).toLocaleString() + ' mi') + ' from ' + nm;
+    bird.style.transform = 'rotate(' + Math.round(r.br - (d != null && !isNaN(d) ? d : 0)) + 'deg)';
+  }
+  setInterval(upd, 500);
+  new MutationObserver(upd).observe(o, { attributes: true, attributeFilter: ['style'] });
+  /* home panel */
+  var pn = D.createElement('div');
+  pn.style.cssText = 'position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box';
+  var IS = 'width:100%;box-sizing:border-box;font-size:16px;padding:11px 12px;border-radius:10px;border:0.5px solid #3a4658;background:#0b0f14;color:#e8eef6;margin:0';
+  var BS = 'margin:0;padding:12px;font-size:15px;border-radius:10px;width:auto;flex:1';
+  pn.innerHTML = '<div style="width:100%;max-width:340px;background:#1b2431;border:0.5px solid #3a4658;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px">' +
+    '<div style="font-size:16px;color:#e8eef6;font-weight:600">Home spot</div>' +
+    '<input id="vdHN" placeholder="Name (optional, e.g. Camp)" style="' + IS + '">' +
+    '<div style="display:flex;gap:8px"><input id="vdHA" placeholder="Type an address" style="' + IS + '"><button id="vdHF" class="alt" style="' + BS + ';flex:none;padding:12px 16px">Find</button></div>' +
+    '<button id="vdHH" style="' + BS + '">Set home here</button>' +
+    '<div id="vdHM" style="font-size:13px;color:#8a99ad;min-height:16px"></div>' +
+    '<div style="display:flex;gap:8px"><button id="vdHC" class="alt" style="' + BS + '">Clear home</button><button id="vdHX" class="alt" style="' + BS + '">Close</button></div></div>';
+  o.appendChild(pn);
+  var $ = function (i) { return D.getElementById(i); };
+  function msg(t) { $('vdHM').textContent = t; }
+  function save(lat, lon) { home = { lat: lat, lon: lon, name: $('vdHN').value.trim().slice(0, 20) }; sv2(home); pn.style.display = 'none'; upd(); }
+  hr.onclick = function () { $('vdHN').value = home && home.name || ''; $('vdHA').value = ''; msg(home ? 'Home is saved on this device only.' : ''); pn.style.display = 'flex'; };
+  $('vdHX').onclick = function () { pn.style.display = 'none'; };
+  $('vdHC').onclick = function () { home = null; sv2(null); pn.style.display = 'none'; upd(); };
+  $('vdHH').onclick = function () {
+    var p = typeof lastPos != 'undefined' ? lastPos : null;
+    if (!p || p.latitude == null) { msg('No GPS position yet.'); return; }
+    save(p.latitude, p.longitude);
+  };
+  $('vdHF').onclick = function () {
+    var q = $('vdHA').value.trim(); if (!q) { msg('Type an address first.'); return; }
+    msg('Looking...');
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q)).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j[0]) return [parseFloat(j[0].lat), parseFloat(j[0].lon)];
+      return fetch('https://photon.komoot.io/api/?limit=1&q=' + encodeURIComponent(q)).then(function (r) { return r.json(); }).then(function (g) { var f = g.features && g.features[0]; return f ? [f.geometry.coordinates[1], f.geometry.coordinates[0]] : null; });
+    }).then(function (c) { if (c && !isNaN(c[0])) save(c[0], c[1]); else msg('Address not found.'); }, function () { msg('Lookup failed. Check connection.'); });
+  };
+  upd();
 })();
 </script>
 </body>
