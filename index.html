@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 307 -->
+<!-- Van Dash rev 308 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r307</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r308</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5258,7 +5258,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 307): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 308): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6088,7 +6088,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 307): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 308): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6376,6 +6376,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   var $ = function (i) { return D.getElementById(i); };
   function msg(t) { $('vdHM').textContent = t; }
   function save(lat, lon) { home = { lat: lat, lon: lon, name: $('vdHN').value.trim().slice(0, 20) }; sv2(home); pn.style.display = 'none'; upd(); }
+  W.__vdHomeSave = save;
   hr.onclick = function () { $('vdHN').value = home && home.name || ''; $('vdHA').value = ''; msg(home ? 'Home is saved on this device only.' : ''); pn.style.display = 'flex'; };
   $('vdHX').onclick = function () { pn.style.display = 'none'; };
   $('vdHC').onclick = function () { home = null; sv2(null); pn.style.display = 'none'; upd(); };
@@ -6393,6 +6394,51 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     }).then(function (c) { if (c && !isNaN(c[0])) save(c[0], c[1]); else msg('Address not found.'); }, function () { msg('Lookup failed. Check connection.'); });
   };
   upd();
+})();
+(function () { /* rev 308: address suggestions as you type in the Home spot panel */
+  var D = document, W = window, ai = D.getElementById('vdHA'), fb = D.getElementById('vdHF');
+  if (!ai || !W.__vdHomeSave) return;
+  var ls = D.createElement('div'), seq = 0, tm = 0, cur = [];
+  ls.style.cssText = 'display:none;background:#0b0f14;border:0.5px solid #3a4658;border-radius:10px;overflow:hidden;max-height:210px;overflow-y:auto';
+  ai.parentNode.parentNode.insertBefore(ls, ai.parentNode.nextSibling);
+  ai.setAttribute('autocomplete', 'off'); ai.setAttribute('autocorrect', 'off'); ai.setAttribute('autocapitalize', 'off'); ai.setAttribute('spellcheck', 'false');
+  function ab(s) { return typeof STATE_ABBR != 'undefined' && STATE_ABBR[s] || s || ''; }
+  function lab(f) {
+    var p = f.properties || {}, l1 = p.street ? ((p.housenumber ? p.housenumber + ' ' : '') + p.street) : (p.name || ''), l2 = [p.city || p.town || p.village || p.county, ab(p.state)].filter(Boolean).join(', ');
+    if (p.street && p.name && p.name != p.street && !p.housenumber) l1 = p.name + ', ' + p.street;
+    return { a: l1 || l2, b: l1 ? l2 : (p.country || '') };
+  }
+  function show(arr) {
+    cur = arr; ls.innerHTML = '';
+    if (!arr.length) { ls.style.display = 'block'; ls.innerHTML = '<div style="padding:10px 12px;font-size:14px;color:#8a99ad">No match</div>'; return; }
+    arr.forEach(function (f) {
+      var t = lab(f), d = D.createElement('div');
+      d.style.cssText = 'padding:9px 12px;border-top:0.5px solid #1f2935;cursor:pointer';
+      d.innerHTML = '<div style="font-size:15px;color:#e8eef6"></div><div style="font-size:12px;color:#8a99ad"></div>';
+      d.firstChild.textContent = t.a; d.lastChild.textContent = t.b;
+      d.onclick = function () { pick(f); };
+      ls.appendChild(d);
+    });
+    ls.firstChild.style.borderTop = 'none'; ls.style.display = 'block';
+  }
+  function pick(f) {
+    var c = f.geometry.coordinates, t = lab(f); ai.value = t.a + (t.b ? ', ' + t.b : ''); ls.style.display = 'none';
+    W.__vdHomeSave(c[1], c[0]);
+  }
+  function go(q) {
+    var n = ++seq, p = typeof lastPos != 'undefined' ? lastPos : null;
+    var u = 'https://photon.komoot.io/api/?limit=6&lang=en&q=' + encodeURIComponent(q) + (p && p.latitude != null ? '&lat=' + p.latitude.toFixed(3) + '&lon=' + p.longitude.toFixed(3) : '');
+    fetch(u).then(function (r) { return r.json(); }).then(function (j) { if (n == seq) show((j.features || []).filter(function (f) { return f.geometry && f.geometry.coordinates; })); }, function () { if (n == seq) { ls.style.display = 'block'; ls.innerHTML = '<div style="padding:10px 12px;font-size:14px;color:#8a99ad">Lookup failed. Check connection.</div>'; } });
+  }
+  ai.addEventListener('input', function () {
+    clearTimeout(tm); var q = ai.value.trim(); seq++;
+    if (q.length < 3) { ls.style.display = 'none'; return; }
+    tm = setTimeout(function () { go(q); }, 350);
+  });
+  ai.addEventListener('keydown', function (e) { if (e.key == 'Enter') { e.preventDefault(); if (cur.length && ls.style.display == 'block') pick(cur[0]); } });
+  fb.onclick = function () { var q = ai.value.trim(); if (q.length < 3) return; clearTimeout(tm); if (cur.length && ls.style.display == 'block') pick(cur[0]); else go(q); };
+  var pn = ai.closest('div[style*="absolute"]');
+  new MutationObserver(function () { if (pn.style.display == 'none') { ls.style.display = 'none'; cur = []; } }).observe(pn, { attributes: true, attributeFilter: ['style'] });
 })();
 </script>
 </body>
