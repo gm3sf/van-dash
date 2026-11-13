@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 304 -->
+<!-- Van Dash rev 306 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r304</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r306</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3355,7 +3355,7 @@ vm.insertBefore(cv, D.getElementById('vSat'));
 var bst = 'position:absolute;left:8px;width:40px;height:40px;margin:0;padding:0;background:rgba(21,28,37,0.92);border:0.5px solid #8a96a6;border-radius:10px;display:flex;align-items:center;justify-content:center;';
 var rb = D.createElement('button');
 rb.id = 'vRad'; rb.setAttribute('aria-label', 'Radar');
-rb.style.cssText = bst + 'top:100px';
+rb.style.cssText = bst + 'top:' + (D.documentElement.classList.contains('camp') ? 100 : 56) + 'px';
 rb.innerHTML = '<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M7 16a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 7.5 4.5 4.5 0 0 1 17.5 16z"/><path d="M9 19l-1 2M13 19l-1 2M17 19l-1 2"/></svg>';
 var pb = D.createElement('button');
 pb.id = 'vRadPl'; pb.style.cssText = bst + 'bottom:26px;color:#fff;font-size:16px';
@@ -3363,7 +3363,7 @@ var tl = D.createElement('div');
 tl.id = 'vRadT'; tl.style.cssText = 'position:absolute;left:54px;bottom:34px;font-size:13px;color:#fff;background:rgba(21,28,37,0.85);padding:3px 8px;border-radius:8px;display:none';
 [rb, pb].forEach(function (b) { ['pointerdown', 'pointerup'].forEach(function (ev) { b.addEventListener(ev, function (e) { e.stopPropagation(); }); }); });
 vm.appendChild(rb); vm.appendChild(pb); vm.appendChild(tl);
-function camp() { return D.documentElement.classList.contains('camp'); }
+function camp() { return true; }
 function wpx(lat, lon, z) { var n = 256 * Math.pow(2, z), s = Math.sin(lat * Math.PI / 180); return { x: (lon + 180) / 360 * n, y: (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n }; }
 function img(u) {
 var m = imgs[u];
@@ -5258,7 +5258,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 304): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 306): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6088,7 +6088,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 304): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 306): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6182,7 +6182,8 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   var rg = document.getElementById('vdBigRing'), sv = rg && rg.ownerSVGElement, t = '', i, a, tx = rg && rg.querySelectorAll('text');
   if (!sv) return;
   for (i = 0; i < tx.length; i++) tx[i].parentNode.removeChild(tx[i]);
-  for (i = 0; i < 72; i++) { a = i * 5; var mj = a % 30 == 0; t += '<line x1="50" y1="5.5" x2="50" y2="' + (mj ? 10.5 : 8) + '" stroke="' + (a == 0 ? '#e53935' : mj ? '#fff' : '#ff8a2b') + '" stroke-width="' + (mj ? 1 : 0.35) + '" transform="rotate(' + a + ' 50 50)"/>'; }
+  var rc = rg.querySelector('circle'); if (rc) rc.setAttribute('stroke-width', '0.8');
+  for (i = 0; i < 72; i++) { a = i * 5; var mj = a % 30 == 0; t += '<line x1="50" y1="5.5" x2="50" y2="' + (mj ? 10.5 : 8) + '" stroke="' + (a == 0 ? '#e53935' : mj ? '#fff' : '#ff8a2b') + '" stroke-width="' + (mj ? 0.6 : 0.35) + '" transform="rotate(' + a + ' 50 50)"/>'; }
   for (i = 1; i < 12; i++) { a = i * 30; if (a % 90) t += '<text x="50" y="14.9" text-anchor="middle" font-size="3.8" fill="#8a99ad" transform="rotate(' + a + ' 50 50)">' + a + '</text>'; }
   ['N', 'E', 'S', 'W'].forEach(function (n, k) { t += '<text x="50" y="25.3" text-anchor="middle" font-size="12" font-weight="700" fill="' + (k ? '#cfd8e3' : '#e53935') + '" transform="rotate(' + (k * 90) + ' 50 50)">' + n + '</text>'; });
   ['NE', 'SE', 'SW', 'NW'].forEach(function (n, k) { t += '<text x="50" y="22.7" text-anchor="middle" font-size="4.4" font-weight="300" fill="#8a99ad" transform="rotate(' + (45 + k * 90) + ' 50 50)">' + n + '</text>'; });
@@ -6273,6 +6274,49 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
       F.apply(me, a).then(function (r) { r0 = r; if (r.ok) fin(r); else if (nf) fin(r); else go(); }, function () { r0 = new Response('{"error":true}', { status: 503 }); if (nf) fin(r0); else go(); });
     });
   };
+})();
+(function () { /* rev 305: keep the small map smooth in motion: redraw at most about 30 times a second */
+  var inner = vDraw, lt = 0, pend = 0;
+  window.__vDrawNow = function () { lt = performance.now(); return inner.apply(this, arguments); };
+  vDraw = function () {
+    var n = performance.now();
+    if (n - lt >= 33) { lt = n; return inner.apply(this, arguments); }
+    if (!pend) { pend = 1; setTimeout(function () { pend = 0; lt = performance.now(); inner(); }, 34 - (n - lt)); }
+  };
+})();
+(function () { /* rev 305: small map: the locate arrow cycles north-up / heading-up (radar button is added in Part 4) */
+  var D = document, W = window, vm = D.getElementById('vmap'), ctr = D.getElementById('vCtr');
+  if (!vm || !ctr || typeof vDraw != 'function') return;
+  var hu = false, ang = 0, pm = vCanvas.onpointermove;
+  function spin() { var cs = vm.querySelectorAll('canvas'), i; for (i = 0; i < cs.length; i++) cs[i].style.transform = hu ? 'rotate(' + (-ang) + 'deg)' : ''; }
+  function apply() {
+    var b = vm.getBoundingClientRect(), w = b.width, h = b.height, dpr = Math.min(W.devicePixelRatio || 1, 2), S = Math.ceil(Math.sqrt(w * w + h * h)), cs = vm.querySelectorAll('canvas'), i, s;
+    if (!w || !h) return;
+    for (i = 0; i < cs.length; i++) {
+      s = cs[i].style;
+      if (hu) { s.width = s.height = S + 'px'; s.left = (w - S) / 2 + 'px'; s.top = (h - S) / 2 + 'px'; s.transition = 'transform .5s linear'; }
+      else { s.width = s.height = '100%'; s.left = s.top = '0'; s.transition = ''; }
+    }
+    spin();
+    vW = hu ? S : w; vH = hu ? S : h;
+    vCanvas.width = Math.round(vW * dpr); vCanvas.height = Math.round(vH * dpr); vctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    (W.__vDrawNow || vDraw)();
+  }
+  vCanvas.onpointermove = function (e) { if (!hu && pm) return pm.call(this, e); };
+  ctr.onclick = function () {
+    if (!vFollow) { vHome(); return; }
+    hu = !hu;
+    if (hu) ang = W.__vdHd != null && !isNaN(W.__vdHd) ? W.__vdHd : 0; else vHome();
+    ctr.style.borderColor = hu ? '#ff8a2b' : '';
+    apply();
+  };
+  setInterval(function () {
+    if (!hu) return;
+    var d = W.__vdHd;
+    if (d != null && !isNaN(d)) { var dl = (((d - ang) % 360) + 540) % 360 - 180; if (Math.abs(dl) > 2) { ang += dl; spin(); } }
+    if (vW == vm.getBoundingClientRect().width) apply();
+  }, 400);
+  W.addEventListener('resize', function () { if (hu) setTimeout(apply, 80); });
 })();
 </script>
 </body>
