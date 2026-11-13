@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 301 -->
+<!-- Van Dash rev 302 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r301</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r302</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -892,8 +892,9 @@ function vDraw() {
     }
   }
   const g = vWorld(vFollow ? vLat : vGLat, vFollow ? vLon : vGLon, vZoom), cx = g.x - left, cy = g.y - top;
+  if (!(window.__fDot && window.__fDot(vctx, cx, cy, 0.8))) {
   vctx.beginPath(); vctx.arc(cx, cy, 16, 0, 6.2832); vctx.fillStyle = "rgba(255,59,48,0.30)"; vctx.fill();
-  vctx.beginPath(); vctx.arc(cx, cy, 9, 0, 6.2832); vctx.fillStyle = "#ff3b30"; vctx.fill(); vctx.lineWidth = 3; vctx.strokeStyle = "#fff"; vctx.stroke();
+  vctx.beginPath(); vctx.arc(cx, cy, 9, 0, 6.2832); vctx.fillStyle = "#ff3b30"; vctx.fill(); vctx.lineWidth = 3; vctx.strokeStyle = "#fff"; vctx.stroke(); }
 }
 let vGLat = null, vGLon = null, vFollow = true, vDrag = null, vTimer = 0;
 let vAnim = 0;
@@ -1603,9 +1604,10 @@ function decorateResults() {
     // your position
     if (fLat != null) {
       var g = vWorld(fFollow && gLat != null ? gLat : fLat, fFollow && gLat != null ? gLon : fLon, fZoom), cx = g.x - left, cy = g.y - top;
+      if (!(window.__fDot && window.__fDot(fctx, cx, cy))) {
       fctx.beginPath(); fctx.arc(cx, cy, 18, 0, 6.2832); fctx.fillStyle = "rgba(255,59,48,0.30)"; fctx.fill();
       fctx.beginPath(); fctx.arc(cx, cy, 10, 0, 6.2832); fctx.fillStyle = "#ff3b30"; fctx.fill();
-      fctx.lineWidth = 3; fctx.strokeStyle = "#fff"; fctx.stroke();
+      fctx.lineWidth = 3; fctx.strokeStyle = "#fff"; fctx.stroke(); }
     }
     if (window.__drawRadar) window.__drawRadar(fctx, fcLat, fcLon, fZoom, fW, fH, 1, fEx);
     if (window.__fOver) window.__fOver(fctx, left, top, fZoom);
@@ -3397,7 +3399,7 @@ if (m.ok) ctx.drawImage(m, (x * 256 - left) * s, (y * 256 - top) * s, 256 * s + 
 ctx.globalAlpha = 1;
 }
 var g = wpx(vFollow ? vLat : vGLat, vFollow ? vLon : vGLon, vZoom), c0 = wpx(vLat, vLon, vZoom), cx = w / 2 + g.x - c0.x, cy = h / 2 + g.y - c0.y;
-if (vGLat != null) {
+if (vGLat != null && !(window.__fDot && window.__fDot(ctx, cx, cy, 0.8))) {
 ctx.beginPath(); ctx.arc(cx, cy, 9, 0, 6.2832); ctx.fillStyle = '#ff3b30'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
 }
 }
@@ -5256,7 +5258,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 301): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 302): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6086,7 +6088,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 301): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 302): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6159,17 +6161,35 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   }
   setInterval(upd, 400); upd();
 })();
-(function () { /* rev 301: the big compass gets a proper dial: ticks, degrees, NE/SE/SW/NW, bezel, heavier needle, top marker */
-  var rg = document.getElementById('vdBigRing'), sv = rg && rg.ownerSVGElement, t = '', i, a;
+(function () { /* rev 302: map position (big and small) = blue direction arrow with a view beam, like the iPhone */
+  window.__fDot = function (c, x, y, k) {
+    var d = window.__vdHd;
+    if (d == null || isNaN(d)) return false;
+    c.save(); c.translate(x, y); c.scale(k || 1, k || 1); c.rotate(d * Math.PI / 180);
+    var g = c.createRadialGradient(0, 0, 8, 0, 0, 90);
+    g.addColorStop(0, 'rgba(47,123,255,.6)'); g.addColorStop(1, 'rgba(47,123,255,0)');
+    c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, 90, -Math.PI / 2 - 0.5, -Math.PI / 2 + 0.5); c.closePath(); c.fillStyle = g; c.fill();
+    c.beginPath(); c.moveTo(0, -15); c.lineTo(11, 12); c.lineTo(0, 6); c.lineTo(-11, 12); c.closePath();
+    c.lineJoin = 'round'; c.lineWidth = 4; c.strokeStyle = '#fff'; c.stroke(); c.fillStyle = '#2f7bff'; c.fill();
+    c.restore();
+    return true;
+  };
+  var ld = null;
+  setInterval(function () { var d = window.__vdHd; if (d != null && (ld == null || Math.abs(d - ld) > 2)) { ld = d; try { vDraw(); } catch (e) {} } }, 400);
+})();
+(function () { /* rev 302: big compass dial, calmer: thin orange ticks, small NE/SE/SW/NW, long thin needle, letters clear of the ticks */
+  var rg = document.getElementById('vdBigRing'), sv = rg && rg.ownerSVGElement, t = '', i, a, tx = rg && rg.querySelectorAll('text');
   if (!sv) return;
-  for (i = 0; i < 72; i++) { a = i * 5; var mj = a % 30 == 0; t += '<line x1="50" y1="4" x2="50" y2="' + (mj ? 10 : 7) + '" stroke="' + (a == 0 ? '#e53935' : mj ? '#fff' : '#7f8fa3') + '" stroke-width="' + (mj ? 1.2 : 0.6) + '" transform="rotate(' + a + ' 50 50)"/>'; }
-  for (i = 1; i < 12; i++) { a = i * 30; if (a % 90) t += '<text x="50" y="16.5" text-anchor="middle" font-size="4.6" fill="#9fb0c3" transform="rotate(' + a + ' 50 50)">' + a + '</text>'; }
-  ['NE', 'SE', 'SW', 'NW'].forEach(function (n, k) { t += '<text x="50" y="27" text-anchor="middle" font-size="8" font-weight="600" fill="#cfd8e3" transform="rotate(' + (45 + k * 90) + ' 50 50)">' + n + '</text>'; });
+  for (i = 0; i < tx.length; i++) tx[i].parentNode.removeChild(tx[i]);
+  for (i = 0; i < 72; i++) { a = i * 5; var mj = a % 30 == 0; t += '<line x1="50" y1="5.5" x2="50" y2="' + (mj ? 10.5 : 8) + '" stroke="' + (a == 0 ? '#e53935' : mj ? '#fff' : '#ff8a2b') + '" stroke-width="' + (mj ? 1 : 0.35) + '" transform="rotate(' + a + ' 50 50)"/>'; }
+  for (i = 1; i < 12; i++) { a = i * 30; if (a % 90) t += '<text x="50" y="14.9" text-anchor="middle" font-size="3.8" fill="#8a99ad" transform="rotate(' + a + ' 50 50)">' + a + '</text>'; }
+  ['N', 'E', 'S', 'W'].forEach(function (n, k) { t += '<text x="50" y="25.3" text-anchor="middle" font-size="12" font-weight="700" fill="' + (k ? '#cfd8e3' : '#e53935') + '" transform="rotate(' + (k * 90) + ' 50 50)">' + n + '</text>'; });
+  ['NE', 'SE', 'SW', 'NW'].forEach(function (n, k) { t += '<text x="50" y="22.7" text-anchor="middle" font-size="4.4" font-weight="300" fill="#8a99ad" transform="rotate(' + (45 + k * 90) + ' 50 50)">' + n + '</text>'; });
   rg.insertAdjacentHTML('beforeend', t);
   sv.insertAdjacentHTML('afterbegin', '<defs><radialGradient id="vdBg" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#1b2431"/><stop offset="1" stop-color="#0b0f14"/></radialGradient><filter id="vdSh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="1.5" stdDeviation="1.6" flood-opacity=".7"/></filter></defs><circle cx="50" cy="50" r="49" fill="url(#vdBg)" stroke="#3a4658" stroke-width="2"/>');
   var ps = sv.querySelectorAll('polygon');
-  if (ps.length > 1) { ps[0].setAttribute('points', '42,50 58,50 50,31'); ps[1].setAttribute('points', '42,50 58,50 50,69'); ps[0].parentNode.setAttribute('filter', 'url(#vdSh)'); var hb = ps[0].parentNode.querySelector('circle'); if (hb) { hb.setAttribute('r', '5.5'); hb.setAttribute('stroke-width', '2'); } }
-  sv.insertAdjacentHTML('beforeend', '<polygon points="50,1 46,8 54,8" fill="#ff8a2b" stroke="#0b0f14" stroke-width=".6"/>');
+  if (ps.length > 1) { ps[0].setAttribute('points', '46,50 54,50 50,28'); ps[1].setAttribute('points', '46,50 54,50 50,72'); ps[0].parentNode.setAttribute('filter', 'url(#vdSh)'); var hb = ps[0].parentNode.querySelector('circle'); if (hb) { hb.setAttribute('r', '4.5'); hb.setAttribute('stroke-width', '1.6'); } }
+  sv.insertAdjacentHTML('beforeend', '<polygon points="50,1 46.5,7.5 53.5,7.5" fill="#ff8a2b" stroke="#0b0f14" stroke-width=".6"/>');
 })();
 </script>
 </body>
