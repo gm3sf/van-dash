@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 303 -->
+<!-- Van Dash rev 304 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r303</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r304</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -4178,7 +4178,8 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
       delete c.setPointerCapture;
     };
   }
-})();/* ===== Part 5 (rev 274): radar-based rain status and faster weather refresh ===== */
+})();
+/* ===== Part 5 (rev 274): radar-based rain status and faster weather refresh ===== */
 (function () {
   var W = window, D = document;
   var pl = D.getElementById('wxPlace'), sc = D.getElementById('weatherScreen');
@@ -5257,7 +5258,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 303): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 304): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6087,7 +6088,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 303): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 304): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6104,22 +6105,23 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   function near(lat, lon) {
     var c = new AbortController(); setTimeout(function () { c.abort(); }, 5000);
     return fetch('https://photon.komoot.io/reverse?lang=en&lat=' + lat + '&lon=' + lon, { signal: c.signal }).then(function (r) { return r.json(); })
-      .then(function (j) { var p = ((j.features || [])[0] || {}).properties || {}; return p.city || ''; }, function () { return ''; });
+      .then(function (j) { var p = ((j.features || [])[0] || {}).properties || {}; return p.city || p.town || p.village || p.locality || p.district || ''; }, function () { return ''; });
   }
   W.updateCity = async function (lat, lon) {
     var now = Date.now();
     if (now < bo || (lastCityPos && (now - lastCityTime < 10000 || distMeters(lastCityPos, { latitude: lat, longitude: lon }) < 300))) return;
     lastCityPos = { latitude: lat, longitude: lon }; lastCityTime = now;
     try {
-      var r = await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&addressdetails=1&accept-language=en&lat=' + lat + '&lon=' + lon);
+      var r = await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14&addressdetails=1&accept-language=en&lat=' + lat + '&lon=' + lon);
       if (!r.ok) throw 0;
       var d = (await r.json()).address || {}, st = STATE_ABBR[d.state] || d.state || '', nm = d.city || d.town || d.village || d.municipality || '';
       var nb = d.neighbourhood || d.suburb || d.quarter || d.hamlet || d.city_district || '';
-      if (!nm && nb) { nm = nb + ' neighborhood'; var ci = await near(lat, lon) || (d.county || '').replace(/ County$/, ''); if (ci && ci != nb) nm += ', ' + ci; }
+      var nbl = '';
+      if (!nm) { var ci = await near(lat, lon); if (nb) { ci = ci || (d.county || '').replace(/ County$/, ''); if (ci != nb) nbl = nb; } nm = ci; }
       nm = nm || d.county || '';
       cityName = nm && st ? nm + ', ' + st : (nm || st || 'Unknown location');
       var c = document.getElementById('city'), long = cityName.length > 24;
-      c.textContent = cityName; c.style.fontSize = long ? '15px' : ''; c.style.whiteSpace = long ? 'normal' : ''; c.style.lineHeight = long ? '1.15' : '';
+      c.textContent = cityName; if (nbl) { var sp = document.createElement('span'); sp.style.cssText = 'font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:1px;color:#7f8fa3;margin-left:8px;white-space:nowrap'; sp.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M3 21V11h6v10M9 21V3h7v18M16 21V8h5v13M12 7v.01M12 11v.01M12 15v.01"/></svg>'; sp.appendChild(document.createTextNode(nbl)); c.appendChild(sp); } c.style.fontSize = long ? '15px' : ''; c.style.whiteSpace = long ? 'normal' : ''; c.style.lineHeight = long ? '1.15' : '';
       document.getElementById('wCity').textContent = cityName;
     } catch (e) {
       bo = now + 15000; lastCityPos = null;
