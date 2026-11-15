@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 312 -->
+<!-- Van Dash rev 313 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r312</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r313</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5258,7 +5258,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 312): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 313): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6083,7 +6083,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 312): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 313): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6539,6 +6539,80 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     } catch (e) {}
     return p;
   };
+})();
+(function () { /* rev 313: card polish (Spotify art outline, heading size, trip number, weather text and wind size, sun card layout) */
+  var D = document, R = D.documentElement, $ = function (i) { return D.getElementById(i); };
+  var st = D.createElement('style');
+  st.textContent = 'html:not(.camp) #vdSpArt{visibility:visible!important;border-radius:14px!important;width:40px!important;height:40px!important;border:.5px solid #8a96a6!important}html:not(.camp) #vdSpArt:not([src]){background:transparent!important}' +
+    'html:not(.camp) #vdCmpCard .compass-wrap{gap:6px!important}html:not(.camp) #vdCmpCard .compass-wrap svg{width:42px!important;height:42px!important}html:not(.camp) #vdCmpCard #deg{font-size:12px!important}' +
+    'html:not(.camp) #vdWxTxt{font-size:12px;line-height:1.15;color:#9fb0c3;margin-top:3px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}html.camp #vdWxTxt{display:none}' +
+    'html:not(.camp) #wxWind{transform-origin:100% 0}' +
+    'html:not(.camp) .sunrow{display:flex!important;align-items:flex-start;gap:6px;text-align:left}html:not(.camp) .sunrow>div:not(#sunMoon){flex:none}' +
+    'html:not(.camp) .sunrow>div>svg{width:40px!important;height:30px!important;margin:0 auto!important}html:not(.camp) .sunrow .t{font-size:13px!important;margin-top:3px;text-align:center}' +
+    'html:not(.camp) .sunrow{position:relative}html:not(.camp) #sunMoon{flex-direction:column;position:absolute;top:0;right:0;align-items:center!important;justify-content:flex-start!important}' +
+    'html:not(.camp) .vdNm{display:none}html:not(.camp) .vdMn{margin-top:2px;font-size:11px;line-height:1.1;color:#9fb0c3;text-align:center;white-space:nowrap}html.camp .vdMn{display:none}';
+  D.head.appendChild(st);
+  var wxCard = $('wxCard'), wrap = wxCard && wxCard.querySelector('.wx-wrap'), sunCard = $('sunrise') && $('sunrise').closest('.card');
+  var row = sunCard && sunCard.querySelector('.sunrow'), nmEl = sunCard && sunCard.querySelector('.label>span');
+  if (nmEl) nmEl.classList.add('vdNm');
+  var tx = null;
+  if (wrap) { tx = D.createElement('div'); tx.id = 'vdWxTxt'; wrap.insertAdjacentElement('afterend', tx); }
+  function camp() { return R.classList.contains('camp'); }
+  function alignTrip() {
+    var t = $('trip'), b = $('fuelBtn');
+    if (!t || !b || camp()) { if (t) t.style.transform = ''; return; }
+    t.style.transform = '';
+    try {
+      var cs = getComputedStyle(t), r = t.getBoundingClientRect(), c = D.createElement('canvas').getContext('2d');
+      c.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+      var m = c.measureText(t.textContent || '0'), fa = m.fontBoundingBoxAscent, fd = m.fontBoundingBoxDescent;
+      if (!fa || !m.actualBoundingBoxAscent) return;
+      var ink = r.top + (r.height - (fa + fd)) / 2 + fa - m.actualBoundingBoxAscent, dy = b.getBoundingClientRect().top - ink;
+      if (Math.abs(dy) > 0.3 && Math.abs(dy) < 10) t.style.transform = 'translateY(' + dy.toFixed(1) + 'px)';
+    } catch (e) {}
+  }
+  function sync() {
+    var h = $('heading'), t = $('trip');
+    if (h && t) { if (camp()) h.style.removeProperty('font-size'); else h.style.setProperty('font-size', getComputedStyle(t).fontSize, 'important'); }
+    if (camp()) return;
+    var src = $('wx'), loc = $('vdLoc'), ic = $('wxIcon');
+    if (tx && src) {
+      var s = (src.textContent || '').replace(/^\W+/, '').trim(); if (s === '--') s = '';
+      if (tx.textContent !== s) tx.textContent = s;
+      if (loc && ic) { var w = loc.getBoundingClientRect().right - ic.getBoundingClientRect().left; if (w > 30) tx.style.maxWidth = Math.round(w) + 'px'; }
+    }
+    var ww = $('wxWind'), th = D.querySelector('#mainScreen .thermo');
+    if (ww && th) {
+      ww.style.transform = '';
+      var r = ww.getBoundingClientRect(), tb = th.getBoundingClientRect().bottom, k = (tb - r.top) / (ww.offsetHeight || r.height);
+      var lc = $('vdLoc'), rg = $('wxWindRing'); if (lc && rg) { var ar = lc.getBoundingClientRect().right, rr = rg.getBoundingClientRect(); if (ar < rr.left) k = Math.min(k, 1 + (rr.left - ar - 8) / rr.width); }
+      if (k > 1.01 && k < 1.6) ww.style.transform = 'scale(' + k.toFixed(3) + ')';
+    }
+    if (row && sunCard) {
+      var mc = $('sunMoon'), ring = $('wxWindRing'), cw = D.querySelector('#vdCmpCard .compass-wrap');
+      if (mc) {
+        var d0 = ring ? Math.round(ring.getBoundingClientRect().width) : 44; if (d0 < 36) d0 = 44;
+        var sp = mc.querySelector('span'), nm = mc.querySelector('.vdMn'), txt = nmEl ? nmEl.textContent.trim() : '';
+        if (!nm) { nm = D.createElement('div'); nm.className = 'vdMn'; mc.appendChild(nm); }
+        if (nm.getAttribute('data-t') !== txt) { nm.setAttribute('data-t', txt); nm.innerHTML = '<span style="display:inline-block">' + txt.replace(' ', '<br>') + '</span>'; }
+        var rise = $('sunrise'), set = $('sunset'), rw = row.getBoundingClientRect(), cx = ring ? ring.getBoundingClientRect().left + ring.getBoundingClientRect().width / 2 : rw.right - d0 / 2;
+        var tries = [[13, 0], [12, 0], [11, 0], [11, 6], [11, 12], [10, 12], [10, 18]];
+        for (var q = 0; q < tries.length; q++) {
+          var f = tries[q][0], d = Math.max(34, d0 - tries[q][1]);
+          if (sp) sp.style.fontSize = d + 'px';
+          rise.style.fontSize = set.style.fontSize = f + 'px';
+          mc.style.right = 'auto'; mc.style.left = (cx - mc.offsetWidth / 2 - rw.left).toFixed(1) + 'px';
+          var lim = nm.firstChild.getBoundingClientRect().left - 4, rl = Math.min(lim, mc.getBoundingClientRect().left - 4);
+          if (set.parentNode.getBoundingClientRect().right <= rl) break;
+        }
+      }
+      if (cw) { row.style.marginTop = ''; var dd = cw.getBoundingClientRect().top - row.getBoundingClientRect().top; if (Math.abs(dd) > 0.4 && Math.abs(dd) < 20) row.style.marginTop = (6 + dd).toFixed(1) + 'px'; }
+    }
+    alignTrip();
+  }
+  setInterval(sync, 700); setTimeout(sync, 300);
+  var im = $('vdSpArt');
+  if (im) setInterval(function () { if (im.style.visibility === 'hidden' && im.getAttribute('src')) im.removeAttribute('src'); }, 400);
 })();
 (function () { /* rev 309: hourly rows, wind page, daily icons and sunrise/sunset also fall back to the National Weather Service when Open-Meteo does not answer */
   var W = window, F = W.fetch, X = W.__vdNw;
