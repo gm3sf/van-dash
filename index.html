@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 315 -->
+<!-- Van Dash rev 316 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r315</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r316</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5258,7 +5258,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 315): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 316): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6083,7 +6083,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 315): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 316): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6608,7 +6608,6 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
       }
       if (cw) { row.style.marginTop = ''; var dd = cw.getBoundingClientRect().top - row.getBoundingClientRect().top; if (Math.abs(dd) > 0.4 && Math.abs(dd) < 20) row.style.marginTop = (6 + dd).toFixed(1) + 'px'; }
     }
-    alignTrip();
   }
   setInterval(sync, 700); setTimeout(sync, 300);
   var im = $('vdSpArt');
@@ -6649,65 +6648,73 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   }
   setInterval(sync, 700); setTimeout(sync, 400);
 })();
-(function () { /* rev 315: one spacing rule for all ring blocks, trip column, sun box, compass centering, weather caption */
+(function () { /* rev 316: compact cards again, snug labels, one gap under each label, captions snapped and left aligned */
   var D = document, W = window, R = D.documentElement, $ = function (i) { return D.getElementById(i); };
-  var K = 1.1, MB = 14, MS = 18;
-  var tempC = $('tempCard'), wxC = $('wxCard'), cmp = $('vdCmpCard'), sunC = $('vdSunCard'), trip = D.querySelector('.tripcard'), spC = $('vdSpCard');
+  var K = 1.1, G = 6, PX = 10;
+  var tempC = $('tempCard'), wxC = $('wxCard'), cmp = $('vdCmpCard'), sunC = $('vdSunCard'), trip = D.querySelector('.tripcard');
   var altRow = $('vdAltRow'), hdDiv = $('heading') && $('heading').parentNode, row = sunC && sunC.querySelector('.sunrow'), blk = $('vdMoonBlk');
-  var nmEl = sunC && sunC.querySelector('.label>span');
-  var txt = null;
+  var nmEl = sunC && sunC.querySelector('.label>span'), txt = null;
   if (cmp && hdDiv && altRow) { txt = D.createElement('div'); txt.id = 'vdCmpTxt'; cmp.appendChild(txt); txt.appendChild(hdDiv); txt.appendChild(altRow); }
   var st = D.createElement('style');
   st.textContent =
-    'html:not(.camp) #tempCard,html:not(.camp) #wxCard,html:not(.camp) #vdCmpCard,html:not(.camp) #vdSunCard,html:not(.camp) .tripcard,html:not(.camp) #vdSpCard{padding-bottom:' + MB + 'px!important}' +
-    'html:not(.camp) #tempCard,html:not(.camp) .tripcard,html:not(.camp) #vdSpCard{display:flex;flex-direction:column}' +
-    'html:not(.camp) #tempCard .temp-wrap{margin-top:auto;margin-left:' + (MS - 12) + 'px}' +
-    'html:not(.camp) .tripcard .tripbody{margin-top:auto;align-items:flex-start}' +
-    'html:not(.camp) .tripcard .tripbody .btns{flex-direction:column;align-items:stretch;gap:6px;width:60px;flex:none;margin-right:' + (MS - 12) + 'px}' +
+    'html:not(.camp) #mainScreen .grid>.card:not(.locrow):not(.battcard){padding:5px ' + PX + 'px 8px!important}' +
+    'html:not(.camp) .tripcard .tripbody{align-items:flex-start}html:not(.camp) .tripcard .tripbody .btns{flex-direction:column;align-items:stretch;gap:6px;width:60px;flex:none}' +
+    'html:not(.camp) #trip{line-height:1}html:not(.camp) .tripcard .tripbody .sub{margin-top:1px}' +
     'html:not(.camp) #fuelBtn{width:100%;height:36px;padding:0;display:flex;align-items:center;justify-content:center}' +
     'html:not(.camp) #resetBtn{width:100%;height:26px;padding:0;font-size:13px;display:flex;align-items:center;justify-content:center}' +
-    'html:not(.camp) #vdSpCard{justify-content:space-between}' +
-    'html:not(.camp) #wxWind,html:not(.camp) #vdMoonBlk{top:auto!important;bottom:' + MB + 'px!important;right:' + MS + 'px!important;transform-origin:100% 100%!important;transform:scale(' + K + ')!important}' +
+    'html:not(.camp) #tempCard .temp-wrap .value{line-height:1.05;margin-top:0}html:not(.camp) #tempCard .temp-wrap .sub{margin-top:1px}' +
+    'html:not(.camp) #wxWind,html:not(.camp) #vdMoonBlk{top:var(--vdTop,30px)!important;bottom:auto!important;right:' + PX + 'px!important;transform-origin:100% 0!important;transform:scale(' + K + ')!important}' +
     '#vdMoonBlk{position:absolute;width:72px;text-align:center;line-height:1}' +
-    'html:not(.camp) #vdCmpCard{grid-template-rows:auto 1fr auto!important}' +
-    'html:not(.camp) #vdCmpCard .compass-wrap>svg{grid-row:2!important;align-self:end!important;margin:0 0 0 ' + (MS - 12) + 'px!important}' +
-    'html:not(.camp) #vdCmpTxt{grid-column:2;grid-row:2;align-self:center;justify-self:center;display:flex;flex-direction:column;align-items:center;text-align:center}' +
-    'html:not(.camp) #vdCmpTxt>div:first-child{display:flex;align-items:baseline;justify-content:center;gap:5px;margin:0!important}' +
+    'html:not(.camp) #vdCmpCard{grid-template-rows:auto auto auto!important}' +
+    'html:not(.camp) #vdCmpCard .compass-wrap>svg{grid-row:2!important;align-self:start!important;margin:0!important}' +
+    'html:not(.camp) #vdCmpTxt{grid-column:2;grid-row:2;align-self:center;justify-self:start;display:flex;flex-direction:column;align-items:flex-start;text-align:left}' +
+    'html:not(.camp) #vdCmpTxt>div:first-child{display:flex;align-items:baseline;gap:5px;margin:0!important}' +
     'html:not(.camp) #vdCmpCard #heading{font-size:26px!important;line-height:1}html:not(.camp) #vdCmpCard #deg{font-size:16px!important;line-height:1;margin:0!important}' +
-    'html:not(.camp) #vdCmpTxt #vdAltRow{display:flex!important;flex-wrap:wrap!important;justify-content:center;align-items:baseline!important;margin:3px 0 0 0!important;gap:0 4px!important}' +
-    'html:not(.camp) #vdAltRow #vdAlt2{font-size:24px!important;line-height:1}html:not(.camp) #vdAltRow .vdEl{text-align:center;margin-top:3px}' +
-    'html:not(.camp) #vdSunCard .sunrow{left:' + MS + 'px!important;right:auto;width:auto!important;display:flex!important;gap:0!important;justify-content:flex-start;align-items:stretch;padding:6px 0;background:#26303c;border:.5px solid #8a96a6;border-radius:10px}' +
-    'html:not(.camp) #vdSunCard .sunrow>div{padding:0 10px;text-align:center}html:not(.camp) #vdSunCard .sunrow>div+div{border-left:.5px solid #8a96a6}' +
+    'html:not(.camp) #vdCmpTxt #vdAltRow{display:flex!important;flex-wrap:wrap!important;align-items:baseline!important;margin:3px 0 0 0!important;gap:0 4px!important}' +
+    'html:not(.camp) #vdAltRow #vdAlt2{font-size:24px!important;line-height:1}html:not(.camp) #vdAltRow .vdEl{margin-top:3px}' +
+    'html:not(.camp) #vdCmpCard>#compassBtn{grid-column:1/3;grid-row:3;width:100%;margin-top:6px}' +
+    'html:not(.camp) #vdSunCard .sunrow{left:' + PX + 'px!important;right:auto;width:auto!important;display:flex!important;gap:0!important;justify-content:flex-start;align-items:stretch;padding:6px 0;background:#26303c;border:.5px solid #8a96a6;border-radius:10px}' +
+    'html:not(.camp) #vdSunCard .sunrow>div{padding:0 12px;text-align:center}html:not(.camp) #vdSunCard .sunrow>div+div{border-left:.5px solid #8a96a6}' +
     'html:not(.camp) #vdSunCard .sunrow .t{font-weight:400!important;margin-top:3px}';
   D.head.appendChild(st);
-  var inkCache = {};
-  function inkBelowBaseline(font, s) {
-    var k = font + '|' + s; if (k in inkCache) return inkCache[k];
+  var ic0 = {};
+  function ink(font, s) {
+    var k = font + '|' + s; if (k in ic0) return ic0[k];
     var v = null;
     try {
-      var cv = D.createElement('canvas'); cv.width = 260; cv.height = 260; var c = cv.getContext('2d'); c.font = font; c.textBaseline = 'alphabetic'; c.fillText(s, 20, 170);
-      var d = c.getImageData(0, 0, 260, 260).data, last = -1;
-      for (var y = 259; y >= 0 && last < 0; y--) for (var x = 0; x < 260; x++) if (d[(y * 260 + x) * 4 + 3] > 24) { last = y; break; }
-      if (last >= 0) v = last + 1 - 170;
+      var cv = D.createElement('canvas'); cv.width = 300; cv.height = 260; var c = cv.getContext('2d'); c.font = font; c.textBaseline = 'alphabetic'; c.fillText(s, 20, 170);
+      var d = c.getImageData(0, 0, 300, 260).data, mx = 999, my = -1;
+      for (var y = 0; y < 260; y++) for (var x = 0; x < 300; x++) if (d[(y * 300 + x) * 4 + 3] > 24) { if (x < mx) mx = x; if (y > my) my = y; }
+      if (my >= 0) v = { l: mx - 20, b: my + 1 - 170 };
     } catch (e) {}
-    inkCache[k] = v; return v;
+    ic0[k] = v; return v;
   }
-  function labH(card) { var l = card && card.querySelector('.label'); return l ? l.getBoundingClientRect().bottom - card.getBoundingClientRect().top : 28; }
+  function labH(card) { var l = card && card.querySelector('.label'); return l ? l.getBoundingClientRect().bottom - card.getBoundingClientRect().top : 24; }
+  function gapTo(el, card) {
+    var lab = card && card.querySelector('.label'); if (!el || !lab) return;
+    el.style.removeProperty('margin-top');
+    var g = el.getBoundingClientRect().top - lab.getBoundingClientRect().bottom, m = parseFloat(getComputedStyle(el).marginTop) || 0;
+    el.style.setProperty('margin-top', (m + G - g).toFixed(1) + 'px', 'important');
+  }
   function camp() { return R.classList.contains('camp'); }
   function sync() {
     var ic = $('wxIcon'), t = $('trip'), ww = $('wxWind');
-    if (camp()) { if (ic) ic.style.removeProperty('font-size'); if (t) t.style.removeProperty('font-size'); return; }
+    if (camp()) { R.style.removeProperty('--vdTop'); if (ic) ic.style.removeProperty('font-size'); if (t) { t.style.removeProperty('font-size'); t.style.transform = ''; } return; }
+    var top = Math.max(labH(wxC), labH(sunC)) + G;
+    R.style.setProperty('--vdTop', top.toFixed(1) + 'px');
     if (ic) ic.style.setProperty('font-size', '72px', 'important');
-    // trip number: 20% bigger, shrinks if it would hit the buttons
     var tb = trip && trip.querySelector('.tripbody'), bt = trip && trip.querySelector('.btns');
     if (t && tb && bt) {
+      t.style.transform = '';
       if (!t.getAttribute('data-b')) t.setAttribute('data-b', parseFloat(getComputedStyle(t).fontSize));
       var fs = parseFloat(t.getAttribute('data-b')) * 1.2, av = tb.clientWidth - bt.offsetWidth - 14;
       t.style.fontSize = fs + 'px';
       while (fs > 22 && t.scrollWidth > av) { fs -= 2; t.style.fontSize = fs + 'px'; }
     }
-    // moon block: same layout as the wind block
-    var wsv = ww && ww.querySelector('svg'), sw = wsv ? parseFloat(wsv.style.width) || 58 : 58, ringD = sw * 0.95;
+    gapTo(tb, trip); gapTo(tempC && tempC.querySelector('.temp-wrap'), tempC); gapTo(wxC && wxC.querySelector('.wx-wrap'), wxC);
+    var cs = cmp && cmp.querySelector('.compass-wrap>svg'), wsv = ww && ww.querySelector('svg'), sw = wsv ? parseFloat(wsv.style.width) || 58 : 58, ringD = sw * 0.95;
+    if (cs) { var z = (sw * K * 1.1).toFixed(1) + 'px'; cs.style.setProperty('width', z, 'important'); cs.style.setProperty('height', z, 'important'); gapTo(cs, cmp); }
+    // moon block, same layout as the wind block, centered captions
     if (blk && nmEl && W.__vdMoon) {
       var name = nmEl.textContent.trim(), kk = name + '|' + Math.floor(Date.now() / 600000) + '|' + sw;
       if (blk.getAttribute('data-k') !== kk) {
@@ -6717,55 +6724,68 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
           '<div style="' + cap + 'margin-top:3px;line-height:10px">' + a + '</div><div style="' + cap + 'margin-top:2px;line-height:16px">' + (b || '&nbsp;') + '</div>';
       }
     }
-    // compass ring a bit bigger than the wind ring; heading block centered between the label and the card's right edge
-    var cs = cmp && cmp.querySelector('.compass-wrap>svg');
-    if (cs) { var z = (sw * K * 1.1).toFixed(1) + 'px'; cs.style.setProperty('width', z, 'important'); cs.style.setProperty('height', z, 'important'); }
+    // compass text: one fixed left edge, grows to the right only
     if (cmp && txt) {
       txt.style.transform = '';
-      var hh = $('heading'), dd0 = $('deg'), al2 = $('vdAlt2'), fz = 26, cr0 = cmp.getBoundingClientRect(), rr0 = cs ? cs.getBoundingClientRect().right : cr0.left;
+      var hh = $('heading'), dd0 = $('deg'), al2 = $('vdAlt2'), fz = 26, cr = cmp.getBoundingClientRect();
       function setF(v) { hh.style.setProperty('font-size', v + 'px', 'important'); dd0.style.setProperty('font-size', Math.round(v * 0.62) + 'px', 'important'); al2.style.setProperty('font-size', Math.round(v * 0.92) + 'px', 'important'); }
-      if (hh && dd0 && al2) { setF(fz); while (fz > 16 && (txt.getBoundingClientRect().right > cr0.right - 8 || txt.getBoundingClientRect().left < rr0 + 4)) { fz -= 2; setF(fz); } }
-      var lab = cmp.querySelector('.label'), xl = 0, cr = cmp.getBoundingClientRect();
-      for (var n = lab.firstChild; n; n = n.nextSibling) if (n.nodeType === 3 && n.textContent.trim()) { var rg = D.createRange(); rg.selectNodeContents(n); var rr = rg.getBoundingClientRect(); if (rr.right > xl) xl = rr.right; }
-      if (xl) {
-        var tr = txt.getBoundingClientRect(), cC = (xl + (cr.right - 12)) / 2, d = cC - (tr.left + tr.width / 2);
-        if (Math.abs(d) > 0.5 && tr.width > 0) txt.style.transform = 'translateX(' + d.toFixed(1) + 'px)';
+      if (hh && dd0 && al2) {
+        setF(fz); var lab = cmp.querySelector('.label'), xl = 0;
+        for (var n = lab.firstChild; n; n = n.nextSibling) if (n.nodeType === 3 && n.textContent.trim()) { var rg = D.createRange(); rg.selectNodeContents(n); var rr = rg.getBoundingClientRect(); if (rr.right > xl) xl = rr.right; }
+        var c2 = D.createElement('canvas').getContext('2d'), cs3 = getComputedStyle(hh), fam = cs3.fontFamily, refW = 0, ws;
+        c2.font = '700 26px ' + fam; ws = c2.measureText('NE').width + 5; c2.font = '600 16px ' + fam; ws += c2.measureText('555°').width; refW = ws;
+        c2.font = '600 24px ' + fam; ws = c2.measureText('0,000').width + 4; c2.font = '400 14px ' + fam; ws += c2.measureText('ft').width; if (ws > refW) refW = ws;
+        var tl = txt.getBoundingClientRect().left, ringR = cs ? cs.getBoundingClientRect().right : tl, sx = (xl + (cr.right - PX)) / 2 - refW / 2;
+        if (sx < ringR + 8) sx = ringR + 8;
+        while (fz > 16 && (tl + (sx - tl) + txt.getBoundingClientRect().width > cr.right - PX)) { fz -= 2; setF(fz); }
+        if (Math.abs(sx - tl) > 0.5) txt.style.transform = 'translateX(' + (sx - tl).toFixed(1) + 'px)';
       }
     }
-    // weather caption tight under the cloud, never reaching the wind ring
-    var tx = $('vdWxTxt');
-    if (tx && ic && wsv) {
-      var ir = ic.getBoundingClientRect(), ink = ir.bottom;
+    // weather: cloud's left edge lines up with the label icon, caption snug under it and left aligned
+    var tx = $('vdWxTxt'), li = wxC && wxC.querySelector('.label svg');
+    if (tx && ic && wsv && li) {
+      ic.style.removeProperty('margin-left');
+      var ir = ic.getBoundingClientRect(), il = 0, ib = ir.bottom - ir.top;
       if (!ic.querySelector('svg')) {
-        var cs2 = getComputedStyle(ic), fnt = cs2.fontWeight + ' ' + cs2.fontSize + ' ' + cs2.fontFamily, off = inkBelowBaseline(fnt, ic.textContent.trim() || '☁');
-        var c2 = D.createElement('canvas').getContext('2d'); c2.font = fnt; var mm = c2.measureText('M'), fa = mm.fontBoundingBoxAscent, fd = mm.fontBoundingBoxDescent;
-        if (off !== null && fa) { var lh = parseFloat(cs2.lineHeight); if (!(lh > 0)) lh = fa + fd; ink = ir.top + (lh - (fa + fd)) / 2 + fa + off; }
+        var cs2 = getComputedStyle(ic), fnt = cs2.fontWeight + ' ' + cs2.fontSize + ' ' + cs2.fontFamily, bx = ink(fnt, ic.textContent.trim() || '☁');
+        var c3 = D.createElement('canvas').getContext('2d'); c3.font = fnt; var mm = c3.measureText('M'), fa = mm.fontBoundingBoxAscent, fd = mm.fontBoundingBoxDescent;
+        if (bx && fa) { var lh = parseFloat(cs2.lineHeight); if (!(lh > 0)) lh = fa + fd; il = bx.l; ib = (lh - (fa + fd)) / 2 + fa + bx.b; }
       }
-      var nat = tx.getBoundingClientRect().top - (parseFloat(tx.style.marginTop) || 0), mt = ink + 2 - nat;
+      var dx = li.getBoundingClientRect().left - (ir.left + il);
+      if (Math.abs(dx) > 0.5 && Math.abs(dx) < 30) ic.style.setProperty('margin-left', dx.toFixed(1) + 'px', 'important');
+      ir = ic.getBoundingClientRect();
+      tx.style.marginTop = ''; tx.style.marginLeft = '';
+      var nat = tx.getBoundingClientRect(), mt = ir.top + ib + 2 - nat.top, ml = ir.left + il - nat.left;
       if (mt > -40 && mt < 12) tx.style.marginTop = mt.toFixed(1) + 'px';
-      var lc = $('vdLoc'), lim = wsv.getBoundingClientRect().left - 12;
-      if (lc) lim = Math.min(lim, Math.max(lc.getBoundingClientRect().right, ir.left + 60));
-      var w = lim - ir.left; tx.style.display = 'block'; tx.style.width = 'fit-content'; tx.style.textAlign = 'center'; tx.style.minWidth = Math.round(ir.width) + 'px';
-      if (w > 40) tx.style.maxWidth = Math.round(w) + 'px';
+      if (Math.abs(ml) < 30) tx.style.marginLeft = ml.toFixed(1) + 'px';
+      tx.style.display = 'block'; tx.style.width = 'fit-content'; tx.style.textAlign = 'left'; tx.style.minWidth = ''; tx.style.fontSize = '14px';
+      var w = wsv.getBoundingClientRect().left - 10 - (ir.left + il); if (w > 40) tx.style.maxWidth = Math.round(w) + 'px';
     }
-    // sunrise and sunset box, centered against the moon block, times like the High/Low text
+    // sunrise and sunset box
     if (row && sunC && blk) {
-      var hl = $('hilo'), hcs = hl ? getComputedStyle(hl) : null, ts = row.querySelectorAll('.t');
-      for (var i = 0; i < ts.length; i++) { if (hcs) { ts[i].style.setProperty('font-size', hcs.fontSize, 'important'); ts[i].style.setProperty('color', hcs.color, 'important'); } }
-      var bh = blk.offsetHeight * K, rh = row.offsetHeight;
-      row.style.bottom = (MB + Math.max(0, (bh - rh) / 2)).toFixed(1) + 'px'; row.style.top = 'auto';
-      var mb = blk.getBoundingClientRect(), sr = sunC.getBoundingClientRect(), avail = (mb.left + mb.right) / 2 - Math.max(ringD * K / 2, 30) - 10 - (sr.left + MS), pad = 10;
-      var tf = hcs ? parseFloat(hcs.fontSize) : 14;
-      while ((pad > 3 || tf > 9) && row.offsetWidth > avail) { if (pad > 3) pad--; else { tf--; for (var q = 0; q < ts.length; q++) ts[q].style.setProperty('font-size', tf + 'px', 'important'); } for (var j = 0; j < row.children.length; j++) row.children[j].style.padding = '0 ' + pad + 'px'; }
+      var hl = $('hilo'), hcs = hl ? getComputedStyle(hl) : null, ts = row.querySelectorAll('.t'), tf = (hcs ? parseFloat(hcs.fontSize) : 14) - 1;
+      for (var i = 0; i < ts.length; i++) { ts[i].style.setProperty('font-size', tf + 'px', 'important'); if (hcs) ts[i].style.setProperty('color', hcs.color, 'important'); }
+      row.style.top = (top + (blk.offsetHeight * K - row.offsetHeight) / 2).toFixed(1) + 'px'; row.style.bottom = 'auto';
+      var mb = blk.getBoundingClientRect(), sr = sunC.getBoundingClientRect(), avail = (mb.left + mb.right) / 2 - Math.max(ringD * K / 2, 30) - 8 - (sr.left + PX), pad = 12;
+      while ((pad > 5 || tf > 9) && row.offsetWidth > avail) { if (pad > 5) pad--; else { tf--; for (var q = 0; q < ts.length; q++) ts[q].style.setProperty('font-size', tf + 'px', 'important'); } for (var j = 0; j < row.children.length; j++) row.children[j].style.padding = '0 ' + pad + 'px'; }
     }
-    // every ring block starts below its label line and sits the same distance above its card's bottom edge
-    var need1 = Math.max(labH(tempC), labH(wxC)) + 4 + (ww ? ww.offsetHeight * K : 0) + MB;
-    var need2 = Math.max(labH(sunC), labH(cmp)) + 4 + Math.max(blk ? blk.offsetHeight * K : 0, cs ? parseFloat(cs.style.height) || 0 : 0) + MB;
-    [tempC, wxC].forEach(function (c) { if (c) c.style.minHeight = need1.toFixed(0) + 'px'; });
-    [sunC, cmp].forEach(function (c) { if (c) c.style.minHeight = need2.toFixed(0) + 'px'; });
+    var n1 = top + (ww ? ww.offsetHeight * K : 0) + 8, n2 = top + Math.max(blk ? blk.offsetHeight * K : 0, cs ? parseFloat(cs.style.height) || 0 : 0) + 8;
+    [tempC, wxC].forEach(function (c) { if (c) c.style.minHeight = n1.toFixed(0) + 'px'; });
+    [sunC, cmp].forEach(function (c) { if (c) c.style.minHeight = n2.toFixed(0) + 'px'; });
   }
   setInterval(sync, 700); setTimeout(sync, 500);
-})();
+})();/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
 (function () { /* rev 309: hourly rows, wind page, daily icons and sunrise/sunset also fall back to the National Weather Service when Open-Meteo does not answer */
   var W = window, F = W.fetch, X = W.__vdNw;
   if (!X) return;
