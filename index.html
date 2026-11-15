@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 308 -->
+<!-- Van Dash rev 309 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r308</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r309</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5258,7 +5258,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 308): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 309): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6088,7 +6088,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 308): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 309): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6222,6 +6222,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     return [f(720 - 4 * (lon + ha) - eq), f(720 - 4 * (lon - ha) - eq)];
   }
   function J(u) { var c = new AbortController(); setTimeout(function () { c.abort(); }, 9000); return F.call(W, u, { signal: c.signal }).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
+  W.__vdNw = { code: code, sun: sun, DEG: DEG, J: J, NW: NW };
   function nws(lat, lon) {
     return J(NW + 'points/' + lat.toFixed(4) + ',' + lon.toFixed(4)).then(function (p) {
       p = p.properties;
@@ -6232,9 +6233,9 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
       var F2 = function (q) { return q.temperatureUnit == 'C' ? q.temperature * 1.8 + 32 : q.temperature; }, CF = function (v) { return v * 1.8 + 32; };
       per.forEach(function (q) {
         var dt = q.startTime.slice(0, 10), d = D[dt];
-        if (!d) { d = D[dt] = { t: [], pop: [], day: [], all: [] }; ord.push(dt); }
+        if (!d) { d = D[dt] = { t: [], pop: [], dp: [], day: [], all: [] }; ord.push(dt); }
         var cd = code(q.shortForecast), pp = (q.probabilityOfPrecipitation && q.probabilityOfPrecipitation.value) || 0;
-        d.t.push(F2(q)); d.pop.push(pp); d.all.push(cd); if (q.isDaytime) d.day.push(cd);
+        d.t.push(F2(q)); d.pop.push(pp); d.all.push(cd); if (q.isDaytime) { d.day.push(cd); d.dp.push(pp); }
       });
       var gv = function (k, fn) { var o = {}; try { g[k].values.forEach(function (v) { var dt = new Date(Date.parse(v.validTime.split('/')[0]) + om * 60000).toISOString().slice(0, 10); if (v.value != null) o[dt] = o[dt] == null ? v.value : fn(o[dt], v.value); }); } catch (e) {} return o; };
       var gx = gv('maxTemperature', Math.max), gn = gv('minTemperature', Math.min);
@@ -6250,7 +6251,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
         if (gx[dt] != null) hi = Math.max(hi, CF(gx[dt]));
         if (gn[dt] != null) lo = Math.min(lo, CF(gn[dt]));
         var y = o.daily; y.time.push(dt); y.weather_code.push(mode(d.day.length ? d.day : d.all)); y.temperature_2m_max.push(hi); y.temperature_2m_min.push(lo);
-        y.precipitation_probability_max.push(Math.max.apply(null, d.pop)); y.sunrise.push(s[0]); y.sunset.push(s[1]);
+        y.precipitation_probability_max.push(Math.max.apply(null, d.dp.length ? d.dp : d.pop)); y.sunrise.push(s[0]); y.sunset.push(s[1]);
       });
       return o;
     });
@@ -6439,6 +6440,80 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   fb.onclick = function () { var q = ai.value.trim(); if (q.length < 3) return; clearTimeout(tm); if (cur.length && ls.style.display == 'block') pick(cur[0]); else go(q); };
   var pn = ai.closest('div[style*="absolute"]');
   new MutationObserver(function () { if (pn.style.display == 'none') { ls.style.display = 'none'; cur = []; } }).observe(pn, { attributes: true, attributeFilter: ['style'] });
+})();
+(function () { /* rev 309: hourly rows, wind page, daily icons and sunrise/sunset also fall back to the National Weather Service when Open-Meteo does not answer */
+  var W = window, F = W.fetch, X = W.__vdNw;
+  if (!X) return;
+  var cache = {}, down = 0;
+  function load(lat, lon) {
+    var k = lat.toFixed(2) + ',' + lon.toFixed(2), c = cache[k];
+    if (c && Date.now() - c.t < 600000) return c.p;
+    var p = X.J(X.NW + 'points/' + lat.toFixed(4) + ',' + lon.toFixed(4)).then(function (pt) {
+      pt = pt.properties; return Promise.all([X.J(pt.forecastHourly), X.J(pt.forecastGridData).catch(function () { return null; })]);
+    });
+    cache[k] = { t: Date.now(), p: p }; p.catch(function () { delete cache[k]; });
+    return p;
+  }
+  function dur(s) { var m = /P(?:(\d+)D)?T?(?:(\d+)H)?/.exec(s || ''); return m ? ((+m[1] || 0) * 24 + (+m[2] || 0)) || 1 : 1; }
+  function expand(g, key, fn) {
+    var o = {};
+    try { g[key].values.forEach(function (v) { if (v.value == null) return; var a = v.validTime.split('/'), t0 = Math.floor(Date.parse(a[0]) / 36e5), n = dur(a[1]), i; for (i = 0; i < n; i++) o[t0 + i] = fn ? fn(v.value, n) : v.value; }); } catch (e) {}
+    return o;
+  }
+  function build(lat, lon, s, a) {
+    var per = a[0].properties.periods, g = a[1] && a[1].properties;
+    var ofs = /([+-])(\d\d):(\d\d)$/.exec(per[0].startTime), om = ofs ? (ofs[1] == '-' ? -1 : 1) * (ofs[2] * 60 + +ofs[3]) : 0;
+    var days = +(/forecast_days=(\d+)/.exec(s) || [0, 7])[1], n = days * 24, fh = /temperature_unit=fahrenheit/.test(s), mph = /wind_speed_unit=mph/.test(s);
+    var mp = {}, i, j;
+    per.forEach(function (q) { mp[Math.floor(Date.parse(q.startTime) / 36e5)] = q; });
+    var sky = expand(g, 'skyCover'), gst = expand(g, 'windGust'), qp = expand(g, 'quantitativePrecipitation', function (v, k) { return v / k; });
+    var P = per[0].startTime.slice(0, 10).split('-').map(Number), mid = Date.UTC(P[0], P[1] - 1, P[2]) - om * 60000;
+    var first = Math.floor(Date.parse(per[0].startTime) / 36e5), last = Math.floor(Date.parse(per[per.length - 1].startTime) / 36e5), lq = per[0], sc = {};
+    var H = { time: [], temperature_2m: [], weather_code: [], precipitation_probability: [], cloud_cover: [], precipitation: [], is_day: [], wind_speed_10m: [], wind_direction_10m: [], wind_gusts_10m: [] };
+    var mm = function (t) { return +t.slice(11, 13) * 60 + +t.slice(14, 16); };
+    for (i = 0; i < n; i++) {
+      var e = mid + i * 36e5, hk = Math.floor(e / 36e5), q = mp[Math.min(Math.max(hk, first), last)] || lq, t = new Date(e + om * 60000).toISOString().slice(0, 16), day = t.slice(0, 10);
+      lq = q;
+      var sn = sc[day] || (sc[day] = X.sun(lat, lon, day, om)), m = +t.slice(11, 13) * 60 + 30;
+      var tf = q.temperatureUnit == 'C' ? q.temperature * 1.8 + 32 : q.temperature, cd = X.code(q.shortForecast), pp = (q.probabilityOfPrecipitation && q.probabilityOfPrecipitation.value) || 0;
+      var ws = (q.windSpeed || '').match(/\d+/g), sp = ws ? +ws[ws.length - 1] : 0, gu = gst[hk] != null ? gst[hk] * 0.621371 : sp;
+      H.time.push(t); H.temperature_2m.push(fh ? tf : (tf - 32) / 1.8); H.weather_code.push(cd); H.precipitation_probability.push(pp);
+      H.cloud_cover.push(sky[hk] != null ? sky[hk] : cd == 0 ? 5 : cd == 1 ? 25 : cd == 2 ? 55 : 90);
+      H.precipitation.push(qp[hk] != null ? qp[hk] : (cd >= 51 && pp >= 50 ? 0.4 : 0));
+      H.is_day.push(m >= mm(sn[0]) && m < mm(sn[1]) ? 1 : 0);
+      H.wind_speed_10m.push(mph ? sp : sp * 1.609); H.wind_direction_10m.push(X.DEG[q.windDirection] || 0); H.wind_gusts_10m.push(mph ? Math.max(sp, gu) : Math.max(sp, gu) * 1.609);
+    }
+    var o = { latitude: lat, longitude: lon, utc_offset_seconds: om * 60, timezone: 'auto' };
+    if (/hourly=/.test(s)) o.hourly = H;
+    if (/daily=/.test(s)) {
+      var Dy = { time: [], sunrise: [], sunset: [], daylight_duration: [], wind_speed_10m_max: [], wind_gusts_10m_max: [], wind_direction_10m_dominant: [] };
+      for (i = 0; i < days; i++) {
+        var dd = H.time[i * 24].slice(0, 10), sn2 = sc[dd], mx = -1, di = 0, gm = 0;
+        for (j = i * 24; j < i * 24 + 24; j++) { if (H.wind_speed_10m[j] > mx) { mx = H.wind_speed_10m[j]; di = H.wind_direction_10m[j]; } gm = Math.max(gm, H.wind_gusts_10m[j]); }
+        Dy.time.push(dd); Dy.sunrise.push(sn2[0]); Dy.sunset.push(sn2[1]); Dy.daylight_duration.push(Math.max(0, mm(sn2[1]) - mm(sn2[0])) * 60);
+        Dy.wind_speed_10m_max.push(mx); Dy.wind_gusts_10m_max.push(gm); Dy.wind_direction_10m_dominant.push(di);
+      }
+      o.daily = Dy;
+    }
+    return o;
+  }
+  W.fetch = function (u) {
+    var s = typeof u == 'string' ? u : '', a = arguments, me = this;
+    if (!/^https:\/\/api\.open-meteo\.com\/v1\/forecast/.test(s) || (/&current=/.test(s) && /&daily=weather_code/.test(s)) || !/[?&](hourly|daily)=/.test(s)) return F.apply(me, a);
+    var la = +/latitude=(-?[\d.]+)/.exec(s)[1], lo = +/longitude=(-?[\d.]+)/.exec(s)[1];
+    return new Promise(function (res) {
+      var done = 0, r0 = null, nf = 0, np = 0, t;
+      var fin = function (r) { if (!done) { done = 1; clearTimeout(t); res(r); } };
+      var go = function () {
+        if (np) return; np = 1;
+        load(la, lo).then(function (a2) { return new Response(JSON.stringify(build(la, lo, s, a2)), { status: 200, headers: { 'Content-Type': 'application/json' } }); })
+          .then(fin, function () { nf = 1; if (r0) fin(r0); });
+      };
+      t = setTimeout(go, down > Date.now() ? 0 : 4000);
+      F.apply(me, a).then(function (r) { r0 = r; if (r.ok) { down = 0; fin(r); } else { down = Date.now() + 90000; if (nf) fin(r); else go(); } },
+        function () { down = Date.now() + 90000; r0 = new Response('{"error":true}', { status: 503 }); if (nf) fin(r0); else go(); });
+    });
+  };
 })();
 </script>
 </body>
