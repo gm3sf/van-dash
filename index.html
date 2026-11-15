@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 309 -->
+<!-- Van Dash rev 312 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r309</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r312</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -2288,7 +2288,7 @@ function decorateResults() {
     catch (e) { return null; }
   }
   async function poll() {
-    if (!tok || document.hidden || document.getElementById('spotScreen').classList.contains('hidden')) return;
+    if (!tok || document.hidden) return;
     var r = await api('GET', '');
     if (!r) return;
     if (r.status === 401) { sv(null); idle('Connect Spotify', 'Tap here to log in'); return; }
@@ -5258,7 +5258,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 309): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 312): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -5384,15 +5384,16 @@ D.head.appendChild(st);
 const U = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
 const pm = v => { const m = String(v || '').match(/(\d+)\s*(mph)?/i); if (!m) return null; let n = +m[1]; if (!m[2]) n = Math.round(n * 0.621371); return n >= 5 && n <= 85 ? n : null; };
 const ask = (q, i) => { i = i || 0; const c = new AbortController(), t = setTimeout(() => c.abort(), 12000); return fetch(U[i], { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(q), signal: c.signal }).then(r => { clearTimeout(t); return r.ok ? r.json() : Promise.reject(r.status); }).catch(e => { clearTimeout(t); return i + 1 < U.length ? ask(q, i + 1) : Promise.reject(e); }); };
-const look = (lat, lon, hd) => ask('[out:json][timeout:10];way(around:30,' + lat + ',' + lon + ')[highway][maxspeed];out geom tags;').then(j => {
+const look = (lat, lon, hd) => ask('[out:json][timeout:10];way(around:45,' + lat + ',' + lon + ')[highway][maxspeed];out geom tags;').then(j => {
 let best = null, bs = 1e9;
+window.__vdWn = (j.elements || []).length;
 (j.elements || []).forEach(w => {
 const lim = pm(w.tags && w.tags.maxspeed), g = w.geometry;
 if (lim == null || !g || g.length < 2 || /_link$/.test(w.tags.highway || '')) return;
 let md = 1e9, sb = 0;
 for (let i = 0; i < g.length - 1; i++) { const d = distMeters({ latitude: lat, longitude: lon }, { latitude: (g[i].lat + g[i + 1].lat) / 2, longitude: (g[i].lon + g[i + 1].lon) / 2 }); if (d < md) { md = d; sb = bearing(g[i].lat, g[i].lon, g[i + 1].lat, g[i + 1].lon); } }
 const df = Math.min(angDiff(hd, sb), angDiff(hd, (sb + 180) % 360));
-if (df > 30) return;
+if (df > 40) return;
 if (md + df < bs) { bs = md + df; best = lim; }
 });
 return best;
@@ -5406,7 +5407,7 @@ if (c.heading != null && !isNaN(c.heading) && mph > 5) hd = c.heading;
 if (hd == null || mph <= 5 || busy || Date.now() - last < 10000) return;
 last = Date.now(); busy = true;
 look2(c.latitude, c.longitude, hd).then(b => {
-if (b == null) { cand = null; cnt = 0; miss++; if (limShown != null && miss >= 6) clear(); ls.textContent = limShown == null ? 'No posted limit on the map here' : ''; return; }
+if (b == null) { cand = null; cnt = 0; miss++; if (limShown != null && miss >= 6) clear(); ls.textContent = limShown == null ? 'No posted limit on the map here' + (window.__vdWn ? ' (' + window.__vdWn + ' tagged, none match)' : ' (no tagged roads)') : ''; return; }
 miss = 0;
 if (b == limShown) { cand = null; cnt = 0; ls.textContent = ''; return; }
 if (b == cand) cnt++; else { cand = b; cnt = 1; }
@@ -5526,7 +5527,6 @@ drag = null; data = ord; sv(); render();
 };
 D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
 })();
-/* rev 280 */
 (function () {
   var D = document, st = D.createElement('style'), d = D.createElement('div');
   st.textContent = '#vdRot{display:none}@media (orientation:landscape) and (max-width:999px) and (max-height:500px){#vdRot{display:flex;position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483000;background:#000;color:#fff;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;font:600 20px -apple-system,Helvetica,Arial,sans-serif}html,body{overflow:hidden!important}}';
@@ -5534,7 +5534,6 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   d.innerHTML = '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#ff8a2b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18.5h2"/></svg><div>Turn your phone upright</div><div style="font-size:14px;font-weight:400;color:#8a96a6">Van Dash keeps running. It is built for portrait.</div>';
   D.head.appendChild(st); D.body.appendChild(d);
 })();
-/* rev 282 */
 (function () {
   var D = document, fm = D.getElementById('fullMap'), bar = null;
   if (!fm) return;
@@ -5557,7 +5556,6 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   setInterval(function () { if (bar && fm.classList.contains('hidden')) bar.style.display = 'none'; }, 500);
 })();
 
-/* rev 284 */
 (function () {
   var D = document, W = window;
   var fm = D.getElementById('fullMap'), bar = D.getElementById('fSrchBar'), sIn = D.getElementById('fSrchIn'), sList = D.getElementById('fSrchList');
@@ -5846,7 +5844,6 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     zb.appendChild(m1); mics.push(m1);
   }
 })();
-/* rev 287 */
 (function () {
   var D = document, sp = D.querySelector('.speed'), u = sp && sp.querySelector('.unit'), rb = D.getElementById('revBtn'), sg = D.getElementById('limSign');
   if (!sp || !u) return;
@@ -6004,7 +6001,6 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   };
 })();
 
-/* rev 291 */
 (function () {
   var D = document, sp = D.querySelector('.speed'), rb = D.getElementById('revBtn'), sg = D.getElementById('limSign');
   if (!sp || !rb) return;
@@ -6023,7 +6019,6 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   });
 })();
 
-/* rev 292 */
 (function () {
   var D = document, fm = D.getElementById('fullMap'), C = D.getElementById('fStats');
   var st = D.createElement('style');
@@ -6088,7 +6083,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 309): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 312): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6117,6 +6112,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
       var d = (await r.json()).address || {}, st = STATE_ABBR[d.state] || d.state || '', nm = d.city || d.town || d.village || d.municipality || '';
       var nb = d.neighbourhood || d.suburb || d.quarter || d.hamlet || d.city_district || '';
       var nbl = '';
+      if (nm) { try { var r2 = await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=10&addressdetails=1&accept-language=en&lat=' + lat + '&lon=' + lon); if (r2.ok) { var a2 = (await r2.json()).address || {}, c2 = a2.city || a2.town || a2.village || a2.municipality || ''; if (c2 && c2 != nm) { nbl = nm; nm = c2; } } } catch (e2) {} }
       if (!nm) { var ci = await near(lat, lon); if (nb) { ci = ci || (d.county || '').replace(/ County$/, ''); if (ci != nb) nbl = nb; } nm = ci; }
       nm = nm || d.county || '';
       cityName = nm && st ? nm + ', ' + st : (nm || st || 'Unknown location');
@@ -6440,6 +6436,109 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   fb.onclick = function () { var q = ai.value.trim(); if (q.length < 3) return; clearTimeout(tm); if (cur.length && ls.style.display == 'block') pick(cur[0]); else go(q); };
   var pn = ai.closest('div[style*="absolute"]');
   new MutationObserver(function () { if (pn.style.display == 'none') { ls.style.display = 'none'; cur = []; } }).observe(pn, { attributes: true, attributeFilter: ['style'] });
+})();
+(function () { /* rev 311: Spotify card next to Trip, and the compass card now also shows the altitude */
+  var D = document, g = D.querySelector('#mainScreen .grid'), al = D.getElementById('alt'), hd = D.getElementById('heading');
+  if (!g || !al || !hd) return;
+  var cc = hd.closest('.card'), ac = al.closest('.card'), wr = cc.querySelector('.compass-wrap');
+  cc.id = 'vdCmpCard'; ac.classList.add('vdAltCard');
+  var st = D.createElement('style');
+  st.textContent = 'html:not(.camp) #vdSpCard{order:3!important}html:not(.camp) #vdCmpCard{order:8!important}html:not(.camp) #mainScreen .grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}html:not(.camp) .vdAltCard{display:none!important}html.camp #vdSpCard,html.camp #vdAltRow{display:none!important}' +
+    'html:not(.camp) #vdCmpCard .compass-wrap{gap:8px}html:not(.camp) #vdCmpCard .compass-wrap svg{width:46px;height:46px}html:not(.camp) #vdCmpCard .compass-wrap>div{display:flex;align-items:baseline;gap:6px;min-width:0}' +
+    'html:not(.camp) #vdCmpCard #heading{font-size:24px}html:not(.camp) #vdCmpCard #deg{font-size:13px;margin-top:0}';
+  D.head.appendChild(st);
+  var row = D.createElement('div'); row.id = 'vdAltRow'; row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:6px;color:#9fb0c3;font-size:14px';
+  row.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:#ff8a2b;stroke-width:2;stroke-linejoin:round;flex:none"><path d="M2 20 9 7l4 7 3-5 6 11z"/></svg><b id="vdAlt2" style="font-size:20px;color:#e8eef5;font-weight:600">--</b><span>ft</span>';
+  wr.insertAdjacentElement('afterend', row);
+  var ic = function (d, s) { return '<svg viewBox="0 0 24 24" style="width:' + s + 'px;height:' + s + 'px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block">' + d + '</svg>'; };
+  var bs = 'margin:0;padding:4px 10px;background:none;border:0;flex:none';
+  var sp = D.createElement('div'); sp.className = 'card'; sp.id = 'vdSpCard';
+  sp.innerHTML = '<div class="label"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7 9.5c3.5-1 7-.7 10 1M7.5 12.8c3-.8 6-.5 8.5.9M8 15.8c2.5-.6 5-.4 7 .7"/></svg>Spotify</div>' +
+    '<div id="vdSpTap" style="display:flex;gap:8px;align-items:center;margin-top:6px;cursor:pointer"><img id="vdSpArt" alt="" style="width:40px;height:40px;border-radius:8px;object-fit:cover;flex:none;border:.5px solid #8a96a6;background:#26303c;visibility:hidden">' +
+    '<div style="min-width:0;flex:1"><div id="vdSpT" style="font-size:13px;font-weight:600;color:#e8eef5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>' +
+    '<div id="vdSpA" style="font-size:12px;color:#7f8fa3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px"></div></div></div>' +
+    '<div style="display:flex;justify-content:space-around;align-items:center;margin-top:6px">' +
+    '<button id="vdSpP" aria-label="Previous" style="' + bs + '">' + ic('<path d="M6 5v14M19 5L9 12l10 7z"/>', 22) + '</button>' +
+    '<button id="vdSpY" aria-label="Play or pause" style="' + bs + '"></button>' +
+    '<button id="vdSpN" aria-label="Next" style="' + bs + '">' + ic('<path d="M18 5v14M5 5l10 7-10 7z"/>', 22) + '</button></div>';
+  g.appendChild(sp);
+  var $ = function (i) { return D.getElementById(i); }, lastP = null;
+  function clk(id) { var b = $(id); if (b) b.click(); }
+  $('vdSpP').onclick = function (e) { e.stopPropagation(); clk('spPrev'); };
+  $('vdSpN').onclick = function (e) { e.stopPropagation(); clk('spNext'); };
+  $('vdSpY').onclick = function (e) { e.stopPropagation(); clk('spPlay'); };
+  sp.style.cursor = 'pointer'; sp.onclick = function (e) { if (!(e.target.closest && e.target.closest('button'))) clk('spotBtn'); };
+  function sync() {
+    var T = $('spT'), A = $('spA'), art = $('spArt'), pl = $('spPlay'), im = $('vdSpArt');
+    $('vdAlt2').textContent = al.textContent;
+    if (!T) return;
+    $('vdSpT').textContent = T.textContent.replace(/ \(\d{4}\)$/, ''); $('vdSpA').textContent = A.textContent;
+    var ok = art && art.style.display != 'none' && art.getAttribute('src');
+    if (ok) { if (im.getAttribute('src') != art.getAttribute('src')) im.src = art.getAttribute('src'); im.style.visibility = 'visible'; } else im.style.visibility = 'hidden';
+    var pp = !!(pl && /M10 8v8M14 8v8/.test(pl.innerHTML));
+    if (pp !== lastP) { lastP = pp; $('vdSpY').innerHTML = ic(pp ? '<circle cx="12" cy="12" r="10"/><path d="M10 8v8M14 8v8"/>' : '<circle cx="12" cy="12" r="10"/><path d="M10 8v8l6-4z"/>', 32); }
+  }
+  setInterval(sync, 500); sync();
+})();
+(function () { /* rev 312: map buttons (locate + mic on the left, bigger zoom), speedometer spacing, Spotify page text size and song year */
+  var D = document, W = window, F = W.fetch, K = 'vdYr', C = {}, cur = null;
+  var st = D.createElement('style');
+  st.textContent = 'html:not(.camp) .vmap .zbtns{display:contents}' +
+    'html:not(.camp) #vzIn,html:not(.camp) #vzOut{position:absolute!important;right:8px;width:54px!important;height:54px!important;font-size:32px!important}' +
+    'html:not(.camp) #vzIn{top:8px}html:not(.camp) #vzOut{top:70px}' +
+    'html:not(.camp) #vCtr{position:absolute!important;left:8px;top:104px;width:40px!important;height:40px!important}' +
+    'html:not(.camp) #vdMic{position:absolute!important;left:8px;top:152px}' +
+    'html:not(.camp) #vRadPl{bottom:auto!important;left:56px!important;top:56px!important}html:not(.camp) #vRadT{bottom:auto!important;left:102px!important;top:62px!important}' +
+    '.speed{justify-content:flex-start!important}.speed #speed{margin:28px 0 -10px!important}' +
+    '.speed #limSign{width:38px!important;height:38px!important;margin:7px auto 0!important}' +
+    '.speed #revBtn{position:absolute!important;left:50%;bottom:6px;margin:0 0 0 -22px!important}' +
+    '#spT{font-size:20px!important;line-height:1.15;white-space:normal!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}#spA{font-size:16px!important}';
+  D.head.appendChild(st);
+  try { C = JSON.parse(localStorage.getItem(K)) || {}; } catch (e) { C = {}; }
+  function sv() { var k = Object.keys(C); if (k.length > 300) k.slice(0, 100).forEach(function (x) { delete C[x]; }); try { localStorage.setItem(K, JSON.stringify(C)); } catch (e) {} }
+  function nz(s) { return (s || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ''); }
+  function clean(t) { return t.replace(/\s*[\(\[][^\)\]]*[\)\]]/g, '').replace(/\s+-\s+.*$/, '').trim(); }
+  function mb(name, art) {
+    var t = clean(name) || name, q = 'recording:"' + t.replace(/"/g, '') + '" AND artist:"' + art.replace(/"/g, '') + '"';
+    return F.call(W, 'https://musicbrainz.org/ws/2/recording?fmt=json&limit=25&query=' + encodeURIComponent(q)).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      var best = 0;
+      ((j && j.recordings) || []).forEach(function (x) {
+        var y = parseInt((x['first-release-date'] || '').slice(0, 4), 10), ac = (x['artist-credit'] || []).map(function (a) { return a.name; }).join(' ');
+        if (!y || y < 1900 || (x.score || 0) < 90 || nz(x.title) !== nz(t) || nz(ac).indexOf(nz(art)) < 0) return;
+        if (!best || y < best) best = y;
+      });
+      return best;
+    }).catch(function () { return 0; });
+  }
+  function show() {
+    var T = D.getElementById('spT');
+    if (T && cur && cur.y && T.textContent === cur.name) T.textContent = cur.name + ' (' + cur.y + ')';
+  }
+  var T0 = D.getElementById('spT');
+  if (T0) new MutationObserver(show).observe(T0, { childList: true, characterData: true, subtree: true });
+  W.fetch = function (u) {
+    var p = F.apply(this, arguments);
+    try {
+      if (/me\/player$/.test(String(u))) p.then(function (r) {
+        if (r.status !== 200) return;
+        r.clone().json().then(function (j) {
+          var it = j && j.item;
+          if (!it || !it.album || j.currently_playing_type === 'ad') return;
+          var art = (it.artists && it.artists[0] && it.artists[0].name) || '', id = it.id || (it.name + '|' + art);
+          if (!cur || cur.id !== id) {
+            var ry = parseInt((it.album.release_date || '').slice(0, 4), 10) || 0;
+            cur = { id: id, name: it.name, y: C[id] > 0 ? C[id] : ry };
+            if (!C[id] && art) mb(it.name, art).then(function (y) {
+              C[id] = y || -1; sv();
+              if (y && cur && cur.id === id) { cur.y = y; show(); }
+            });
+          }
+          show();
+        }).catch(function () {});
+      }).catch(function () {});
+    } catch (e) {}
+    return p;
+  };
 })();
 (function () { /* rev 309: hourly rows, wind page, daily icons and sunrise/sunset also fall back to the National Weather Service when Open-Meteo does not answer */
   var W = window, F = W.fetch, X = W.__vdNw;
