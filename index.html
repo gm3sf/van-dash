@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 322 -->
+<!-- Van Dash rev 325 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r322</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r325</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5258,7 +5258,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 322): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 325): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6083,7 +6083,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 322): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 325): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6624,7 +6624,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   }
   setInterval(sync, 700); setTimeout(sync, 400);
 })();
-(function () { /* rev 322: compass ring on the right, tighter heading, re-spaced letters (no counter-rotation) */
+(function () { /* rev 325: compass ring and heading text sized once; compass page letters left alone */
   var D = document, W = window, R = D.documentElement, $ = function (i) { return D.getElementById(i); };
   var K = 0.95, G = 6, PX = 10;
   var tempC = $('tempCard'), wxC = $('wxCard'), cmp = $('vdCmpCard'), sunC = $('vdSunCard'), trip = D.querySelector('.tripcard');
@@ -6691,8 +6691,10 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     gapTo(tb, trip); gapTo(wxC && wxC.querySelector('.wx-wrap'), wxC);
     var cs = cmp && cmp.querySelector('.compass-wrap>svg'), wsv = ww && ww.querySelector('svg'), sw = wsv ? parseFloat(wsv.style.width) || 58 : 58, ringD = sw * 0.95;
     var wr = $('wxWindRing');
-    if (cs && wr && ww) {
-      var q1 = wr.getBoundingClientRect(), q2 = ww.getBoundingClientRect(), q3 = wxC.getBoundingClientRect(), q4 = cmp.getBoundingClientRect(), z = Math.round((q2.bottom - q1.top) / 0.94), ins = 0.03 * z;
+    var vk = ww ? innerWidth + '|' + ww.offsetHeight + '|' + wxC.offsetWidth : '';
+    if (cs && wr && ww && cs.getAttribute('data-vk') !== vk) {
+      cs.setAttribute('data-vk', vk);
+      var q1 = wr.getBoundingClientRect(), q2 = ww.getBoundingClientRect(), q3 = wxC.getBoundingClientRect(), q4 = cmp.getBoundingClientRect(), z = Math.round((q2.bottom - q1.top) / 0.94 * 0.92), ins = 0.03 * z;
       cs.style.setProperty('margin', '0', 'important'); cs.style.setProperty('width', z + 'px', 'important'); cs.style.setProperty('height', z + 'px', 'important');
       var qn = cs.getBoundingClientRect();
       cs.style.setProperty('margin', Math.max(0, q4.top + (q1.top - q3.top - ins) - qn.top).toFixed(1) + 'px ' + Math.max(0, q3.right - q1.right - ins - PX).toFixed(1) + 'px 0 0', 'important');
@@ -6712,7 +6714,11 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
       if (hh && dd0 && al2) {
         setF(fz); var lim = cs ? cs.getBoundingClientRect().left - 8 : cmp.getBoundingClientRect().right - PX;
         var tw = function () { var q = D.createRange(); q.selectNodeContents(txt); return q.getBoundingClientRect().right; };
-        while (fz > 24 && tw() > lim) { fz -= 2; setF(fz); }
+        if (W.__vdFk !== vk) {
+          var h0 = hh.textContent, d0 = dd0.textContent; hh.textContent = 'WNW'; dd0.textContent = '555°';
+          while (fz > 24 && tw() > lim) { fz -= 2; setF(fz); }
+          W.__vdFz = fz; W.__vdFk = vk; hh.textContent = h0; dd0.textContent = d0;
+        } else { fz = W.__vdFz; setF(fz); }
       }
     }
     // weather: cloud and caption centered under the label icon and the word Weather
@@ -6753,7 +6759,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   }
   function up() {
     var P = { N: [50, 23], S: [50, 90], E: [81, 56], W: [19, 56] };
-    document.querySelectorAll('#compassRing text,#vdBigRing text').forEach(function (t) {
+    document.querySelectorAll('#compassRing text').forEach(function (t) {
       var p = P[t.textContent.trim()]; if (p) { t.setAttribute('x', p[0]); t.setAttribute('y', p[1]); }
       t.style.transform = '';
     });
