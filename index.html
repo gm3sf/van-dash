@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 333 -->
+<!-- Van Dash rev 334 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r333</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r334</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -620,6 +620,20 @@ showFuel();
     ov.style.display = "";
   };
 })();
+setInterval(function () {
+  var l = $("vdRadL"), s = $("vdRadS"), fs = $("fStats"), W = window;
+  if (!l || !s || !fs) return;
+  if (!s.__vd) {
+    s.__vd = 1; var sp = +localStorage.getItem("vdRadSp") || 1;
+    W.__vdSp = sp; s.textContent = sp + "x";
+    [l, s].forEach(function (b) { ["pointerdown", "pointerup"].forEach(function (n) { b.addEventListener(n, function (e) { e.stopPropagation(); }); }); });
+    l.onclick = function (e) { e.stopPropagation(); if (W.__vdLatest) W.__vdLatest(); };
+    s.onclick = function (e) { e.stopPropagation(); W.__vdSp = W.__vdSp === 3 ? 1 : W.__vdSp + 1; s.textContent = W.__vdSp + "x"; localStorage.setItem("vdRadSp", W.__vdSp); };
+  }
+  var bx = l.parentNode, kb = fs.parentNode.querySelectorAll("button"), a = null, z = null, i;
+  for (i = 0; i < kb.length; i++) if (kb[i].offsetWidth && /track/.test(kb[i].textContent)) { if (!a) a = kb[i]; z = kb[i]; }
+  if (a && z && bx.offsetParent) { var bp = bx.offsetParent.getBoundingClientRect(); bx.style.left = (a.getBoundingClientRect().left - bp.left) + "px"; bx.style.right = (bp.right - z.getBoundingClientRect().right) + "px"; }
+}, 300);
 let tripMeters = parseFloat(localStorage.getItem("tripMeters") || "0");
 let lastPos = null;
 function showTrip() { $("trip").textContent = (tripMeters * M_TO_MI).toFixed(1); }
@@ -1939,7 +1953,7 @@ function decorateResults() {
   if (wxv) { wxv.style.textAlign = "left"; wxv.style.maxWidth = "100%"; }
   if (icon) { icon.style.textAlign = "left"; }
 
-  // ===== 2. Shared state for the map overlays =====
+  // 2
   var headUp = localStorage.getItem("vdHeadUp") === "1";
   var radarOn = localStorage.getItem("vdRadar") === "1";
   var mapHead = 0;          // smoothed heading used for rotation
@@ -1983,7 +1997,7 @@ function decorateResults() {
     try { if (window.__fDraw && !document.getElementById("fullMap").classList.contains("hidden")) window.__fDraw(); } catch (e) {}
   }
 
-  // ===== 3. Rotate the small map: wrap vDraw =====
+  // 3
   //
   var vOff = document.createElement("canvas"), vOffCtx = vOff.getContext("2d");
   var vInner = vDraw;
@@ -2008,7 +2022,7 @@ function decorateResults() {
     realCtx.restore();
   };
 
-  // ===== 4. Radar tiles (RainViewer) =====
+  // 4
   var radarPath = null, radarHost = "https://tilecache.rainviewer.com", radarFetched = 0;
   var radarTiles = {};
   function loadRadarIndex() {
@@ -2054,7 +2068,7 @@ function decorateResults() {
     ctx.restore();
   }
 
-  // ===== 5. Overlay widgets (wind ring + buttons) on both maps =====
+  // 5
   function ringSvg() {
     return '<svg viewBox="0 0 100 100" style="width:46px;height:46px;display:block;margin:0 auto">' +
       '<g class="mwRing" style="transform-origin:50px 50px">' +
@@ -2271,7 +2285,7 @@ function decorateResults() {
   if (radarOn) loadRadarIndex();
   setInterval(function () { if (radarOn) loadRadarIndex(); }, 300000);
 
-  // ===== 6. Rotate the full-screen map =====
+  // 6
   //
   //
   window.__drawRadar = drawRadar;
@@ -2417,7 +2431,7 @@ function decorateResults() {
     if (s) { s.style.top = '16px'; s.style.lineHeight = '12px'; s.style.textAlign = 'center'; }
   });
 
-  // ---- data: hourly + 15-minute rain, one fetch for the spot the weather is showing ----
+  // data
   function load(force) {
     var p = pos();
     if (!p) return Promise.reject(new Error('no position'));
@@ -2601,19 +2615,19 @@ function decorateResults() {
     }
   }, 200);
 })();
-/* ---- rev 235: radar controls on the big map, refresh arrow spin ---- */
+/* 235 */
 (function () {
   var fm = document.getElementById('fullMap'), st = document.getElementById('fStats');
   if (!fm || !st || !st.parentNode) return;
   var box = document.createElement('div');
-  box.style.cssText = 'position:absolute;left:0;right:0;top:0;z-index:3;display:none;align-items:center;gap:8px;padding:0 8px;box-sizing:border-box;background:rgba(21,28,37,0.97);border:0.5px solid #ff8a2b;border-radius:10px';
+  box.style.cssText = 'position:absolute;left:0;right:0;top:0;z-index:3;display:none;align-items:center;gap:5px;padding:0 6px;box-sizing:border-box;background:rgba(21,28,37,0.97);border:0.5px solid #ff8a2b;border-radius:10px';
   function ic(d) { return '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:#ff8a2b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:auto">' + d + '</svg>'; }
-  var bs = 'margin:0;padding:0;width:44px;height:34px;background:#26303c;border:0;border-radius:8px;flex:none';
-  box.innerHTML = '<div style="font-size:15px;font-weight:700;color:#ff8a2b;flex:none">Radar:</div>' +
+  var bs = 'margin:0;padding:0;width:34px;height:34px;background:#26303c;border:0;border-radius:8px;flex:none';
+  box.innerHTML = '<div style="font-size:13px;font-weight:700;color:#ff8a2b;flex:none">Radar:</div>' +
     '<button id="vdRadB" style="' + bs + '">' + ic('<path d="M6 5v14M19 5L9 12l10 7z"/>') + '</button>' +
     '<button id="vdRadP" style="' + bs + '"></button>' +
     '<button id="vdRadF" style="' + bs + '">' + ic('<path d="M18 5v14M5 5l10 7-10 7z"/>') + '</button>' +
-    '<div id="vdRadT" style="flex:1;min-width:0;text-align:right;font-size:13px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading...</div>';
+    '<button id="vdRadL" style="' + bs + ';width:46px;font-size:12px;color:#ff8a2b">Latest</button><button id="vdRadS" style="' + bs + ';font-size:12px;color:#ff8a2b">1x</button><div id="vdRadT" style="flex:1;min-width:0;text-align:right;font-size:11px;color:#9fb0c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading...</div>';
   st.parentNode.insertBefore(box, st);
   var pb = document.getElementById('vdRadP'), tt = document.getElementById('vdRadT'), shown = null;
   var fr = [], idx = 0, play = true, got = 0, tried = 0, lastStep = 0;
@@ -2628,15 +2642,15 @@ function decorateResults() {
     if (!f) return;
     if (window.__vdSetRad) window.__vdSetRad(f.path);
     var ago = Math.max(0, Math.round((Date.now() - f.time * 1000) / 60000));
-    tt.textContent = new Date(f.time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + (ago ? ' (' + ago + ' min ago)' : ' (now)');
+    tt.textContent = new Date(f.time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/i, '') + (ago ? ' · ' + ago + 'm' : ' · now');
   }
   function step(d) { if (!fr.length) return; idx = (idx + d + fr.length) % fr.length; show(); }
-  function getFrames() {
+  function getFrames(last) {
     tried = Date.now();
     fetch('https://api.rainviewer.com/public/weather-maps.json').then(function (r) { return r.json(); }).then(function (j) {
       var past = (j && j.radar && j.radar.past) || [];
       if (!past.length) return;
-      fr = past.slice(-7); idx = 0; got = Date.now(); show();
+      fr = past.slice(-7); idx = last ? fr.length - 1 : 0; got = Date.now(); show();
     }).catch(function () {});
   }
   ['vdRadB', 'vdRadP', 'vdRadF'].forEach(function (id) {
@@ -2647,6 +2661,7 @@ function decorateResults() {
   document.getElementById('vdRadB').onclick = function (e) { e.stopPropagation(); play = false; step(-1); };
   document.getElementById('vdRadF').onclick = function (e) { e.stopPropagation(); play = false; step(1); };
   pb.onclick = function (e) { e.stopPropagation(); play = !play; };
+  window.__vdLatest = function () { play = false; if (fr.length) { idx = fr.length - 1; show(); } getFrames(true); };
   setInterval(function () {
     var on = false;
     try { on = localStorage.getItem('vdRadar') === '1'; } catch (e) {}
@@ -2658,11 +2673,11 @@ function decorateResults() {
     var now = Date.now();
     if ((!fr.length || now - got > 300000) && now - tried > 15000) getFrames();
     if (!fr.length) { tt.textContent = 'Loading...'; return; }
-    if (play && fr.length > 1 && now - lastStep >= (idx === fr.length - 1 ? 1600 : 650)) { lastStep = now; step(1); }
+    if (play && fr.length > 1 && now - lastStep >= (idx === fr.length - 1 ? 1600 : 650) / (window.__vdSp || 1)) { lastStep = now; step(1); }
   }, 200);
 })();
 
-/* ---- refresh arrow: spins while it works, pulses when the city comes back ---- */
+/* spin */
 (function () {
   var b = document.getElementById('cityRef'), c = document.getElementById('city');
   if (!b || !c || !b.animate) return;
@@ -2684,7 +2699,7 @@ function decorateResults() {
     kill = setTimeout(done, 4000);
   });
 })();
-/* ---- rev 236: saved trails (name, show on map, share as GPX) ---- */
+/* 236 */
 (function () {
   var fm = document.getElementById('fullMap'), ov = fm && fm.querySelector('.mapOv');
   if (!fm || !ov) return;
@@ -2848,7 +2863,7 @@ function decorateResults() {
   if (st2) { st2.style.gridTemplateColumns = 'repeat(4,1fr) 40px'; st2.style.alignItems = 'center'; st2.appendChild(tb); } else ov.appendChild(tb);
   mark();
 })();
-/* ---- rev 238: drop pins on the big map ---- */
+/* 238 */
 (function () {
   var fm = document.getElementById('fullMap'), fIn = document.getElementById('fIn');
   if (!fm || !fIn || !fIn.parentNode) return;
@@ -3336,6 +3351,9 @@ if (W.__fCen) W.__fCen(true);
 /* ===== Part 4 (rev 275): iPad camp layout, weather map picker, Topo layer ===== */
 (function () {
 var D = document, W = window;
+var st0 = D.createElement('style');
+st0.textContent = 'html.vdR:not(.camp) #wxIcon{transform:scale(.82);transform-origin:50% 0}html:not(.camp) #vd4Card{font-size:13px!important;font-weight:400!important;margin-top:-4px!important}html:not(.camp) #fullMap #fIn,html:not(.camp) #fullMap #fOut,html:not(.camp) #fullMap #fCtr{width:60px!important;height:60px!important;font-size:30px!important}html:not(.camp) #fullMap div:has(>#fStats){right:84px!important}';
+D.head.appendChild(st0);
 var pT = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent'), pH = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
 var ids = ['wxIcon', 'wBoxIcon', 'wBoxDesc'], els = {}, last = {};
 ids.forEach(function (id) {
@@ -5324,7 +5342,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 333): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 334): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6150,7 +6168,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 333): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 334): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
