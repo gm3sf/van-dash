@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 332 -->
+<!-- Van Dash rev 333 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r332</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r333</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -4324,9 +4324,9 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
   }
   function set(t, blue) {
     STAT = t;
-    // main card: alert only ('Raining now' / 'Rain in ~N min'); Clear shows nothing
+    // alert only
     var alert = /^(Raining now|Rain in)/.test(t);
-    rl.textContent = alert ? t : ''; rl.style.color = '#6db3ff'; rl.style.display = alert ? '' : 'none';
+    D.documentElement.classList.toggle('vdR', alert); rl.textContent = alert ? t : ''; rl.style.color = '#6db3ff'; rl.style.display = alert ? '' : 'none';
     // weather page box: 'Raining now' is carried by the condition word ('Rain'); only 'Rain in ~N min' needs its own line
     var soon = /^Rain in/.test(t);
     if (ln) { ln.textContent = soon ? t : ''; ln.style.color = '#6db3ff'; ln.style.display = soon ? '' : 'none'; }
@@ -5324,7 +5324,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 332): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 333): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6150,7 +6150,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 332): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 333): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6612,7 +6612,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   var st = D.createElement('style');
   st.textContent = 'html:not(.camp) #vdSpArt{visibility:visible!important;border-radius:14px!important;width:40px!important;height:40px!important;border:.5px solid #8a96a6!important}html:not(.camp) #vdSpArt:not([src]){background:transparent!important}' +
     'html:not(.camp) #vdCmpCard .compass-wrap{gap:6px!important}html:not(.camp) #vdCmpCard .compass-wrap svg{width:42px!important;height:42px!important}html:not(.camp) #vdCmpCard #deg{font-size:12px!important}' +
-    'html:not(.camp) #vdWxTxt{font-size:12px;line-height:1.15;color:#9fb0c3;margin-top:3px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}html.camp #vdWxTxt{display:none}' +
+    'html:not(.camp) #vdWxTxt{font-size:12px;line-height:1.15;color:#9fb0c3;margin-top:3px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}html.camp #vdWxTxt{display:none}html.vdR:not(.camp) #vdWxTxt{visibility:hidden!important}' +
     'html:not(.camp) #wxWind{transform-origin:100% 0}' +
     'html:not(.camp) .sunrow{display:flex!important;align-items:flex-start;gap:6px;text-align:left}html:not(.camp) .sunrow>div:not(#sunMoon){flex:none}' +
     'html:not(.camp) .sunrow>div>svg{width:40px!important;height:30px!important;margin:0 auto!important}html:not(.camp) .sunrow .t{font-size:13px!important;margin-top:3px;text-align:center}' +
