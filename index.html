@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 336 -->
+<!-- Van Dash rev 337 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r336</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r337</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -3352,7 +3352,7 @@ if (W.__fCen) W.__fCen(true);
 (function () {
 var D = document, W = window;
 var st0 = D.createElement('style');
-st0.textContent = 'html.vdR:not(.camp) #wxIcon{transform:scale(.82);transform-origin:50% 0}html:not(.camp) #vd4Card{font-size:13px!important;font-weight:400!important;margin-top:-4px!important}html:not(.camp) #fullMap #fIn,html:not(.camp) #fullMap #fOut,html:not(.camp) #fullMap #fCtr{width:60px!important;height:60px!important;font-size:30px!important}html:not(.camp) #fullMap div:has(>#fStats){right:84px!important;gap:6px!important}html:not(.camp) #fullMap #fStart,html:not(.camp) #fullMap #fStop,html:not(.camp) #fullMap #fClr,html:not(.camp) #fullMap #fHide{padding:10px 9px!important;font-size:13px!important}html:not(.camp) #fullMap div:has(+#fStats){left:0!important;right:0!important;width:auto!important;transform:translateY(-60px)!important}';
+st0.textContent = 'html.vdR:not(.camp) #wxIcon{transform:scale(.82);transform-origin:50% 0}html:not(.camp) #vd4Card{font-size:13px!important;font-weight:400!important;margin-top:-4px!important}html:not(.camp) #fullMap #fIn,html:not(.camp) #fullMap #fOut,html:not(.camp) #fullMap #fCtr{width:60px!important;height:60px!important;font-size:30px!important}html:not(.camp) #fullMap div:has(>#fStats){right:84px!important;gap:6px!important}html:not(.camp) #fullMap #fStart,html:not(.camp) #fullMap #fStop,html:not(.camp) #fullMap #fClr,html:not(.camp) #fullMap #fHide{padding:10px 9px!important;font-size:13px!important}html:not(.camp) #fullMap div:has(>#vdRadB){margin-top:-60px!important}';
 D.head.appendChild(st0);
 var pT = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent'), pH = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
 var ids = ['wxIcon', 'wBoxIcon', 'wBoxDesc'], els = {}, last = {};
@@ -3374,7 +3374,7 @@ function night() {
 var a = mins((D.getElementById('sunrise') || {}).textContent), b = mins((D.getElementById('sunset') || {}).textContent);
 if (a == null || b == null) return false;
 var n = new Date(), t = n.getHours() * 60 + n.getMinutes();
-return t < a || t >= b;
+return t < a - 30 || t >= b + 30;
 }
 var RAIN = ['🌧️', '🌦️', '⛈️', '🌨️', '❄️'];
 var DROPS = '<g stroke="#5fb8ff" stroke-width="3" stroke-linecap="round"><path d="M26 57l-2 5M34 57l-2 5M42 57l-2 5"/></g>';
@@ -4279,7 +4279,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     wrap.style.alignItems = 'flex-start';
     if (wxv) wxv.style.display = 'none';
     if (icon) { icon.style.fontSize = '54px'; icon.style.lineHeight = '1.1'; icon.style.marginBottom = '0'; }
-    // the pin sits right next to the icon so it reads as "weather where you are"
+    // x
     var pinEl = D.createElement('span');
     pinEl.innerHTML = '<svg viewBox="0 0 24 32" style="width:14px;height:19px;display:block"><path d="M12 1C6.2 1 1.5 5.7 1.5 11.5c0 7.6 10.5 19 10.5 19s10.5-11.4 10.5-19C22.5 5.7 17.8 1 12 1z" fill="#ff8a2b"/><circle cx="12" cy="11.5" r="4" fill="#151c25"/></svg>';
     // x
@@ -4320,7 +4320,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     }
     return m;
   }
-  // is there rain at this spot in this frame? -1 = tile not ready yet
+  // x
   function wet(f, lat, lon) {
     var p = wpx(lat, lon, RZ), n = Math.pow(2, RZ), tx = Math.floor(p.x / TS), ty = Math.floor(p.y / TS);
     if (ty < 0 || ty >= n) return 0;
@@ -4330,7 +4330,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     var ix = Math.floor(p.x - tx * TS), iy = Math.floor(p.y - ty * TS), a = m.px[(iy * TS + ix) * 4 + 3];
     return a > (window.__vdTh || 80) ? 1 : 0;
   }
-  // 1 if rain at the spot or within about 6 miles of it
+  // x
   function near(f, lat, lon) {
     var d = 0.015, i, r, ready = true, pts = [[0, 0], [d, 0], [-d, 0], [0, d], [0, -d]];
     for (i = 0; i < pts.length; i++) {
@@ -4345,10 +4345,11 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     // alert only
     var alert = /^(Raining now|Rain in)/.test(t);
     D.documentElement.classList.toggle('vdR', alert); rl.textContent = alert ? t : ''; rl.style.color = '#6db3ff'; rl.style.display = alert ? '' : 'none';
-    // weather page box: 'Raining now' is carried by the condition word ('Rain'); only 'Rain in ~N min' needs its own line
+    // x
     var soon = /^Rain in/.test(t);
     if (ln) { ln.textContent = soon ? t : ''; ln.style.color = '#6db3ff'; ln.style.display = soon ? '' : 'none'; }
   }
+  { var s0 = document.createElement('style'); s0.textContent = '#vdLs,#vdDg{display:none!important}html:not(.camp) #fStats{display:grid!important;visibility:visible!important;opacity:1!important}html:not(.camp) #wBoxIcon{transform:scale(1.35);margin:10px 0 8px}html:not(.camp) #wBox1{gap:28px!important}html:not(.camp) #wBox1>div:first-child{width:130px!important}html:not(.camp) #vdSpTap #vdSpArt{border:0!important;outline:1px solid #3a4658!important;outline-offset:-1px!important;box-shadow:none!important;background:none!important}'; document.head.appendChild(s0); }
   function mwet() {
     var n = Date.now(), i;
     for (i = 0; MODEL && i < MODEL.length; i++) if (MODEL[i].t <= n && n < MODEL[i].t + 900000) return MODEL[i].v >= 0.05;
@@ -4366,7 +4367,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     var wl = wetAt(last, p), wf = wetAt(first, p);
     set('Clear', false);
     if (wl && wl.length && wf && dt > 0) {
-      // rain was somewhere around us earlier and is nearer now: estimate arrival
+      // x
       var vx = (wf.x - wl.x) / dt, vy = (wf.y - wl.y) / dt, sp = Math.hypot(vx, vy);
       if (sp > 0.0005) {
         var mins = wl.dist / sp;
@@ -4388,7 +4389,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     return best;
   }
 
-  // ---- fallback: Open-Meteo 15-minute rain model, used only when radar pixels can't be read ----
+  // x
   var MODEL = null, modelT = 0;
   function modelFetch() {
     var p = pos();
@@ -4440,7 +4441,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
   function putLine() {
     var d = D.getElementById('wBoxDesc');
     if (d && ln.parentNode !== d.parentNode) d.parentNode.appendChild(ln);
-    // silence Part 3's old rain line (the one that says 'No rain expected in the next 4 hours')
+    // x
     var kids = sc.children, i;
     for (i = 0; i < kids.length; i++) {
       var t = (kids[i].textContent || '');
@@ -4456,12 +4457,12 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     var a = mins(sr), b = mins(ss);
     if (a == null || b == null) return false;
     var n = new Date(), now = n.getHours() * 60 + n.getMinutes();
-    return now < a || now >= b;
+    return now < a - 30 || now >= b + 30;
   }
-  // no moon-with-cloud emoji exists, so that one is drawn
+  // x
   var MOONCLOUD = '<svg viewBox="0 0 64 64" style="width:1em;height:1em;display:inline-block;vertical-align:-0.12em"><path d="M30 8a20 20 0 1 0 20 28 16 16 0 0 1-20-28z" fill="#f4d35e"/><path d="M22 50a9 9 0 0 1 2-17.8 12 12 0 0 1 23 2.8A8 8 0 0 1 46 50z" fill="#e6edf5" stroke="#9fb0c3" stroke-width="1.5"/></svg>';
   var MOON = '\uD83C\uDF19', RAINI = '\uD83C\uDF27\uFE0F';
-  // forecast icons that mean sun or part-sun, and which of those mean "partly cloudy"
+  // x
   var SUNNY = { '\u2600\uFE0F': 'moon', '\uD83C\uDF24\uFE0F': 'moon', '\u26C5': 'mooncloud' };
   function setIcon(e, kind, plain) {
     var want = kind === 'moon' ? MOON : kind === 'rain' ? RAINI : plain;
@@ -4482,7 +4483,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     [['wxIcon', 'wx'], ['wBoxIcon', 'wBoxDesc']].forEach(function (ids) {
       var ic = D.getElementById(ids[0]), tx = D.getElementById(ids[1]);
       if (!ic) return;
-      // remember the forecast icon whenever Part 1 has written one (it is plain text, not our drawing)
+      // x
       if (ic.getAttribute('data-vd') !== 'mc' && ic.textContent !== RAINI && ic.textContent !== MOON) lastForecastIcon[ids[0]] = ic.textContent;
       var f = lastForecastIcon[ids[0]];
       // x
@@ -4785,7 +4786,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     var a = mins(sr), b = mins(ss);
     if (a == null || b == null) return false;
     var n = new Date(), now = n.getHours() * 60 + n.getMinutes();
-    return now < a || now >= b;
+    return now < a - 30 || now >= b + 30;
   }
   function guard(id) {
     var e = D.getElementById(id);
@@ -5348,7 +5349,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 336): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 337): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6174,7 +6175,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 336): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 337): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
