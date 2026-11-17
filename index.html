@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 339 -->
+<!-- Van Dash rev 340 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r339</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r340</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -4349,7 +4349,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     var soon = /^Rain in/.test(t);
     if (ln) { ln.textContent = soon ? t : ''; ln.style.color = '#6db3ff'; ln.style.display = soon ? '' : 'none'; }
   }
-  { var s0 = document.createElement('style'); s0.textContent = '#vdLs,#vdDg{display:none!important}html:not(.camp) #fStats{display:grid!important;visibility:visible!important;opacity:1!important}html:not(.camp) #wBoxIcon{transform:scale(1.35);margin:10px 0 8px}html:not(.camp) #wBox1{gap:28px!important}html:not(.camp) #vdWxTxt,html:not(.camp) #wBoxDesc{white-space:nowrap!important}html:not(.camp) #vdWxTxt{margin-left:-20px!important;margin-right:-20px!important;font-size:15px!important}html:not(.camp) #wBox1>div:first-child{width:130px!important}html:not(.camp) #vdSpTap #vdSpArt{border:0!important;outline:1px solid #3a4658!important;outline-offset:-1px!important;box-shadow:none!important;background:none!important}'; document.head.appendChild(s0); }
+  { var s0 = document.createElement('style'); s0.textContent = '#vdLs,#vdDg{display:none!important}html:not(.camp) #fStats{display:grid!important;visibility:visible!important;opacity:1!important}html:not(.camp) #wBoxIcon{transform:scale(1.35);margin:10px 0 8px}html:not(.camp) #wBox1{gap:28px!important}html:not(.camp) #wBoxDesc{white-space:nowrap!important}html:not(.camp) #vdWxTxt{white-space:nowrap!important;margin:0!important;width:max-content!important;max-width:none!important;position:relative!important;left:50%!important;transform:translateX(-50%)!important;overflow:visible!important;text-overflow:clip!important;font-size:15px!important}html:not(.camp) :has(>#vdWxTxt){overflow:visible!important}html:not(.camp) #wBox1>div:first-child{width:130px!important}html:not(.camp) #vdSpTap #vdSpArt{border:0!important;outline:1px solid #3a4658!important;outline-offset:-1px!important;box-shadow:none!important;background:none!important}'; document.head.appendChild(s0); }
   function mwet() {
     var n = Date.now(), i;
     for (i = 0; MODEL && i < MODEL.length; i++) if (MODEL[i].t <= n && n < MODEL[i].t + 900000) return MODEL[i].v >= 0.05;
@@ -5349,7 +5349,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 339): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 340): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6175,7 +6175,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 339): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 340): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6944,6 +6944,83 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
         function () { down = Date.now() + 90000; r0 = new Response('{"error":true}', { status: 503 }); if (nf) fin(r0); else go(); });
     });
   };
+})();
+</script>
+</body>
+</html>
+<script>
+/* ===== Part 8 (rev 340): golden hour on the Sunrise & sunset page, weather heads-up. Paste at the very end of index.html, after Part 7 (after its closing tags is fine). ===== */
+(function () {
+  var D = document;
+  function pos() { try { return lastWeatherPos || null; } catch (e) { return null; } }
+  function cam(on) {
+    return '<svg viewBox="0 0 56 40" style="display:block;margin:0 auto;width:34px;height:24px"><defs><linearGradient id="vdcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1f3f6"/><stop offset="1" stop-color="#a9b2be"/></linearGradient></defs>' +
+      '<rect x="3" y="9" width="50" height="27" rx="5" fill="url(#vdcg)" stroke="#6f7a88" stroke-width="1.2"/>' +
+      '<rect x="37" y="9" width="16" height="27" rx="5" fill="#1b2027"/>' +
+      '<rect x="39" y="5.5" width="8" height="3.5" rx="1.5" fill="#ff8a2b"/><rect x="13" y="5.5" width="10" height="3.5" rx="1.5" fill="#7d8896"/>' +
+      (on ? '<circle cx="24" cy="24" r="13.5" fill="none" stroke="#ffc94d" stroke-width="1.5" opacity=".7"/>' : '') +
+      '<circle cx="24" cy="24" r="11" fill="#2a313b" stroke="#59636f" stroke-width="1.5"/><circle cx="24" cy="24" r="7" fill="#10151b" stroke="' + (on ? '#ffc94d' : '#3b4552') + '" stroke-width="1.5"/><circle cx="21.5" cy="21.5" r="2" fill="#7fa6d6" opacity=".85"/>' +
+      '<rect x="8" y="12" width="4" height="2" rx="1" fill="#6f7a88"/></svg>';
+  }
+  function gold(sm, lat, doy) {
+    var d = 23.44 * Math.sin(2 * Math.PI * (284 + doy) / 365) * Math.PI / 180, p = lat * Math.PI / 180;
+    function ha(h) { var c = (Math.sin(h * Math.PI / 180) - Math.sin(p) * Math.sin(d)) / (Math.cos(p) * Math.cos(d)); return Math.acos(Math.max(-1, Math.min(1, c))) * 180 / Math.PI; }
+    return sm - (ha(-0.833) - ha(6)) * 4;
+  }
+  function fm(g) { var h = Math.floor(g / 60); return ((h + 11) % 12 + 1) + ':' + ('0' + (g % 60)).slice(-2) + ' ' + (h >= 12 ? 'PM' : 'AM'); }
+  function enh() {
+    var l = D.getElementById('spList'), p = pos();
+    if (!l || !p) return;
+    var now = new Date(), nm = now.getHours() * 60 + now.getMinutes(), i;
+    for (i = 0; i < l.children.length; i++) {
+      var r = l.children[i];
+      if (r.getAttribute('data-vdg') || r.children.length < 4) continue;
+      var m = /(\d+):(\d+)\s*(AM|PM)/i.exec(r.children[2].textContent);
+      if (!m) continue;
+      var sm = (+m[1] % 12 + (/PM/i.test(m[3]) ? 12 : 0)) * 60 + +m[2];
+      var d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i), doy = Math.round((d0 - new Date(d0.getFullYear(), 0, 0)) / 864e5);
+      var g = Math.round(gold(sm, p.latitude, doy)), on = i === 0 && nm >= g && nm < sm, c = D.createElement('div');
+      c.style.cssText = 'flex:none;width:62px;text-align:center';
+      c.innerHTML = cam(on) + '<div style="font-size:14px;font-weight:600;margin-top:3px' + (on ? ';color:#ffc94d' : '') + '">' + fm(g) + '</div>';
+      r.insertBefore(c, r.children[3]);
+      r.setAttribute('data-vdg', '1');
+    }
+  }
+  setInterval(enh, 1000);
+  var el = null, okAt = 0, key = '';
+  function put(lines) {
+    var b = D.getElementById('wBox1');
+    if (!b || !b.parentNode) return false;
+    if (!el) { el = D.createElement('div'); el.id = 'vdHeads'; el.style.cssText = 'background:#151c25;border:0.5px solid #8a96a6;border-radius:16px;padding:10px 14px;margin-bottom:10px;color:#ffb23e;font-size:15px;font-weight:600;line-height:1.35'; }
+    if (el.previousSibling !== b) b.parentNode.insertBefore(el, b.nextSibling);
+    el.innerHTML = lines.join('<br>');
+    el.style.display = lines.length ? '' : 'none';
+    return true;
+  }
+  function heads() {
+    var p = pos();
+    if (!p) return;
+    var k = p.latitude.toFixed(2) + ',' + p.longitude.toFixed(2);
+    if (k === key && Date.now() - okAt < 1200000) return;
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + p.latitude + '&longitude=' + p.longitude + '&hourly=temperature_2m,wind_speed_10m,wind_gusts_10m,is_day&temperature_unit=fahrenheit&wind_speed_unit=mph&forecast_days=2&timezone=auto')
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        var h = j.hourly, off = (j.utc_offset_seconds || 0) * 1000, now = Date.now(), s = -1, i, t = [], out = [];
+        for (i = 0; i < h.time.length; i++) { t.push(Date.parse(h.time[i] + 'Z') - off); if (s < 0 && t[i] > now - 3600000) s = i; }
+        if (s < 0) return;
+        var e = Math.min(h.time.length - 1, s + 12), wi = s, ti = -1, dr = 0, bt = h.temperature_2m[s];
+        for (i = s; i <= e; i++) {
+          if (Math.max(h.wind_speed_10m[i], h.wind_gusts_10m[i]) > Math.max(h.wind_speed_10m[wi], h.wind_gusts_10m[wi])) wi = i;
+          if (h.is_day[i] && bt - h.temperature_2m[i] > dr) { dr = bt - h.temperature_2m[i]; ti = i; }
+        }
+        function hr(x) { return new Date(t[x]).toLocaleTimeString([], { hour: 'numeric' }); }
+        var w = Math.round(Math.max(h.wind_speed_10m[wi], h.wind_gusts_10m[wi]));
+        if (w > 15) out.push('Wind up to ' + w + ' mph around ' + hr(wi));
+        if (dr >= 15) out.push('Temperature dropping about ' + Math.round(dr) + '° by ' + hr(ti));
+        if (put(out)) { key = k; okAt = Date.now(); }
+      }, function () {});
+  }
+  setInterval(heads, 5000);
 })();
 </script>
 </body>
