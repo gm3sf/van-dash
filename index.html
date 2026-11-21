@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 340 -->
+<!-- Van Dash rev 342 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r340</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r342</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -4349,7 +4349,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
     var soon = /^Rain in/.test(t);
     if (ln) { ln.textContent = soon ? t : ''; ln.style.color = '#6db3ff'; ln.style.display = soon ? '' : 'none'; }
   }
-  { var s0 = document.createElement('style'); s0.textContent = '#vdLs,#vdDg{display:none!important}html:not(.camp) #fStats{display:grid!important;visibility:visible!important;opacity:1!important}html:not(.camp) #wBoxIcon{transform:scale(1.35);margin:10px 0 8px}html:not(.camp) #wBox1{gap:28px!important}html:not(.camp) #wBoxDesc{white-space:nowrap!important}html:not(.camp) #vdWxTxt{white-space:nowrap!important;margin:0!important;width:max-content!important;max-width:none!important;position:relative!important;left:50%!important;transform:translateX(-50%)!important;overflow:visible!important;text-overflow:clip!important;font-size:15px!important}html:not(.camp) :has(>#vdWxTxt){overflow:visible!important}html:not(.camp) #wBox1>div:first-child{width:130px!important}html:not(.camp) #vdSpTap #vdSpArt{border:0!important;outline:1px solid #3a4658!important;outline-offset:-1px!important;box-shadow:none!important;background:none!important}'; document.head.appendChild(s0); }
+  { var s0 = document.createElement('style'); s0.textContent = '#vdLs,#vdDg{display:none!important}html:not(.camp) #fStats{display:grid!important;visibility:visible!important;opacity:1!important}html:not(.camp) #wBoxIcon{transform:scale(1.35);margin:10px 0 8px}html:not(.camp) #wBox1{gap:28px!important}html:not(.camp) #wBoxDesc{white-space:nowrap!important}html:not(.camp) #vdWxTxt{white-space:nowrap!important;margin:0!important;width:max-content!important;max-width:none!important;position:relative!important;left:50%!important;transform:translateX(calc(-50% - 58px))!important;overflow:visible!important;text-overflow:clip!important;font-size:13px!important}html:not(.camp) :has(>#vdWxTxt){overflow:visible!important}html:not(.camp) #wBox1>div:first-child{width:130px!important}html:not(.camp) #vdSpTap #vdSpArt{border:0!important;outline:1px solid #3a4658!important;outline-offset:-1px!important;box-shadow:none!important;background:none!important}'; document.head.appendChild(s0); }
   function mwet() {
     var n = Date.now(), i;
     for (i = 0; MODEL && i < MODEL.length; i++) if (MODEL[i].t <= n && n < MODEL[i].t + 900000) return MODEL[i].v >= 0.05;
@@ -5349,7 +5349,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 340): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 342): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6175,7 +6175,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 340): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 342): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -7021,6 +7021,59 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
       }, function () {});
   }
   setInterval(heads, 5000);
+  /* r342 */
+  var s342 = D.createElement('style');
+  s342.textContent = 'html:not(.camp) #wxCard #wxIcon{width:56px!important;height:62px!important;max-width:56px!important;flex:none!important;overflow:visible!important}' +
+    'html:not(.camp) #wxCard #wxIcon svg,html:not(.camp) #wxCard #wxIcon img{width:54px!important;height:auto!important;max-width:54px!important}' +
+    'html:not(.camp) #wxCard #vdWxTxt{position:relative!important;transform:none!important;width:max-content!important;max-width:none!important;margin:0!important;text-align:left!important;white-space:nowrap!important;overflow:visible!important}' +
+    'html:not(.camp) #spCtl button:not(#spPlay){padding:3px 6px!important}html:not(.camp) #spCtl button:not(#spPlay) svg{width:34px!important;height:34px!important}' +
+    'html:not(.camp) #spCtl #spPlay{width:56px!important;height:48px!important}html:not(.camp) #spCtl #spPlay svg{width:46px!important;height:46px!important}' +
+    'html:not(.camp) #wxWind{cursor:pointer}';
+  D.head.appendChild(s342);
+  function lock() {
+    var c = D.getElementById('wxCard'), ic = D.getElementById('wxIcon'), t = D.getElementById('vdWxTxt');
+    if (!c || !ic || !t || !c.offsetWidth || !t.offsetWidth) return;
+    var cr = c.getBoundingClientRect(), ir = ic.getBoundingClientRect(), lim = cr.left + cr.width * 0.6;
+    var lc = D.getElementById('vdLoc'), rg = D.getElementById('wxWindRing');
+    if (lc && rg) { var ar = lc.getBoundingClientRect().right, rl = rg.getBoundingClientRect().left; if (ar > 0 && rl > ar) lim = (ar + rl) / 2 - 8; }
+    t.style.setProperty('font-size', '13px', 'important');
+    t.style.setProperty('left', '0px', 'important');
+    var r = t.getBoundingClientRect(), w = r.width, avail = lim - ir.left;
+    if (w > avail && avail > 40) t.style.setProperty('font-size', Math.max(9, 13 * avail / w) + 'px', 'important');
+    t.style.setProperty('left', (ir.left - r.left) + 'px', 'important');
+  }
+  var gv = null, gk = '', ga = 0;
+  function gusts() {
+    var p = pos();
+    if (!p) return;
+    var k = p.latitude.toFixed(2) + ',' + p.longitude.toFixed(2);
+    if (k === gk && Date.now() - ga < 600000) return;
+    gk = k; ga = Date.now();
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + p.latitude + '&longitude=' + p.longitude +
+      '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&forecast_days=7&wind_speed_unit=mph&timezone=auto')
+      .then(function (r) { return r.json(); })
+      .then(function (j) { var v = j.daily && j.daily.wind_gusts_10m_max[0]; if (v != null) gv = Math.round(v); }, function () { ga = 0; });
+  }
+  function sync() {
+    var g = D.getElementById('wGust'), g2 = D.getElementById('wBoxGust'), w = D.getElementById('wWind'), s = D.getElementById('wxWindSpd'), m;
+    if (gv != null) { var tx = gv + ' mph'; if (g && g.textContent !== tx) g.textContent = tx; if (g2 && g2.textContent !== tx) g2.textContent = tx; }
+    if (w && s && (m = /(\d+)/.exec(w.textContent)) && s.textContent !== m[1] + ' mph') s.textContent = m[1] + ' mph';
+  }
+  var toHome = false;
+  function show(id, on) { var e = D.getElementById(id); if (e) e.classList[on ? 'remove' : 'add']('hidden'); }
+  D.addEventListener('click', function (e) {
+    var t = e.target;
+    if (t && t.closest && t.closest('#wxWind') && D.getElementById('wBox2')) {
+      e.stopPropagation(); e.preventDefault();
+      toHome = true; show('mainScreen', false); show('weatherScreen', true); window.scrollTo(0, 0);
+      D.getElementById('wBox2').click();
+    } else if (t && t.closest && t.closest('#wpBack') && toHome) {
+      e.stopPropagation(); e.stopImmediatePropagation(); e.preventDefault();
+      toHome = false; show('windScreen', false); show('weatherScreen', false); show('mainScreen', true); window.scrollTo(0, 0);
+    }
+  }, true);
+  setInterval(function () { try { gusts(); sync(); lock(); } catch (e) {} }, 1000);
+
 })();
 </script>
 </body>
