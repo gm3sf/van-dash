@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 347 -->
+<!-- Van Dash rev 348 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -275,7 +275,7 @@
       </div>
     </div>
     <div class="card" style="order:9">
-      <div class="label"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Sun</div>
+      <div class="label"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Sun &amp; Moon</div>
       <div class="sunrow">
         <div>
           <svg viewBox="0 0 38 28"><path d="M4 22h30"/><path d="M10 22a9 9 0 0 1 18 0"/><path d="M19 4v5M8 9l3 3M30 9l-3 3"/><path d="M15 6l4-4 4 4"/></svg>
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r347</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r348</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -4564,8 +4564,8 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
         h += '<div ' + (selMode ? 'data-pick="' + s.t + '" ' : '') + 'style="display:flex;gap:12px;align-items:center;background:#151c25;border:0.5px solid ' + (selMode && on ? '#ff8a2b' : '#8a96a6') + ';border-radius:14px;padding:10px;margin-bottom:8px">' +
           (selMode ? '<div style="flex:none;width:26px;height:26px;border-radius:50%;border:2px solid ' + (on ? '#ff8a2b' : '#8a96a6') + ';background:' + (on ? '#ff8a2b' : 'none') + ';color:#000;font-weight:700;text-align:center;line-height:22px;font-size:16px">' + (on ? '\u2713' : '') + '</div>' : '') +
           '<img ' + (selMode ? '' : 'data-view="' + s.t + '" ') + 'src="' + s.img + '" style="width:72px;height:72px;object-fit:cover;border-radius:8px;flex:none">' +
-          '<div ' + (selMode ? '' : 'data-view="' + s.t + '" ') + 'style="flex:1;min-width:0"><div style="font-size:16px;font-weight:600;color:#e8eef5">' + stamp(s.t) + (s.type ? ' · <span style="color:#ff8a2b">' + String(s.type).replace(/</g, '&lt;') + '</span>' : '') + '</div>' +
-          '<div style="font-size:12px;color:#9fb0c3;margin-top:3px">' + (s.lat == null ? 'No GPS fix' : s.lat.toFixed(5) + ', ' + s.lon.toFixed(5)) + '</div>' + (s.note ? '<div style="font-size:12px;color:#c3cfdc;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + String(s.note).replace(/</g, '&lt;') + '</div>' : '') + '</div>' +
+          '<div ' + (selMode ? '' : 'data-view="' + s.t + '" ') + 'style="flex:1;min-width:0"><div style="font-size:16px;font-weight:600;color:#e8eef5">' + stamp(s.t) + '' + '</div>' +
+          '<div style="font-size:12px;color:#9fb0c3;margin-top:3px">' + (s.lat == null ? 'No GPS fix' : s.lat.toFixed(5) + ', ' + s.lon.toFixed(5)) + '</div>' + (s.type ? '<div style="font-size:12px;color:#ff8a2b;margin-top:3px">Description: ' + String(s.type).replace(/</g, '&lt;') + '</div>' : '') + (s.note ? '<div style="font-size:12px;color:#c3cfdc;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + String(s.note).replace(/</g, '&lt;') + '</div>' : '') + '</div>' +
           (selMode ? '' : '<button data-del="' + s.t + '" style="margin:0;background:none;color:#ff8a2b;font-size:20px;padding:6px 10px">\u2715</button>') + '</div>';
       }
     }
@@ -4576,7 +4576,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
   async function sendThese(list) {
     if (!list.length || busy) return;
     busy = true;
-    var text = list.map(function (s, i) { return (i + 1) + '. ' + (s.type ? s.type + ' - ' : '') + stamp(s.t) + ' - ' + link(s) + (s.note ? ' - ' + s.note : ''); }).join('\n');
+    var text = list.map(function (s, i) { return (i + 1) + '. ' + (s.type ? 'Description: ' + s.type + ' - ' : '') + stamp(s.t) + ' - ' + link(s) + (s.note ? ' - ' + s.note : ''); }).join('\n');
     var files = list.map(toFile);
     try {
       if (navigator.canShare && navigator.canShare({ files: files })) {
@@ -5349,7 +5349,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 347): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 348): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6175,7 +6175,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 347): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 348): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -6816,7 +6816,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     }
     // weather: cloud and caption centered under the label icon and the word Weather
     var tx = $('vdWxTxt'), li = wxC && wxC.querySelector('.label svg'), wl = wxC && wxC.querySelector('.label');
-    if (tx && ic && wsv && li && wl) {
+    if (false && tx && ic && wsv && li && wl) {
       ic.style.removeProperty('margin-left'); tx.style.marginLeft = '';
       var xr = 0; for (var n2 = wl.firstChild; n2; n2 = n2.nextSibling) if (n2.nodeType === 3 && n2.textContent.trim()) { var g2 = D.createRange(); g2.selectNodeContents(n2); var q2 = g2.getBoundingClientRect(); if (q2.right > xr) xr = q2.right; }
       var CX = (li.getBoundingClientRect().left + (xr || li.getBoundingClientRect().right)) / 2 - 10;
@@ -7175,9 +7175,9 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   }
     /* r346: weather icon + label centered by CSS only (no timer moves them); photo-spot camera button back on the small map */
   var s346 = D.createElement('style');
-  s346.textContent = 'html:not(.camp) #wxCard .wx-wrap{width:calc(100% - 48px)!important;margin:-6px 0 0 0!important;justify-content:center!important}' +
-    'html:not(.camp) #wxCard #wxIcon{transform:none!important;margin:0 auto!important}' +
-    'html:not(.camp) #wxCard #vdWxTxt{display:block!important;position:static!important;left:auto!important;transform:none!important;width:calc(100% - 48px)!important;max-width:none!important;margin:0!important;text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important}' +
+  s346.textContent = 'html:not(.camp) #wxCard .wx-wrap{width:calc(100% - 76px)!important;max-width:none!important;margin:-6px 0 0 0!important;align-items:center!important;justify-content:center!important}' +
+    'html:not(.camp) #wxCard #wxIcon{transform:none!important;margin:0!important;text-align:center!important;justify-content:center!important}' +
+    'html:not(.camp) #wxCard #vdWxTxt{display:block!important;position:static!important;left:auto!important;transform:none!important;width:calc(100% - 76px)!important;max-width:none!important;margin:0!important;text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important}' +
     'html:not(.camp) #vCam{left:auto!important;right:15px!important;top:134px!important}';
   D.head.appendChild(s346);
   function lock() {
@@ -7304,10 +7304,10 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
         if (info) {
           var g = c.getContext("2d"), fs = Math.max(9, Math.round(c.width / 63)), pad = Math.round(fs * 0.6);
           var l0 = "VAN-DASH APP PHOTOS", l1 = info.place || "", l2 = info.coords, l3 = info.when;
-          var rows = [{ t: l0, b: 1 }];
-          if (info.type) rows.push({ t: "Type: " + info.type, b: 1 });
+          var rows = [{ t: l0, b: 1 }, { t: l3 }];
           if (l1) rows.push({ t: l1, b: 1 });
-          rows.push({ t: l2 }); rows.push({ t: l3 });
+          rows.push({ t: l2 });
+          if (info.type) rows.push({ t: "Description: " + info.type, b: 1 });
           if (info.note) {
             g.font = "400 " + fs + "px -apple-system, Helvetica, sans-serif";
             var mw = c.width - pad * 2, wds = String(info.note).split(" "), cur = "", nl = 0, wi = 0;
