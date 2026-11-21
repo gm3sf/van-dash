@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 349 -->
+<!-- Van Dash rev 350 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r349</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r350</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5349,7 +5349,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 349): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 350): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6175,7 +6175,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 349): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 350): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -7230,6 +7230,189 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     if (loc) { loc.parentNode.insertBefore(bar, loc); loc.style.width = "auto"; loc.style.flex = "1"; bar.appendChild(loc); } else vw.appendChild(bar);
     bar.appendChild(sb);
   }, 300);
+})();
+
+/* ---- rev 350: camera on the Photos page, Save to iCloud, Saved page (floppy icon), backup notice ---- */
+(function () {
+  var panel = D.getElementById("shotPanel");
+  if (!panel) return;
+  var NOTE = "Saved only on this phone's browser. Back up to iCloud so they can't be lost.";
+  var WARN = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ff8a2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18v.5"/></svg>';
+  function noteHTML() { return '<div id="vdNote" style="display:flex;gap:7px;align-items:flex-start;font-size:12px;line-height:1.35;color:#8796a8;margin:0 2px 12px">' + WARN + '<span>' + NOTE + '</span></div>'; }
+  function esc(x) { return String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
+  function shots() { try { var a = JSON.parse(localStorage.getItem("vdShots") || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function trails() { try { var a = JSON.parse(localStorage.getItem("vdTrails") || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function when(t) { var d = new Date(t); return d.toLocaleDateString([], { month: "short", day: "numeric" }) + " " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
+  function photoName(s) {
+    if (s.type && window.__vdTagName) return window.__vdTagName(s);
+    var d = new Date(s.t), z = function (n) { return (n < 10 ? "0" : "") + n; };
+    return "vandash-geo-photos-" + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + "-" + z(d.getHours()) + z(d.getMinutes()) + z(d.getSeconds()) + ".jpg";
+  }
+  function photoFile(s) {
+    var bin = atob(s.img.split(",")[1]), u = new Uint8Array(bin.length);
+    for (var k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k);
+    return new File([u], photoName(s), { type: "image/jpeg" });
+  }
+  function trackFile(tr) {
+    var g = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Van Dash" xmlns="http://www.topografix.com/GPX/1/1">\n<trk><name>' + esc(tr.name) + '</name><trkseg>\n';
+    (tr.pts || []).forEach(function (p) { g += '<trkpt lat="' + p[0] + '" lon="' + p[1] + '"/>\n'; });
+    g += '</trkseg></trk></gpx>\n';
+    var nm = String(tr.name || "trail").replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "-") || "trail";
+    return new File([g], "vandash-" + nm + ".gpx", { type: "application/gpx+xml" });
+  }
+  async function saveFiles(files, title) {
+    if (!files.length) return;
+    try {
+      if (navigator.canShare && navigator.canShare({ files: files })) { await navigator.share({ files: files, title: title }); return; }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    alert("Saving isn't available here.");
+  }
+
+  /* camera button on the Photos page */
+  var inp = D.querySelector("#vCamHost input[type=file]");
+  var cam = D.createElement("button");
+  cam.id = "vdPhCam"; cam.setAttribute("aria-label", "Take photo");
+  cam.style.cssText = "position:fixed;right:12px;top:calc(env(safe-area-inset-top) + 8px);width:52px;height:52px;margin:0;padding:0;background:rgba(21,28,37,0.96);border:0.5px solid #8a96a6;border-radius:12px;z-index:92;display:none";
+  var vs = D.querySelector("#vCam svg");
+  cam.innerHTML = vs ? vs.outerHTML : "";
+  if (cam.firstChild && cam.firstChild.style) { cam.firstChild.style.width = "30px"; cam.firstChild.style.height = "30px"; }
+  cam.addEventListener("click", function (e) { e.stopPropagation(); if (inp) { inp.value = ""; inp.click(); } });
+  D.body.appendChild(cam);
+  setInterval(function () {
+    var pv = D.getElementById("pvBack"), vw = pv && pv.parentNode.parentNode, vOpen = vw && vw.style.display !== "none";
+    cam.style.display = (panel.style.display === "block" && !vOpen) ? "block" : "none";
+  }, 250);
+
+  /* spacing + notice + Save to iCloud on the Photos page */
+  var cs = D.createElement("style");
+  cs.textContent = "#shotPanel>div:first-child{min-height:56px!important;padding:0 0 12px!important;align-items:center!important;box-sizing:border-box}";
+  D.head.appendChild(cs);
+  function ensure() {
+    if (panel.style.display === "none" || !panel.querySelector("#pxBack")) return;
+    var first = panel.firstElementChild;
+    if (first && !panel.querySelector("#vdNote")) first.insertAdjacentHTML("afterend", noteHTML());
+    var all = panel.querySelector("#pxAll");
+    if (all) {
+      var n = 0;
+      panel.querySelectorAll("[data-pick]").forEach(function (r) { var c = r.firstElementChild; if (c && c.textContent.indexOf("✓") >= 0) n++; });
+      var b = panel.querySelector("#vdIc");
+      if (!b) {
+        b = D.createElement("button"); b.id = "vdIc";
+        b.style.cssText = "width:100%;margin:0 0 8px;padding:12px;font-size:15px;background:#26303c;border:0.5px solid #ff8a2b;color:#ff8a2b";
+        all.parentNode.insertAdjacentElement("afterend", b);
+        b.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var ks = [];
+          panel.querySelectorAll("[data-pick]").forEach(function (r) { var c = r.firstElementChild; if (c && c.textContent.indexOf("✓") >= 0) ks.push(r.getAttribute("data-pick")); });
+          if (!ks.length) { alert("Tap the photos you want to save first."); return; }
+          saveFiles(shots().filter(function (s) { return ks.indexOf(String(s.t)) >= 0; }).map(photoFile), "Van Dash photos");
+        });
+      }
+      b.textContent = "Save to iCloud (" + n + ")"; b.style.opacity = n ? "1" : "0.55";
+    }
+  }
+  new MutationObserver(ensure).observe(panel, { childList: true, attributes: true, attributeFilter: ["style"] });
+
+  /* after a new photo is saved from this page, refresh the list */
+  if (inp) inp.addEventListener("change", function () {
+    setTimeout(function () { if (panel.style.display === "block") panel.innerHTML = ""; }, 2500);
+  });
+
+  /* ---- Saved page (floppy disk icon on the main page) ---- */
+  var sv = D.createElement("div");
+  sv.id = "vdSaved";
+  sv.style.cssText = "position:fixed;left:0;top:0;right:0;bottom:0;z-index:96;background:#000;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top) + 12px) 12px 0";
+  D.body.appendChild(sv);
+  var st = { f: "all", sel: {} };
+  function items() {
+    var a = [];
+    shots().forEach(function (s) { a.push({ k: "p" + s.t, kind: "photo", s: s, t: s.t }); });
+    trails().forEach(function (tr) { a.push({ k: "t" + tr.id, kind: "track", tr: tr, t: tr.t0 || 0 }); });
+    a.sort(function (x, y) { return y.t - x.t; });
+    return a;
+  }
+  function trackSVG(pts) {
+    pts = pts || [];
+    if (pts.length < 2) return "";
+    var la = pts.map(function (p) { return p[0]; }), lo = pts.map(function (p) { return p[1]; });
+    var a0 = Math.min.apply(null, la), a1 = Math.max.apply(null, la), o0 = Math.min.apply(null, lo), o1 = Math.max.apply(null, lo);
+    var kx = Math.cos((a0 + a1) / 2 * Math.PI / 180), w = (o1 - o0) * kx, h = a1 - a0, sc = 74 / Math.max(w, h, 1e-9);
+    var cx = (o0 + o1) / 2, cy = (a0 + a1) / 2, step = Math.max(1, Math.floor(pts.length / 160)), d = "", i, q;
+    function X(p) { return (50 + (p[1] - cx) * kx * sc).toFixed(1); }
+    function Y(p) { return (50 - (p[0] - cy) * sc).toFixed(1); }
+    for (i = 0; i < pts.length; i += step) d += (i ? "L" : "M") + X(pts[i]) + " " + Y(pts[i]);
+    q = pts[pts.length - 1];
+    return '<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block"><path d="M0 25H100M0 50H100M0 75H100M25 0V100M50 0V100M75 0V100" stroke="#1b2634" stroke-width="0.6"/><path d="' + d + '" fill="none" stroke="#ff8a2b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="' + X(pts[0]) + '" cy="' + Y(pts[0]) + '" r="3.2" fill="#4cd964"/><circle cx="' + X(q) + '" cy="' + Y(q) + '" r="3.2" fill="#ff453a"/></svg>';
+  }
+  function renderSaved() {
+    var all = items(), np = all.filter(function (x) { return x.kind === "photo"; }).length, nt = all.length - np;
+    var vis = all.filter(function (x) { return st.f === "all" || (st.f === "photos" && x.kind === "photo") || (st.f === "tracks" && x.kind === "track"); });
+    Object.keys(st.sel).forEach(function (k) { if (!all.some(function (x) { return x.k === k; })) delete st.sel[k]; });
+    var ns = Object.keys(st.sel).length, allOn = vis.length && vis.every(function (x) { return st.sel[x.k]; });
+    function chip(id, label) {
+      var on = st.f === id;
+      return '<button data-f="' + id + '" style="margin:0 6px 0 0;padding:8px 14px;font-size:14px;border-radius:18px;border:0.5px solid ' + (on ? "#ff8a2b" : "#8a96a6") + ";background:" + (on ? "#ff8a2b" : "#26303c") + ";color:" + (on ? "#000" : "#e8eef5") + '">' + label + "</button>";
+    }
+    var h = '<div style="display:flex;align-items:center;justify-content:space-between;min-height:44px;padding-bottom:6px">' +
+      '<button id="svBack" style="margin:0;background:#26303c;padding:8px 14px;font-size:15px">&lsaquo; Back</button>' +
+      '<div style="font-size:20px;font-weight:600;color:#e8eef5">Saved</div><div style="width:70px"></div></div>' + noteHTML() +
+      '<div style="display:flex;align-items:center;margin-bottom:12px">' + chip("all", "All " + all.length) + chip("photos", "Photos " + np) + chip("tracks", "Tracks " + nt) +
+      '<button id="svAll" style="margin:0 0 0 auto;padding:8px 12px;font-size:14px;background:none;border:0;color:#ff8a2b">' + (allOn ? "Select none" : "Select all") + "</button></div>";
+    if (!vis.length) h += '<div style="text-align:center;color:#7f8fa3;padding:36px 22px;line-height:1.45"><svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#ff8a2b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg><div style="font-size:18px;font-weight:600;color:#e8eef5;margin-bottom:8px">' + (st.f === "photos" ? "No photos yet" : st.f === "tracks" ? "No tracks yet" : "Nothing saved yet") + '</div><div style="font-size:14px">Photos and tracks you save will show up here. Select any of them, then tap Save to iCloud to back them up to iCloud Drive or another service, like Dropbox or Google Drive.</div></div>';
+    else {
+      h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+      vis.forEach(function (x) {
+        var on = !!st.sel[x.k], lab, body;
+        if (x.kind === "photo") {
+          lab = x.s.type ? esc(x.s.type) : when(x.s.t);
+          body = '<img src="' + x.s.img + '" style="width:100%;height:100%;object-fit:cover;display:block">';
+        } else {
+          lab = esc(x.tr.name) + '<span style="opacity:.75"> &middot; ' + (x.tr.mi || 0).toFixed(1) + " mi</span>";
+          body = trackSVG(x.tr.pts);
+        }
+        h += '<div data-k="' + x.k + '" style="position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#101821;border:2px solid ' + (on ? "#ff8a2b" : "#2a3646") + '">' + body +
+          '<div style="position:absolute;left:0;right:0;bottom:0;padding:14px 6px 5px;background:linear-gradient(transparent,rgba(0,0,0,0.78));font-size:11px;line-height:1.2;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + lab + "</div>" +
+          '<div style="position:absolute;left:5px;top:5px;width:22px;height:22px;border-radius:50%;box-sizing:border-box;border:2px solid ' + (on ? "#ff8a2b" : "rgba(255,255,255,0.75)") + ";background:" + (on ? "#ff8a2b" : "rgba(0,0,0,0.35)") + ';color:#000;font-weight:700;font-size:14px;line-height:18px;text-align:center">' + (on ? "✓" : "") + "</div>" +
+          (x.kind === "track" ? '<div style="position:absolute;right:6px;top:6px;font-size:10px;letter-spacing:.5px;color:#9fb0c3">GPX</div>' : "") + "</div>";
+      });
+      h += "</div>";
+    }
+    h += '<div style="position:sticky;bottom:0;margin:0 -12px;padding:14px 12px calc(env(safe-area-inset-bottom) + 10px);background:linear-gradient(rgba(0,0,0,0),#000 28%)">' +
+      '<button id="svSave" style="width:100%;margin:0;padding:14px;font-size:17px;background:#c9651a;opacity:' + (ns ? "1" : "0.55") + '">Save to iCloud (' + ns + ")</button>" +
+      '<div style="text-align:center;font-size:11px;color:#6f7f93;margin-top:6px">Opens the iPhone save sheet. Choose Save to Files, then iCloud Drive.</div></div>';
+    var keep = sv.scrollTop;
+    sv.innerHTML = h; sv.scrollTop = keep;
+  }
+  sv.addEventListener("click", function (e) {
+    var t = e.target, b = t.closest ? t.closest("button") : null, tile = t.closest ? t.closest("[data-k]") : null;
+    if (b && b.id === "svBack") { sv.style.display = "none"; return; }
+    if (b && b.hasAttribute("data-f")) { st.f = b.getAttribute("data-f"); renderSaved(); return; }
+    if (b && b.id === "svAll") {
+      var vis = items().filter(function (x) { return st.f === "all" || (st.f === "photos" && x.kind === "photo") || (st.f === "tracks" && x.kind === "track"); });
+      var every = vis.length && vis.every(function (x) { return st.sel[x.k]; });
+      vis.forEach(function (x) { if (every) delete st.sel[x.k]; else st.sel[x.k] = 1; });
+      renderSaved(); return;
+    }
+    if (b && b.id === "svSave") {
+      var files = [];
+      items().forEach(function (x) { if (st.sel[x.k]) files.push(x.kind === "photo" ? photoFile(x.s) : trackFile(x.tr)); });
+      if (!files.length) { alert("Tap the photos or tracks you want to save first."); return; }
+      saveFiles(files, "Van Dash saved items"); return;
+    }
+    if (tile) { var k = tile.getAttribute("data-k"); if (st.sel[k]) delete st.sel[k]; else st.sel[k] = 1; renderSaved(); }
+  });
+
+  /* floppy disk icon, top right of the main page */
+  var gx = D.querySelector('a[href^="https://192.168.68"]'), host = gx ? gx.parentNode : D.body;
+  var fl = D.createElement("button");
+  fl.id = "vdFloppy"; fl.setAttribute("aria-label", "Saved items");
+  fl.style.cssText = "position:absolute;top:calc(env(safe-area-inset-top) - 3px);right:8px;width:46px;height:46px;margin:0;padding:0;background:none;border:0;z-index:6;display:flex;align-items:center;justify-content:center;opacity:0.9";
+  fl.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#ff8a2b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M7 3v5h8V3"/><rect x="7" y="13" width="10" height="8" rx="1"/></svg>';
+  fl.addEventListener("click", function (e) { e.stopPropagation(); renderSaved(); sv.style.display = "block"; sv.scrollTop = 0; });
+  host.appendChild(fl);
+  var fs = D.createElement("style");
+  fs.textContent = "html.camp #vdFloppy{display:none!important}";
+  D.head.appendChild(fs);
 })();
 
 /* ---- rev 347: ask what kind of spot after each photo (type + notes), print it on the photo ---- */
