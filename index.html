@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 345 -->
+<!-- Van Dash rev 347 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r345</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r347</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -4533,7 +4533,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
   function load() { try { return JSON.parse(localStorage.getItem('vdShots') || '[]'); } catch (e) { return []; } }
   function store(a) { try { localStorage.setItem('vdShots', JSON.stringify(a)); return true; } catch (e) { return false; } }
   function stamp(t) { var d = new Date(t); return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
-  function fname(s) { var d = new Date(s.t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return 'vandash-geo-photos-' + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '-' + z(d.getHours()) + z(d.getMinutes()) + z(d.getSeconds()) + '.jpg'; }
+  function fname(s) { if (s.type && window.__vdTagName) return window.__vdTagName(s); var d = new Date(s.t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return 'vandash-geo-photos-' + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '-' + z(d.getHours()) + z(d.getMinutes()) + z(d.getSeconds()) + '.jpg'; }
   function link(s) { return s.lat == null ? 'no GPS fix' : s.lat.toFixed(5) + ', ' + s.lon.toFixed(5) + ' https://maps.google.com/?q=' + s.lat.toFixed(5) + ',' + s.lon.toFixed(5); }
   function toFile(s) { var bin = atob(s.img.split(',')[1]), u = new Uint8Array(bin.length); for (var k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k); return new File([u], fname(s), { type: 'image/jpeg' }); }
   function refreshBadge() {
@@ -4564,8 +4564,8 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
         h += '<div ' + (selMode ? 'data-pick="' + s.t + '" ' : '') + 'style="display:flex;gap:12px;align-items:center;background:#151c25;border:0.5px solid ' + (selMode && on ? '#ff8a2b' : '#8a96a6') + ';border-radius:14px;padding:10px;margin-bottom:8px">' +
           (selMode ? '<div style="flex:none;width:26px;height:26px;border-radius:50%;border:2px solid ' + (on ? '#ff8a2b' : '#8a96a6') + ';background:' + (on ? '#ff8a2b' : 'none') + ';color:#000;font-weight:700;text-align:center;line-height:22px;font-size:16px">' + (on ? '\u2713' : '') + '</div>' : '') +
           '<img ' + (selMode ? '' : 'data-view="' + s.t + '" ') + 'src="' + s.img + '" style="width:72px;height:72px;object-fit:cover;border-radius:8px;flex:none">' +
-          '<div ' + (selMode ? '' : 'data-view="' + s.t + '" ') + 'style="flex:1;min-width:0"><div style="font-size:16px;font-weight:600;color:#e8eef5">' + stamp(s.t) + '</div>' +
-          '<div style="font-size:12px;color:#9fb0c3;margin-top:3px">' + (s.lat == null ? 'No GPS fix' : s.lat.toFixed(5) + ', ' + s.lon.toFixed(5)) + '</div></div>' +
+          '<div ' + (selMode ? '' : 'data-view="' + s.t + '" ') + 'style="flex:1;min-width:0"><div style="font-size:16px;font-weight:600;color:#e8eef5">' + stamp(s.t) + (s.type ? ' · <span style="color:#ff8a2b">' + String(s.type).replace(/</g, '&lt;') + '</span>' : '') + '</div>' +
+          '<div style="font-size:12px;color:#9fb0c3;margin-top:3px">' + (s.lat == null ? 'No GPS fix' : s.lat.toFixed(5) + ', ' + s.lon.toFixed(5)) + '</div>' + (s.note ? '<div style="font-size:12px;color:#c3cfdc;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + String(s.note).replace(/</g, '&lt;') + '</div>' : '') + '</div>' +
           (selMode ? '' : '<button data-del="' + s.t + '" style="margin:0;background:none;color:#ff8a2b;font-size:20px;padding:6px 10px">\u2715</button>') + '</div>';
       }
     }
@@ -4576,7 +4576,7 @@ if (D.readyState === 'complete') setTimeout(go, 0); else W.addEventListener('loa
   async function sendThese(list) {
     if (!list.length || busy) return;
     busy = true;
-    var text = list.map(function (s, i) { return (i + 1) + '. ' + stamp(s.t) + ' - ' + link(s); }).join('\n');
+    var text = list.map(function (s, i) { return (i + 1) + '. ' + (s.type ? s.type + ' - ' : '') + stamp(s.t) + ' - ' + link(s) + (s.note ? ' - ' + s.note : ''); }).join('\n');
     var files = list.map(toFile);
     try {
       if (navigator.canShare && navigator.canShare({ files: files })) {
@@ -5349,7 +5349,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 345): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 347): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6175,7 +6175,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 345): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 347): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -7173,7 +7173,184 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     if (w / 2 > half && half > 20) { t.style.setProperty('font-size', Math.max(9, 13 * half * 2 / w) + 'px', 'important'); w = t.getBoundingClientRect().width; }
     t.style.setProperty('left', (X - w / 2 - r.left).toFixed(1) + 'px', 'important');
   }
+    /* r346: weather icon + label centered by CSS only (no timer moves them); photo-spot camera button back on the small map */
+  var s346 = D.createElement('style');
+  s346.textContent = 'html:not(.camp) #wxCard .wx-wrap{width:calc(100% - 48px)!important;margin:-6px 0 0 0!important;justify-content:center!important}' +
+    'html:not(.camp) #wxCard #wxIcon{transform:none!important;margin:0 auto!important}' +
+    'html:not(.camp) #wxCard #vdWxTxt{display:block!important;position:static!important;left:auto!important;transform:none!important;width:calc(100% - 48px)!important;max-width:none!important;margin:0!important;text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important}' +
+    'html:not(.camp) #vCam{left:auto!important;right:15px!important;top:134px!important}';
+  D.head.appendChild(s346);
+  function lock() {
+    fit(D.getElementById('vdSpT'), 13, 11); fit(D.getElementById('vdSpA'), 12, 10);
+    var t = D.getElementById('vdWxTxt');
+    if (!t || !t.offsetWidth) return;
+    var k = t.textContent + '|' + t.clientWidth;
+    if (t._k === k) return;
+    t._k = k;
+    var z = 13; t.style.setProperty('font-size', z + 'px', 'important');
+    while (t.scrollWidth > t.clientWidth && z > 9) { z -= 0.5; t.style.setProperty('font-size', z + 'px', 'important'); }
+  }
   setInterval(function () { try { gusts(); sync(); lock(); } catch (e) {} }, 1000);
+
+/* ---- rev 347: ask what kind of spot after each photo (type + notes), print it on the photo ---- */
+(function () {
+  var inp = D.querySelector('#vCamHost input[type=file]');
+  if (!inp) return;
+  function load() { try { var a = JSON.parse(localStorage.getItem("vdShots") || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function save(a) { try { localStorage.setItem("vdShots", JSON.stringify(a)); return true; } catch (e) { return false; } }
+  function badge() {
+    var b = D.getElementById("vCam"), sp = b && b.querySelector("span"), n = load().length;
+    if (sp) { sp.textContent = n; sp.style.display = n ? "block" : "none"; }
+  }
+  var pLat = null, pLon = null, pAcc = null;
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(function (p) { pLat = p.coords.latitude; pLon = p.coords.longitude; pAcc = p.coords.accuracy; }, function () {}, { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 });
+  }
+  function stamp(t) {
+    var d = new Date(t);
+    return d.toLocaleDateString([], { month: "short", day: "numeric" }) + " " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+
+  // rev 347: after each photo, ask what kind of spot it is (type, optional note) and print it on the photo
+  var DEF_TYPES = ["Camp Spot", "Attraction", "Rest Stop", "Overnight Spot", "Where We Stayed"];
+  function customTypes() { try { var a = JSON.parse(localStorage.getItem("vdTypes") || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function saveCustom(a) { try { localStorage.setItem("vdTypes", JSON.stringify(a)); } catch (e) {} }
+  function vdNext(ty) {
+    var m = {}; try { m = JSON.parse(localStorage.getItem("vdTypeN") || "{}") || {}; } catch (e) { m = {}; }
+    var k = ty.toLowerCase(), n = (m[k] || 0) + 1;
+    load().forEach(function (s) { if (s.type && s.type.toLowerCase() === k && s.n >= n) n = s.n + 1; });
+    m[k] = n; try { localStorage.setItem("vdTypeN", JSON.stringify(m)); } catch (e) {}
+    return n;
+  }
+  function vdTagName(s) {
+    var ty = String(s.type).replace(/[\\\/:*?"<>|]/g, "").replace(/\s+/g, " ").trim() || "Spot";
+    var n = String(s.n || 1); while (n.length < 3) n = "0" + n;
+    return "Van Dash - " + ty + " - " + n + ".jpg";
+  }
+  window.__vdTagName = vdTagName;
+  function esc(x) { return String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
+  function vdAsk(done) {
+    var cust = customTypes(), sel = "", other = "", note = "", fin = false;
+    var ov = document.createElement("div");
+    ov.id = "vdTagAsk";
+    ov.style.cssText = "position:fixed;left:0;top:0;right:0;bottom:0;z-index:99;background:rgba(0,0,0,0.8);display:flex;align-items:flex-end;justify-content:center;padding:12px;box-sizing:border-box";
+    var box = document.createElement("div");
+    box.style.cssText = "width:100%;max-width:460px;max-height:94%;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#151c25;border:0.5px solid #8a96a6;border-radius:16px;padding:14px;box-sizing:border-box;margin-bottom:env(safe-area-inset-bottom)";
+    ov.appendChild(box);
+    var fs = "font-size:16px;color:#e8eef5;background:#0d1218;border:0.5px solid #8a96a6;border-radius:10px;padding:10px;width:100%;box-sizing:border-box;margin:8px 0 0;-webkit-appearance:none;font-family:inherit";
+    function grab() {
+      var o = box.querySelector("#vdTyO"), n = box.querySelector("#vdTyN");
+      if (o) other = o.value; if (n) note = n.value;
+    }
+    function draw() {
+      var all = DEF_TYPES.concat(cust), h = '<div style="font-size:18px;font-weight:600;color:#e8eef5;margin-bottom:8px">What kind of spot?</div><div style="display:flex;flex-wrap:wrap">';
+      function chip(label, on, extra) {
+        return '<button ' + extra + ' style="margin:0 6px 6px 0;padding:10px 14px;font-size:16px;border-radius:10px;border:0.5px solid ' + (on ? '#ff8a2b' : '#8a96a6') + ';background:' + (on ? '#ff8a2b' : '#26303c') + ';color:' + (on ? '#000' : '#e8eef5') + '">' + esc(label) + '</button>';
+      }
+      all.forEach(function (t, i) {
+        var isC = i >= DEF_TYPES.length;
+        h += '<span style="display:inline-flex;align-items:center;margin:0 6px 6px 0">' +
+          chip(t, sel === t, 'data-ty="' + i + '"').replace('margin:0 6px 6px 0;', 'margin:0;') +
+          (isC ? '<button data-x="' + (i - DEF_TYPES.length) + '" aria-label="Remove" style="margin:0 0 0 2px;padding:6px 8px;font-size:15px;background:none;border:0;color:#7f8fa3">✕</button>' : '') + '</span>';
+      });
+      h += chip("Other…", sel === "\u0000other", 'data-other="1"') + '</div>';
+      if (sel === "\u0000other") h += '<input id="vdTyO" maxlength="30" placeholder="Type a label (e.g. Waterfall)" autocomplete="off" autocorrect="off" style="' + fs + '" value="' + esc(other) + '">';
+      h += '<textarea id="vdTyN" rows="2" maxlength="200" placeholder="Notes (optional)" style="' + fs + ';resize:none">' + esc(note) + '</textarea>' +
+        '<div style="display:flex;gap:8px;margin-top:12px"><button id="vdTySkip" class="alt" style="flex:1;margin:0;padding:13px;font-size:16px">Skip</button>' +
+        '<button id="vdTySave" style="flex:2;margin:0;padding:13px;font-size:16px;background:#c9651a">Save photo</button></div>';
+      box.innerHTML = h;
+    }
+    function finish(res) {
+      if (fin) return; fin = true;
+      if (ov.parentNode) ov.parentNode.removeChild(ov);
+      done(res);
+    }
+    ov.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var b = e.target && e.target.closest ? e.target.closest("button") : null;
+      if (!b) return;
+      grab();
+      if (b.hasAttribute("data-ty")) { var t = DEF_TYPES.concat(cust)[+b.getAttribute("data-ty")]; sel = (sel === t) ? "" : t; draw(); return; }
+      if (b.hasAttribute("data-other")) { sel = (sel === "\u0000other") ? "" : "\u0000other"; draw(); var o = box.querySelector("#vdTyO"); if (o) o.focus(); return; }
+      if (b.hasAttribute("data-x")) {
+        var ix = +b.getAttribute("data-x");
+        if (confirm('Remove "' + cust[ix] + '" from your list?')) { if (sel === cust[ix]) sel = ""; cust.splice(ix, 1); saveCustom(cust); draw(); }
+        return;
+      }
+      if (b.id === "vdTySkip") { finish({}); return; }
+      if (b.id === "vdTySave") {
+        var ty = sel === "\u0000other" ? other.replace(/\s+/g, " ").trim() : sel;
+        if (sel === "\u0000other" && ty) {
+          var low = ty.toLowerCase(), have = DEF_TYPES.concat(cust).some(function (x) { return x.toLowerCase() === low; });
+          if (!have) { cust.push(ty); saveCustom(cust); }
+        }
+        finish({ type: ty, note: note.replace(/\s+/g, " ").trim() });
+      }
+    });
+    ["pointerdown", "pointerup", "touchstart", "touchend"].forEach(function (ev) { ov.addEventListener(ev, function (e) { e.stopPropagation(); }); });
+    draw();
+    document.body.appendChild(ov);
+  }
+
+  function shrink(file, cb, info) {
+    var url = URL.createObjectURL(file), im = new Image();
+    im.onload = function () {
+      var sc = Math.min(1, 1280 / Math.max(im.naturalWidth, im.naturalHeight));
+      var c = D.createElement("canvas");
+      c.width = Math.round(im.naturalWidth * sc); c.height = Math.round(im.naturalHeight * sc);
+      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      try {
+        if (info) {
+          var g = c.getContext("2d"), fs = Math.max(9, Math.round(c.width / 63)), pad = Math.round(fs * 0.6);
+          var l0 = "VAN-DASH APP PHOTOS", l1 = info.place || "", l2 = info.coords, l3 = info.when;
+          var rows = [{ t: l0, b: 1 }];
+          if (info.type) rows.push({ t: "Type: " + info.type, b: 1 });
+          if (l1) rows.push({ t: l1, b: 1 });
+          rows.push({ t: l2 }); rows.push({ t: l3 });
+          if (info.note) {
+            g.font = "400 " + fs + "px -apple-system, Helvetica, sans-serif";
+            var mw = c.width - pad * 2, wds = String(info.note).split(" "), cur = "", nl = 0, wi = 0;
+            while (wi < wds.length && nl < 3) {
+              var pre = nl === 0 ? "Note: " : "", tl = cur ? cur + " " + wds[wi] : wds[wi];
+              if (cur && g.measureText(pre + tl).width > mw) { rows.push({ t: pre + cur }); nl++; cur = ""; } else { cur = tl; wi++; }
+            }
+            if (cur && nl < 3) rows.push({ t: (nl === 0 ? "Note: " : "") + cur + (wi < wds.length ? "…" : "") });
+            else if (wi < wds.length && rows.length) rows[rows.length - 1].t += "…";
+          }
+          var lines = rows;
+          var bh = lines.length * Math.round(fs * 1.25) + pad * 2;
+          g.fillStyle = "rgba(0,0,0,0.6)"; g.fillRect(0, c.height - bh, c.width, bh);
+          g.fillStyle = "#fff"; g.textBaseline = "top";
+          lines.forEach(function (tx, i) {
+            g.font = (tx.b ? "700 " : "400 ") + fs + "px -apple-system, Helvetica, sans-serif";
+            g.fillText(tx.t, pad, c.height - bh + pad + i * Math.round(fs * 1.25), c.width - pad * 2);
+          });
+        }
+      } catch (e) {}
+      cb(c.toDataURL("image/jpeg", 0.72));
+    };
+    im.onerror = function () { URL.revokeObjectURL(url); cb(null); };
+    im.src = url;
+  }
+  inp.onchange = function () {
+    var f = inp.files && inp.files[0];
+    if (!f) return;
+    var t = Date.now(), la = pLat, lo = pLon, ac = pAcc;
+    vdAsk(function (tag) {
+      shrink(f, function (data) {
+        if (!data) { alert("Couldn't read that photo."); return; }
+        var a = load(), sh = { t: t, lat: la, lon: lo, acc: ac, img: data };
+        if (tag && tag.type) { sh.type = tag.type; sh.n = vdNext(tag.type); }
+        if (tag && tag.note) sh.note = tag.note;
+        a.push(sh);
+        if (!save(a)) { alert("Phone storage for photos is full. Send or clear the queued ones first."); return; }
+        badge();
+      }, { place: (typeof cityName !== "undefined" && cityName) ? cityName : "", coords: la == null ? "No GPS fix" : la.toFixed(5) + ", " + lo.toFixed(5), when: stamp(t), type: tag && tag.type, note: tag && tag.note });
+    });
+  };
+})();
+
 
 
 })();
