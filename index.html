@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 343 -->
+<!-- Van Dash rev 345 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r343</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r345</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5349,7 +5349,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 343): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 345): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6175,7 +6175,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 343): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 345): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -7092,14 +7092,14 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     return s + '</svg>';
   };
   var s343 = D.createElement('style');
-  s343.textContent = 'html:not(.camp) #vdSpCard{position:relative!important}' +
-    'html:not(.camp) #vdSpCard #vdSpTap{display:block!important;margin-top:6px!important;padding-right:62px!important}' +
-    'html:not(.camp) #vdSpCard #vdSpArt{position:absolute!important;right:18px!important;top:8px!important;width:48px!important;height:48px!important;margin:0!important}' +
-    'html:not(.camp) #vdSpCard #vdSpT,html:not(.camp) #vdSpCard #vdSpA{text-align:left!important}' +
-    'html:not(.camp) #vdSpCard>div:last-child{margin:2px 0 3px!important}' +
-    'html:not(.camp) #vdSpCard button{padding:3px 4px!important}' +
-    'html:not(.camp) #vdSpCard #vdSpP svg,html:not(.camp) #vdSpCard #vdSpN svg{width:36px!important;height:36px!important}' +
-    'html:not(.camp) #vdSpCard #vdSpY svg{width:44px!important;height:44px!important}' +
+  s343.textContent = '#vdN1{}' +
+    '#vdN2{}' +
+    '#vdN3{}' +
+    '#vdN4{}' +
+    '#vdN5{}' +
+    'html:not(.camp) #vdSpCard button{padding:2px 10px!important}' +
+    'html:not(.camp) #vdSpCard #vdSpP svg,html:not(.camp) #vdSpCard #vdSpN svg{width:30px!important;height:30px!important}' +
+    'html:not(.camp) #vdSpCard #vdSpY svg{width:36px!important;height:36px!important}' +
     'html:not(.camp) #wxCard .wx-wrap{margin-top:-6px!important}' +
     'html:not(.camp) #wxCard #wxIcon{display:flex!important;align-items:center!important;justify-content:center!important}';
   D.head.appendChild(s343);
@@ -7127,7 +7127,54 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     if (w / 2 > half && half > 20) { t.style.setProperty('font-size', Math.max(9, 13 * half * 2 / w) + 'px', 'important'); w = t.getBoundingClientRect().width; }
     t.style.setProperty('left', (X - w / 2 - r.left).toFixed(1) + 'px', 'important');
   }
+    /* r344: moon image is small and checked; the status icon no longer walks sideways */
+  var MJ = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABIAEgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAQCAwUBBv/EAC4QAAIBAwQBAgUCBwAAAAAAAAECAAMEERIhMVFBEyIFMmFxkpHhI0JSodHw8f/EABUBAQEAAAAAAAAAAAAAAAAAAAAB/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AV37/ALTuCf8Ak7qHSQosXqELpVR5kVdTt841nn+VV3lmAnyW2CNyXlyPlgluBkY1Ov8AmNCgKmDVIYjjPiAmanqqNVuKYPDrggxd3WmdvUx2J6GypqAwYBkxgDEEoUMMMIH8JA8/XY0ip1MUYe1h31ICqe6n4/vN40rZiiAYJztwJmXduKbkKSM7iAp6p7qfj+8JWXYEg6gRCBDQrD2qB9Y0KGikSF5M4tI+ohbcEAgTTo0y2RjxuYC1r7UOF2PctapgZqbJ0sap0Qy4BwQNzJ1bJWUZJ043HcCVoxcL6JU0iDkkbiR9rEqG3BySYwLatTtqZoIqsucoDuZK3pCtTZq9AowHHcgXtlNS4KsQQRqH0Mr+IpppHRvjfXiMhVt6PqJzg7Y5iNvcNUp1aFRSFqZOrnmUZVU6hqTGQcHIhJG3elrWoceF+sIE2JKUqg8bSwXLo5GdzJfDwlxahSR4Occ4jFexp6GqatBPH0gFOqSdOo4GDjPM0aSmq7KGA2zMZaNVgcsMgbEeZqWranUjke0nuQalBn9QmmVPt4klIYY5LiLltYCquCo48/eWI5QqAOdswFqgY3CWzAEN5HiLXdFLRXCHOrvkTWux6VE1lXLKNj5mRd5qUleo2325gZbB6unUwbTtvCWPkKWO2+IShWwdbeoAV9hjdwXdAUBODkiY+of1GP2tyrpoZtx35EBy31AIKh3PAmhZ27W1YOzFg/BEVoEOUUFduzNK3qKKoWr8uD/okF4ptRP8RMMDk585kUBdsM2CTyJ1mQE1Msy44J3BxOCvT0hnUatjkbYgN3dVFprTO4mJd19Wcp7QdsiNXN2uPYFCjbOd5h3l1nIGC3j7yimteKHw7rkbkGEzmt2YkswJPJhAs0DtvwMNA7b8DCEC2nU0HJy31KmP21+Q2oajgYIYGEIFp+JkMoJwfJ76kK3xFGDYOskbYMIQEa1zVf5BpH3i+Kn0/WEIBip0P1hCED//2Q==';
+  var moonOK = false, mi = new Image();
+  mi.onload = function () {
+    moonOK = mi.naturalWidth > 8;
+    if (moonOK) [].forEach.call(D.querySelectorAll('[data-vdm]'), function (e) { e.removeAttribute('data-vdm'); });
+  };
+  mi.onerror = function () { moonOK = false; };
+  mi.src = MJ;
+  window.__vdMoon = function (withCloud, t) {
+    var p = window.__vdPhase(t), lit = p.lit, k = 1 - 2 * lit, R = 31, c = 32, rx = Math.abs(k) * R, path = '', full = lit > 0.98;
+    if (lit >= 0.02 && !full) {
+      var s1 = p.waxing ? 1 : 0, s2 = (k > 0) === p.waxing ? 0 : 1;
+      path = 'M' + c + ' ' + (c - R) + 'A' + R + ' ' + R + ' 0 0 ' + s1 + ' ' + c + ' ' + (c + R) + 'A' + rx.toFixed(2) + ' ' + R + ' 0 0 ' + s2 + ' ' + c + ' ' + (c - R) + 'Z';
+    }
+    var id = 'vn' + Math.floor(Math.random() * 1e6),
+      im = moonOK ? '<image href="' + MJ + '" xlink:href="' + MJ + '" x="5" y="5" width="54" height="54" preserveAspectRatio="none"/>' : '<circle cx="32" cy="32" r="27" fill="url(#' + id + 'g)"/>';
+    var s = '<svg viewBox="0 0 64 64" xmlns:xlink="http://www.w3.org/1999/xlink" style="width:1em;height:1em;display:inline-block;vertical-align:-0.12em"><defs>' +
+      '<radialGradient id="' + id + 'g" cx="40%" cy="38%" r="75%"><stop offset="0" stop-color="#f4f4f2"/><stop offset="0.6" stop-color="#cfd2d8"/><stop offset="1" stop-color="#8f95a2"/></radialGradient>' +
+      '<clipPath id="' + id + 'c"><circle cx="32" cy="32" r="27"/></clipPath>' +
+      '<filter id="' + id + 'f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.3"/></filter>' +
+      '<mask id="' + id + 'm" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect width="64" height="64" fill="#000"/>' +
+      (full ? '<rect width="64" height="64" fill="#fff"/>' : path ? '<path d="' + path + '" fill="#fff" filter="url(#' + id + 'f)"/>' : '') + '</mask></defs>' +
+      '<g clip-path="url(#' + id + 'c)">' + im + '<circle cx="32" cy="32" r="27" fill="#080c14" fill-opacity="0.86"/><g mask="url(#' + id + 'm)">' + im + '</g></g>' +
+      '<circle cx="32" cy="32" r="27" fill="none" stroke="#000" stroke-opacity="0.25" stroke-width="1"/>';
+    if (withCloud) s += '<path d="M20 56a9 9 0 0 1 2-17.8 12 12 0 0 1 23 2.8A8 8 0 0 1 44 56z" fill="#eef3f9" stroke="#b9c6d6" stroke-width="1.2"/>';
+    return s + '</svg>';
+  };
+  var s344 = D.createElement('style');
+  s344.textContent = 'html:not(.camp) #wxCard #wxIcon{transition:none!important}';
+  D.head.appendChild(s344);
+  var lastDx = 0;
+  function lock() {
+    var c = D.getElementById('wxCard'), ic = D.getElementById('wxIcon'), t = D.getElementById('vdWxTxt'), rg = D.getElementById('wxWind');
+    fit(D.getElementById('vdSpT'), 13, 11); fit(D.getElementById('vdSpA'), 12, 10);
+    if (!c || !ic || !c.offsetWidth) return;
+    var cr = c.getBoundingClientRect(), rl = rg && rg.offsetWidth ? rg.getBoundingClientRect().left : cr.right - 80;
+    var X = (cr.left + 14 + rl - 6) / 2, ir = ic.getBoundingClientRect(), dx = X - (ir.left + ir.width / 2 - lastDx);
+    if (Math.abs(dx - lastDx) > 0.5) { lastDx = dx; ic.style.setProperty('transform', 'translateX(' + dx.toFixed(1) + 'px)', 'important'); }
+    if (!t || !t.offsetWidth) return;
+    t.style.setProperty('font-size', '13px', 'important');
+    t.style.setProperty('left', '0px', 'important');
+    var r = t.getBoundingClientRect(), w = r.width, half = Math.min(X - cr.left - 8, rl - 6 - X);
+    if (w / 2 > half && half > 20) { t.style.setProperty('font-size', Math.max(9, 13 * half * 2 / w) + 'px', 'important'); w = t.getBoundingClientRect().width; }
+    t.style.setProperty('left', (X - w / 2 - r.left).toFixed(1) + 'px', 'important');
+  }
   setInterval(function () { try { gusts(); sync(); lock(); } catch (e) {} }, 1000);
+
 
 })();
 </script>
