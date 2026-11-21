@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 350 -->
+<!-- Van Dash rev 351 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r350</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r351</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5349,7 +5349,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 350): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 351): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6175,7 +6175,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 350): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 351): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -7314,9 +7314,13 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   new MutationObserver(ensure).observe(panel, { childList: true, attributes: true, attributeFilter: ["style"] });
 
   /* after a new photo is saved from this page, refresh the list */
-  if (inp) inp.addEventListener("change", function () {
-    setTimeout(function () { if (panel.style.display === "block") panel.innerHTML = ""; }, 2500);
-  });
+  var lastSig = null;
+  setInterval(function () {
+    if (panel.style.display !== "block") { lastSig = null; return; }
+    var a = shots(), l = a[a.length - 1] || {}, sig = a.length + "|" + l.t + "|" + (l.type || "") + "|" + (l.note || "");
+    if (lastSig !== null && sig !== lastSig) panel.innerHTML = "";
+    lastSig = sig;
+  }, 400);
 
   /* ---- Saved page (floppy disk icon on the main page) ---- */
   var sv = D.createElement("div");
@@ -7456,14 +7460,14 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     var cust = customTypes(), sel = "", other = "", note = "", fin = false;
     var ov = document.createElement("div");
     ov.id = "vdTagAsk";
-    ov.style.cssText = "position:fixed;left:0;top:0;width:100%;height:100%;z-index:99;background:rgba(0,0,0,0.94);display:flex;align-items:flex-end;justify-content:center;padding:12px;box-sizing:border-box";
+    ov.style.cssText = "position:fixed;left:0;top:0;width:100%;height:100%;z-index:99;background:#000;display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top) + 10px) 12px 12px;box-sizing:border-box";
     var box = document.createElement("div");
-    box.style.cssText = "width:100%;max-width:460px;max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#151c25;border:0.5px solid #8a96a6;border-radius:16px;padding:14px;box-sizing:border-box;margin-bottom:env(safe-area-inset-bottom)";
+    box.style.cssText = "width:100%;max-width:460px;max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#151c25;border:0.5px solid #8a96a6;border-radius:16px;padding:14px;box-sizing:border-box;margin:0";
     ov.appendChild(box);
-    var vv = window.visualViewport;
-    function vfit() { if (vv) { ov.style.top = vv.offsetTop + "px"; ov.style.left = vv.offsetLeft + "px"; ov.style.height = vv.height + "px"; } }
-    if (vv) { vv.addEventListener("resize", vfit); vv.addEventListener("scroll", vfit); }
-    vfit();
+    var de = document.documentElement, ob = document.body, o1 = de.style.overflow, o2 = ob.style.overflow;
+    de.style.overflow = "hidden"; ob.style.overflow = "hidden";
+    ov.addEventListener("touchmove", function (e) { if (!box.contains(e.target)) e.preventDefault(); }, { passive: false });
+    ov.addEventListener("focusin", function () { setTimeout(function () { window.scrollTo(0, 0); }, 60); setTimeout(function () { window.scrollTo(0, 0); }, 350); });
     var fs = "font-size:16px;color:#e8eef5;background:#0d1218;border:0.5px solid #8a96a6;border-radius:10px;padding:10px;width:100%;box-sizing:border-box;margin:8px 0 0;-webkit-appearance:none;font-family:inherit";
     function grab() {
       var o = box.querySelector("#vdTyO"), n = box.querySelector("#vdTyN");
@@ -7489,7 +7493,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     }
     function finish(res) {
       if (fin) return; fin = true;
-      if (vv) { vv.removeEventListener("resize", vfit); vv.removeEventListener("scroll", vfit); }
+      de.style.overflow = o1; ob.style.overflow = o2;
       if (ov.parentNode) ov.parentNode.removeChild(ov);
       done(res);
     }
