@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 351 -->
+<!-- Van Dash rev 352 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r351</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r352</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5349,7 +5349,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 351): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 352): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6175,7 +6175,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 351): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 352): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -7410,12 +7410,13 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   var gx = D.querySelector('a[href^="https://192.168.68"]'), host = gx ? gx.parentNode : D.body;
   var fl = D.createElement("button");
   fl.id = "vdFloppy"; fl.setAttribute("aria-label", "Saved items");
-  fl.style.cssText = "position:absolute;top:calc(env(safe-area-inset-top) - 3px);right:8px;width:46px;height:46px;margin:0;padding:0;background:none;border:0;z-index:6;display:flex;align-items:center;justify-content:center;opacity:0.9";
-  fl.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#ff8a2b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M7 3v5h8V3"/><rect x="7" y="13" width="10" height="8" rx="1"/></svg>';
+  fl.style.cssText = "position:absolute;top:calc(env(safe-area-inset-top) - 3px);right:8px;width:46px;height:46px;margin:0;padding:0;background:none;border:0;z-index:6;display:flex;align-items:center;justify-content:center;opacity:0.9;visibility:hidden";
+  fl.innerHTML = '<svg viewBox="0 0 42 32" width="31.5" height="24" fill="none" stroke="#ff8a2b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h9l3 3h22a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><g transform="translate(9 6)" stroke-width="1.8"><path d="M5 3h11l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M7 3v5h8V3"/><rect x="7" y="13" width="10" height="8" rx="1"/></g></svg>';
   fl.addEventListener("click", function (e) { e.stopPropagation(); renderSaved(); sv.style.display = "block"; sv.scrollTop = 0; });
   host.appendChild(fl);
+  setTimeout(function () { requestAnimationFrame(function () { fl.style.visibility = "visible"; }); }, 120);
   var fs = D.createElement("style");
-  fs.textContent = "html.camp #vdFloppy{display:none!important}";
+  fs.textContent = "html.camp #vdFloppy{display:none!important}#vdFloppy{position:absolute!important;top:calc(env(safe-area-inset-top) - 3px)!important;right:8px!important;width:46px!important;height:46px!important;min-height:0!important;margin:0!important;padding:0!important;box-sizing:border-box!important;line-height:0!important}#vdFloppy svg{width:31.5px!important;height:24px!important;min-width:0!important;max-width:none!important;flex:none!important;margin:0!important}";
   D.head.appendChild(fs);
 })();
 
