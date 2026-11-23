@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 358 -->
+<!-- Van Dash rev 360 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r358</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r360</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -5349,7 +5349,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 358): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 360): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6175,7 +6175,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 358): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 360): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -7780,3 +7780,170 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
 </script>
 </body>
 </html>
+<script>
+/* ===== PART 9 (rev 360): square Spotify art; play never moves to a device that is not this phone ===== */
+(function () {
+  var W = window, D = document, ua = navigator.userAgent, kd = /iPhone|iPad|Macintosh/.test(ua), o = W.vdDev, st = D.createElement("style");
+  st.textContent = "html:not(.camp) #vdSpArt,html:not(.camp) #spArt,html.camp #spArt,html.camp #vdSpArt{border-radius:0!important}";
+  D.head.appendChild(st);
+  if (!o) return;
+  W.vdDev = function (d) {
+    var r = o(d);
+    if (r || !kd) return r;
+    var t = D.createElement("div");
+    t.textContent = "Spotify can't see this phone right now. Open Spotify once, then tap play here.";
+    t.style.cssText = "position:fixed;left:50%;bottom:96px;transform:translateX(-50%);width:84%;max-width:360px;background:#1c2530;color:#e8eef5;padding:12px 14px;border-radius:12px;font:14px/1.3 -apple-system,sans-serif;text-align:center;z-index:99999;border:1px solid #3a4658";
+    D.body.appendChild(t); setTimeout(function () { t.remove(); }, 6000);
+    return { id: "none", name: "this phone", is_active: false, type: "" };
+  };
+})();
+(function () { /* r358: state-line heads-up banner (CA NV OR AZ UT ID WA NM CO) */
+  var W = window, D = document;
+  var RAW = {CA:"fa_Fq{~@`uChJVgDX{@^o@j@YfACBWg@_@]AENg@LiBdEWMAYb@aAAc@Ze@vAq@CWdABv@b@AhAb@i@DyDr@kBSYOFKMK}@h@wEl@uAn@qCnAqBdHqIlDmBrBgB`DuArAwA~AaAlB}@bB]`Bw@~E}Dr@YfA]h@GVHh@Kg@l@CPN?R]LHVy@`AJ\\TLEIrARAKN\\H~Bm@LSl@G^FTK^_A_A_AI{@jBaFjAcB|@m@z@a@tF?XPfCCnAVd@h@zAeAfDQpHqBz@Ke@LHHl@MtCuAFOPJtAmCA_@j@gAPKZDdAc@~@{@f@BhCoBb@@`@Uj@EzAw@XDpAQxBLz@d@p@ClBg@vA@VVTIn@BtAs@dAEhBq@`DBrA[~HHlH`@RNd@MhAmCfCaAvA@\\STm@sAyDEs@hAkBi@wBEmAn@i@H_@RKXBHQmA}FEmAZaCZUf@Et@i@vAEHZTDp@e@tBo@t@i@h@s@Co@w@oBK_AOZBr@q@[h@}@NMLDFcA^w@h@]jAB`@UrAG`EqDx@eBVGr@_Ab@INRh@_@nCa@?_@t@aANeBZk@bBcAr@cAbB_At@}D`@i@vBa@r@}@BYl@g@Vy@~AcBlE}BvAYt@oAx@i@d@GKeAR{ApAiEEs@\\KCIu@AH}@BKHBJKNH^QT][AMs@S@Wy@gAb@]d@a@I_Ay@Ug@Yu@QmBqA^EOPQZ@d@WYoBZ{@nBuDzAsA|@QhAl@|AOFVj@DtBOx@SlDsBJ_@r@e@vAgBpAOA_@j@]Po@t@ONYZqBOa@SuDPGdAsCHmAZg@^K\\BHNh@kAI{@L_Ae@OO_Cf@gFy@SSg@YJkBIi@d@QdAo@r@L\\ZCDRXEG`AO?Ij@Pn@g@FSXHJVIDP]TsADc@X_BPUh@qAVNb@uBf@[AcAtAqANg@GMWf@O?c@RY|@C^[Nq@x@gA`@iDx@gA\\ULVjAo@Rg@YIiAHH]j@DxAO^QEOXFj@KMk@^Eo@STG_ASN_AVBBMSCJ_@\\k@fAFr@GEWj@Wf@_A_ANE[eAc@R_@GO{@NiAMk@[A[s@_@m@EqARa@f@i@FcCo@{COgF\\eBb@sBNw@GyBRQOZOv@ACKmA_@UgA{AIAKa@Gq@LIb@NTfA@Tb@e@l@ODi@UKaAQGqDtAeAt@?OrAqAlAQRUX@j@aA`AQl@?b@Xf@K\\Jd@rAtAj@hAMJMIc@}B_Ay@}@Im@JA^r@rAbAnBp@tASfBf@|@Ii@i@|BFvAo@y@WZs@lBDZVEPPVzApAPb@v@Ar@k@xCGnAmA~DyAZd@l@TfCP]PIv@n@vBgBd@QXJHb@En@X@T[`@VLVIA\\u@PCTeAl@f@T?PTIJg@l@M?j@i@VOv@NLp@HPG^NzAoA|Ai@n@k@t@Op@NDLv@UJa@zAw@^w@p@k@fEiAV]AQWK\\KXRWz@t@J^R@`@a@J~BCUMq@_BqA}D\\mBv@}@DY}@p@_EvEuAjAJo@nEmF\\CD[\\KJy@t@y@v@c@^@LZPBZs@IkArBqDrA{@bD_AfDoBHg@n@[fCkDrBaB|@U\\q@h@ULWv@UjBwA\\k@`BsAZI`@iAc@GgAgC`AqE^SC_@~@eAl@wCVQKe@PM?e@d@m@OaE}AiEAe@b@aAF_Db@eAh@]LoB`@eBjB_Al@sAp@a@l@kAjBaBtA]TeBx@y@hCm@dAeAdEwBNW^Ih@e@_@sB`@s@@_A~@mATw@eBmFqAiCUIJQoCaFQPv@fBaAVW]JgAa@Og@mBiASo@DeAc@Ie@f@[`@Jd@W`@BxAxCl@v@RSoBaDuAoDo@}C@u@JKb@?VW`@oCAMg@Ke@iAaAuEy@eHf@iD[c@h@SZc@?gAhAyBC_@h@qBx@SXNzBiAEYWI[e@]iAa@{EXoAkfG?ApzDctBvpAszAzcAszA|fAkb@bZUxFMT{@TUZ[nBYd@i@Tu@DqCnFAjAgAdAIf@WTRz@Ov@cAPoBrAsHxDKdApE|Df@FjExBfAPt@`ANtAVd@lD`CDbAy@lAr@j@K`C]^?l@NT]x@x@nAHpBVTA~AzA`B|AdDb@TdD\\y@tAr@|AE\\kAtASrBn@fF{@dAoAXsDJeA^_AzAF~@_@~BDj@xB~AFjBR\\rANpEc@jAl@DV",NV:"tv}E_`qAAfhJDf@lArAnA~EdA^`BL`BQ|@s@lA}BlAs@f@@pBb@`Be@|B[bDf@bCx@b@d@AjBh@p@Av@q@bBoArAOf@r@fBBlBO~AsAnDNj@KvAh@~AgAnDqAvCAhBc@lDRzBjBZDXu@pAt@dAUvAjb@cZrzA}fArzA{cAbtBwpA@qzDksJ?",OR:"vcrFczrA}AgEi@qDOKBa@}@qFZ}Ao@{@eAWYDEhAQVOmBk@_@Um@m@m@g@MUAGPIpAeAJkAKz@I`@ULy@\\UUi@T?n@HLRhA^Jb@rAnARCiAiBwBaGw@{EeA_@eAwBMCo@x@iA@CM|@Mv@{@f@@TTVlA|@`@u@aDq@oFUgEi@o@\\kAg@eHM}DLi@[g@_@iD{@i@gAl@Ry@j@S`Ah@@kCi@_Fa@W]Fe@b@M_@BOVENHh@Uf@\\S{AHO\\Eg@eB\\gBOyA{@mBEu@[WNe@i@wETSCS{@qAYaBCeBLW_@eDV}@z@M?Ki@KOW]iBDfAuAmAhA]^e@?sAk@}BSpB_Bp@DMUc@b@kAIk@x@J`Ak@_@qCi@[Eu@}@L_@]\\FTCTWPFXTN~@FcCj@a@Fa@X@k@oBCqBX{Ah@e@u@y@{@YUcAv@sElAaD`A{@KG[E]TLLSRcAHeAn@W@ETwCVYtAYVBsAm@L?Kx@q@hAIh@YeCO}@SoAbAi@AwD]]Kh@I@OmACyAu@c@AcAH_B~@Mh@wA|@cGXm@GiBsAgCMg@D{BbA}BXuCvA}@rAUjAuAbA]zBc@dAJxBu@jAJpAIlA]lAa@ZaBl@{CVmBOcFbAgD@aDh@cQwCyEuBqA_@w@GuCTgHe@sQf@_BVg@V}@hBc@RgF}@uGTyBUgBu@kFm@U[u@WaId@wAU}BJqCq@wBDkBk@aB{@}AKcHuA_PcAmDoB}D@uGe@oNE_B]uAgAucCAoAtDwBtAg@x@mCT}@l@sBr@sAJ[R}CnFQpANd@`BzAt@`C~AtA\\`A|A|AL|Bl@bAb@xBf@lAbFzF@j@W\\h@lDvCbE~EhCtCrFb@rBt@x@|@TDXh@d@Sr@h@xBg@xALbAMb@mBbAu@o@[GYBi@r@i@FsBWYFWvAwAn@q@l@\\d@@l@Xh@jAHRP?^w@bAI`AdAvFl@dAhAx@UvAEpnBz`M?vByAb@AtA{AZKR]Ke@Vc@Cq@\\yA`Ay@E}An@aAOuD\\e@_@]EiAu@wCPw@Ei@\\{AlAq@X_@Ju@~@MbA}Cv@c@e@UoBiD",AZ:"zxwE}d|@xBMlZyGfnEa_AYUYqALsAi@cAuAqAc@oBkAm@qEb@sAOS]GkByB_BEk@^_CG_A~@{AdA_@rDKnAYz@eAo@gFRsBjAuAD]s@}Ax@uAeD]c@U}AeD{AaB@_BWUIqBy@oA\\y@OU?m@\\_@JaCs@k@x@mAEcAmDaCWe@OuAu@aAgAQkEyBg@GqE}DJeArHyDnBsAbAQNw@S{@VUHg@fAeA@kApCoFt@Eh@UXe@ZoBT[z@ULUVoGRaAu@eAt@qAEYkB[S{Bb@mD@iBpAwCfAoDi@_BJwAOk@rAoDN_BCmBk@qACk@vBsCVmBi@q@@kB[_@kC_AcDg@}BZaBd@qBc@{@By@l@gBtCqAj@uCKeA_@oA_FmAsAEg@C}o@awHD?paJlyB?",UT:"r{wE_`qA?n}@g|B?@~xF`wHEDiwHazD?",ID:"zqcFau~A{|@?@x|@_CnB_BjBcDbBcAfCuAj@a@v@sAr@AlAqApBVf@nAf@FNqAn@[~@mAh@d@XnBJTNAR}Bd@uCdAqA~@_BfBaCTeEx@iBfCoDhBsAbBqDhCQt@iBd@sAdAmAf@DzA_@dAaD`BsBd@GXLfAOPo@CwA_A{@BoAv@AX`@`@E^sAl@u@LsBSmAHsAa@gCW}@JKjAZ`AEj@Xn@Od@RXdBj@u@z@C`@~@tBD~An@r@Nv@^l@_@bAIxAZR|ALPZgBdBD^x@hAUn@Bd@YVqB^IX^tAu@pAdAz@lBH`@NdA|Af@Za@pAmAjAFnArA`AU~@^l@GNsDRaAb@_@j@yAd@_@ZuABuAa@aAsAmAEsCu@Ye@u@[i@{@cBe@HgAYWaARyBdAYr@_Dn@]d@l@jBkBt@I|@VlASv@mAz@?lCyA|@Ot@gC~Ay@dBGj@mBNkCfEKj@RfApAz@}AlCi@^iCt@Sr@kACaAe@{@GcB\\sAv@mAlAqBhDE\\t@v@_Az@Gh@oAr@\\`AWbAmAb@u@n@sB^cAz@y@Ub@_AG_@oCiBmC_@wH`@i@V_BCyAd@g@@{@Y_AcCkD_A{A^gB@{BXeGYmAWsABu@NcAr@wCYcCs@yE?yBh@gAEGWdAUTWHk@[kAuAk@Ac@\\i@GSi@WwAMi@i@i@B{Ah@sBvCw@\\W|AmAf@uBtByB`@Ab{C|sJ?DqnBTwAiAy@m@eAeAwFHaAv@cA?_@SQkAIYi@Am@]e@p@m@vAo@VwAXGrBVh@Gh@s@XCZFt@n@lBcALc@McAf@yAi@yBRs@i@e@EY}@Uu@y@c@sBuCsFc@_@}CoAgCwC}@kBU}APsBcF{Fg@mAc@yBm@cAM}B}A}A]aA_BuAu@aCaB{AOe@PqA|CoFZSrAKrBs@|@m@lCUf@y@vBuA|BoGtBuBuAiAQg@?i@j@w@TaBjEkFI{AAq_D",WA:"`wnFau~AedJ?@p_DHzAkEjFU`Bk@v@?h@Pf@tAhAuBtBm@xAtcC@tAfA~A\\nNDtGd@|DAlDnB~ObAbHtA|AJ`Bz@jBj@vBEpCp@|BKvAT`Ie@t@VTZjFl@fBt@xBTtGUfF|@b@S|@iBf@W~AWrQg@fHd@tCUv@FpA^xEtBbQvC`Di@fDAbFcAlBNzCW`Bm@`@[\\mAHmAKqAt@kAKyBb@eA\\{BtAcATkA|@sAtCwA|BYzBcAf@E~DNxBv@x@C|DgB|B}Bl@QvF^vBSVo@b@U|@HBRj@A`@b@rASTZ^?lAx@fBWvBqBn@GZAr@b@DRWH@Nh@GZP]wIBwHP}AQWu@n@NLs@lBNxCWtEoBLSq@_@WIq@_@VeAPy@j@Ke@pBs@F]bA]Am@mAs@?m@vB}CyBf@h@q@L{@Wo@cAScAIa@H[x@a@B}@a@~@GvAeAvB{@VJ@XlADn@_@Jh@e@XRJfBWHM|Bm@NcCx@yCEY]Yi@VLj@i@d@I^[AiAVKe@`@e@p@NSy@sMgC\\K`@Fl@QbDBJGcAOtDGJSK]\\e@pD]j@LPVUj@?bAYh@e@B@V~@W\\L?Np@FKgFv@aHtAmETWj@Al@yAu@HTOdAK|@}GB}AvByGVkBn@Oz@w@JeAtBi@r@gArAIv@aAbAeDj@gDIq@zAkCeAk@Ui@`@aAa@MMU@i@k@eARGAQd@Ix@e@V]C_@}@EuBN{@`@]Qc@H_JvCmE~@gCDiFtAU^cBl@}CTcEFUJwAIy@NqDWsBZORaBJaA_@w@^e@BiCQ}@D~ALELw@L}IDm@MsCmBsAMhB~@aBDm@h@s@Rm@`AHp@]\\aAJPoAMYoCEOp@_AL{@`AGf@f@P?Le@AYU_@y@fByA@u@k@c@yB_@q@?g@n@dAZLf@kCpDcAh@ShAsBrB~ALNP^x@rBrB|@dDd@Vv@E@Uy@eDJcCTXHjA`@RNkAPKT`@A\\u@|Al@Zp@xA`@\\Jl@~@\\|ChCvApCjBtArAxD}@^oBGqIcBcCiAx@GvExAvCn@nA?j@o@E[_BgBoAcCsCsCwCcAuCi@cAa@{@sCeEaEk@Sa@DGn@i@D?iArAqDiDnAc@pCg@x@Z^y@VMd@\\f@tCELt@|@h@nBqAPDEV{@p@gAzEp@Pt@k@jAoB\\x@Mr@eBf@tA`BgB_@yCmAe@lBs@N~A~Fc@h@`@n@|@Tq@dAG^Vh@vDo@p@YsB}CHq@Nd@XPbAXjAp@t@rBy@~Ar@f@Mh@z@d@r@_A^{A?m@e@MWcALaBf@g@I[Z\\r@dCrCjAz@vC\\h@r@^xCd@T^kA[e@?GZTNlART^{EgBu@{@WF`BnC|@d@m@Bk@Qe@a@Um@Of@Nh@a@`Aq@P\\gAWSHiA_BeAId@V^y@MSIGo@e@Nq@z@iA`@[j@gA]cAo@_DaDeAkC@iAqEdBaA_@v@_@Ke@}@c@gBYUSEcArAeBDmBb@o@h@kBe@e@WC_AbAKiAd@q@jBc@^c@]MaAiBL_Ab@s@Cg@k@qAy@a@Ya@g@iCuAq@eAKy@[Ku@]W^WZ?^VjE_Cj@aAFgCRk@vBk@NDBz@h@RB\\U`As@j@_Bh@gA|Ax@Kx@w@fDsAf@a@l@aB@kBoDU_@By@n@WIBg@_@i@Tm@xDoBlB]`AeA?M]ULKp@G~@v@|@Jt@SP_@g@q@Jc@fAYEW{@AmAa@gBrB?u@YGkBfAq@CQ]ZuBj@y@dBu@g@Gk@JqBv@g@MOe@b@sAdAg@RsAj@Ms@}ARa@h@YxAUd@JzAfBRF`@[DUg@i@NYjAo@PXAmA~B}A?m@k@i@Xc@`B@Ja@YSiCDh@cA;l~mFqu|AWr@nAzAX[dAPJIPwATe@\\QrAh@h@KpAaAXg@Aa@b@c@H]]mBLo@^QxAVp@y@dBs@Vo@Ig@{DmGs@?eAa@a@p@Af@{BdABv@v@X~Au@\\Pb@~@Zi@RjA\\NrBN[XsBEoBd@]`@k@dCWnEUT[KWm@Xk@@k@SWkBjA}ChA]^Ml@",NM:"rerEca}@xC??d[~r@??qaJ{xJ?Af^rA?n@bxGv_FBiAbFq@|@NLMV_Bn@}ArA~dBO",CO:"j~sEoaoActL?W~xF|tL?A_yF"};
+  var NAME = { CA: "California", NV: "Nevada", OR: "Oregon", AZ: "Arizona", UT: "Utah", ID: "Idaho", WA: "Washington", NM: "New Mexico", CO: "Colorado" };
+  var NICK = { CA: "The Golden State", NV: "The Silver State", OR: "The Beaver State", AZ: "The Grand Canyon State", UT: "The Beehive State", ID: "The Gem State", WA: "The Evergreen State", NM: "Land of Enchantment", CO: "The Centennial State" };
+  var V = '<svg viewBox="0 0 60 40" width="60" height="40" style="display:block">';
+  var FLAG = {
+    CA: V + '<rect width="60" height="40" fill="#fff"/><rect y="33" width="60" height="7" fill="#b3262d"/><polygon points="9,3 10.6,7.6 15.5,7.7 11.6,10.6 13,15.3 9,12.5 5,15.3 6.4,10.6 2.5,7.7 7.4,7.6" fill="#b3262d"/><ellipse cx="33" cy="22" rx="14" ry="6.5" fill="#7a4a21"/><circle cx="46" cy="17" r="4.5" fill="#7a4a21"/><rect x="22" y="25" width="3" height="5" fill="#7a4a21"/><rect x="38" y="25" width="3" height="5" fill="#7a4a21"/><rect x="14" y="29" width="34" height="2.5" fill="#3f8f4a"/></svg>',
+    NV: V + '<rect width="60" height="40" fill="#1f4aa8"/><polygon points="12,4 14.4,10.6 21.4,10.9 15.9,15.2 17.8,22 12,18 6.2,22 8.1,15.2 2.6,10.9 9.6,10.6" fill="#e6e9ee"/><path d="M3 26 Q12 31 21 26" stroke="#2f8f4f" stroke-width="2.2" fill="none"/><rect x="5" y="28" width="30" height="6" rx="2" fill="#f2c230"/><text x="20" y="33" font-size="4.6" font-weight="700" text-anchor="middle" fill="#1f4aa8" font-family="sans-serif">BATTLE BORN</text></svg>',
+    OR: V + '<rect width="60" height="40" fill="#0d3a73"/><circle cx="30" cy="20" r="12" fill="#f2c230"/><circle cx="30" cy="20" r="9" fill="#0d3a73"/><path d="M23 24 L30 14 L37 24Z" fill="#2f8f4f"/><rect x="21" y="25" width="18" height="2" fill="#f2c230"/></svg>',
+    AZ: V + '<rect width="60" height="20" fill="#c8302b"/><g stroke="#f2c230" stroke-width="2"><path d="M30 20 L2 0M30 20 L12 0M30 20 L22 0M30 20 L38 0M30 20 L48 0M30 20 L58 0"/></g><rect y="20" width="60" height="20" fill="#1f4aa8"/><polygon points="30,13 32,19 38,19 33,23 35,29 30,25 25,29 27,23 22,19 28,19" fill="#c9742b"/></svg>',
+    UT: V + '<rect width="60" height="40" fill="#1f3f8a"/><circle cx="30" cy="20" r="13" fill="#f2c230"/><circle cx="30" cy="20" r="10.5" fill="#1f3f8a"/><path d="M24 27 Q24 15 30 13 Q36 15 36 27Z" fill="#f2c230"/><path d="M25 21h10M25.5 24h9" stroke="#1f3f8a" stroke-width="1"/></svg>',
+    ID: V + '<rect width="60" height="40" fill="#1f4aa8"/><circle cx="30" cy="20" r="13" fill="#f2c230"/><circle cx="30" cy="20" r="10.5" fill="#6fa8dc"/><path d="M20 28 L27 15 L31 22 L35 17 L41 28Z" fill="#2f8f4f"/></svg>',
+    WA: V + '<rect width="60" height="40" fill="#1b5e3b"/><circle cx="30" cy="20" r="13" fill="#f2c230"/><circle cx="30" cy="20" r="10" fill="#1d3a6b"/><circle cx="30" cy="20" r="4" fill="#f2c230"/></svg>',
+    NM: V + '<rect width="60" height="40" fill="#f6d33c"/><circle cx="30" cy="20" r="4.5" fill="none" stroke="#c8302b" stroke-width="1.6"/><g stroke="#c8302b" stroke-width="1.6" stroke-linecap="round"><path d="M30 9v7M27 10v5M33 10v5M30 31v-7M27 30v-5M33 30v-5M19 20h7M20 17h5M20 23h5M41 20h-7M40 17h-5M40 23h-5"/></g></svg>',
+    CO: V + '<rect width="60" height="40" fill="#1f3f8a"/><rect y="13" width="60" height="14" fill="#fff"/><path d="M38 14.5A8 8 0 1 0 38 25.5" stroke="#c8302b" stroke-width="4" fill="none"/><circle cx="30" cy="20" r="3.4" fill="#f2c230"/></svg>'
+  };
+  var S = {};
+  function dec(s) {
+    var i = 0, x = 0, y = 0, o = [], r, sh, b;
+    while (i < s.length) {
+      r = 0; sh = 0; do { b = s.charCodeAt(i++) - 63; r |= (b & 31) << sh; sh += 5; } while (b >= 32);
+      x += (r & 1) ? ~(r >> 1) : (r >> 1);
+      r = 0; sh = 0; do { b = s.charCodeAt(i++) - 63; r |= (b & 31) << sh; sh += 5; } while (b >= 32);
+      y += (r & 1) ? ~(r >> 1) : (r >> 1);
+      o.push([x / 1e3, y / 1e3]);
+    }
+    return o;
+  }
+  Object.keys(RAW).forEach(function (k) {
+    S[k] = RAW[k].split(";").map(function (s) {
+      var r = dec(s), b = [180, 90, -180, -90];
+      r.forEach(function (p) { if (p[0] < b[0]) b[0] = p[0]; if (p[1] < b[1]) b[1] = p[1]; if (p[0] > b[2]) b[2] = p[0]; if (p[1] > b[3]) b[3] = p[1]; });
+      return { r: r, b: b };
+    });
+  });
+  function inR(r, x, y) {
+    var c = false;
+    for (var i = 0, j = r.length - 1; i < r.length; j = i++) {
+      var a = r[i], b = r[j];
+      if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) c = !c;
+    }
+    return c;
+  }
+  function at(x, y) {
+    for (var k in S) for (var i = 0; i < S[k].length; i++) {
+      var q = S[k][i];
+      if (x < q.b[0] || x > q.b[2] || y < q.b[1] || y > q.b[3]) continue;
+      if (inR(q.r, x, y)) return k;
+    }
+    return null;
+  }
+  function ahead(la, lo, h, d) {
+    var t = h * Math.PI / 180;
+    return [lo + Math.sin(t) * d / (69.17 * Math.cos(la * Math.PI / 180)), la + Math.cos(t) * d / 69];
+  }
+  /* first state (not the current one) along the heading within 8 miles: [state, miles] or null */
+  function find(la, lo, h, cur) {
+    for (var d = 0.1; d <= 8.01; d += 0.1) {
+      var p = ahead(la, lo, h, d), s = at(p[0], p[1]);
+      if (s && s !== cur) {
+        var a = d - 0.1, b = d;
+        for (var n = 0; n < 6; n++) { var m = (a + b) / 2, q = ahead(la, lo, h, m); if (at(q[0], q[1]) === s) b = m; else a = m; }
+        return [s, b];
+      }
+    }
+    return null;
+  }
+  var st = D.createElement("style");
+  st.textContent = "#vdBan{position:fixed;left:10px;right:10px;top:58px;z-index:9000;display:none;gap:12px;align-items:center;background:rgba(20,28,38,.96);border:1px solid #3a4658;border-radius:16px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.5);font-family:-apple-system,sans-serif;transition:opacity .35s,transform .35s;opacity:0;transform:translateY(-14px)}#vdBan.on{opacity:1;transform:none}#vdBan .fl{flex:none;border:1px solid #5a6676;line-height:0}#vdBan .tx{flex:1;min-width:0}#vdBan .t1{font-size:22px;font-weight:700;color:#e8eef5;line-height:1.1}#vdBan .t2{font-size:13px;white-space:nowrap;color:#cfd8e3;margin-top:2px;line-height:1.15}#vdBan .t3{font-size:12px;color:#9fb0c3;margin-top:2px}#vdBan .cm{flex:none;width:46px;height:46px;border-radius:50%;background:#ff8a2b;display:flex;align-items:center;justify-content:center;border:0;padding:0}";
+  D.head.appendChild(st);
+  var B = D.createElement("div"); B.id = "vdBan";
+  B.innerHTML = '<div class="fl"></div><div class="tx"><div class="t1"></div><div class="t2"></div><div class="t3"></div></div><button class="cm" aria-label="Take photo"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#10151c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></button>';
+  D.body.appendChild(B);
+  var q = function (c) { return B.querySelector(c); }, shown = null, hideT = 0, wel = 0, dis = null, miss = 0, vis = false;
+  function show(s, t1, t2) {
+    if (shown !== s + t1.length) { q(".fl").innerHTML = FLAG[s]; shown = s + t1.length; }
+    q(".t1").textContent = t1; q(".t2").textContent = t2; q(".t3").textContent = NICK[s];
+    if (!vis) { vis = true; B.style.display = "flex"; void B.offsetWidth; B.classList.add("on"); }
+  }
+  function hide() {
+    if (!vis) return; vis = false; shown = null; B.classList.remove("on");
+    setTimeout(function () { if (!vis) B.style.display = "none"; }, 400);
+  }
+  B.addEventListener("click", function (e) {
+    if (e.target.closest(".cm")) { var c = D.getElementById("vCam"); if (c) c.click(); return; }
+    dis = B.getAttribute("data-s"); hide();
+  });
+  var prev, prevT = 0, cur = null;
+  W.__vdBan = function (la, lo, h, mph, t) {
+    var s = at(lo, la), fresh = prevT && t - prevT < 20000;
+    if (!s && fresh && cur) s = cur;
+    if (s && cur !== s && prev !== undefined && fresh && cur !== undefined) {
+      wel = t + 12000; B.setAttribute("data-s", s); dis = null;
+      show(s, "Welcome to " + NAME[s], "You're in " + NAME[s] + " now");
+    }
+    if (prev === undefined || s || !fresh) prev = s;
+    cur = s; prevT = t;
+    if (wel) { if (t < wel) return; wel = 0; hide(); }
+    if (h == null || !(mph > 5)) return;
+    var f = find(la, lo, h, s);
+    if (f) {
+      miss = 0;
+      if (dis === f[0]) return;
+      if (dis && dis !== f[0]) dis = null;
+      B.setAttribute("data-s", f[0]);
+      show(f[0], NAME[f[0]], "State line in approx. " + Math.max(0.1, f[1]).toFixed(1) + " miles");
+    } else if (++miss >= 3) { miss = 0; dis = null; hide(); }
+  };
+  if (navigator.geolocation) navigator.geolocation.watchPosition(function (p) {
+    var c = p.coords, mph = c.speed != null && c.speed >= 0 ? c.speed * 2.23694 : 0;
+    try { W.__vdBan(c.latitude, c.longitude, c.heading != null && !isNaN(c.heading) ? c.heading : null, mph, Date.now()); } catch (e) {}
+  }, function () {}, { enableHighAccuracy: true, maximumAge: 1000 });
+})();
+(function () { /* r359: battery card on one line with fixed widths; Spotify card controls spaced out */
+  var D = document, s = D.createElement("style"), P = "html:not(.camp) .battcard", Q = "html:not(.camp) #vdSpCard";
+  s.textContent =
+    P + "{grid-template-columns:20px 50px minmax(0,1fr) 50px 58px auto!important;column-gap:5px!important;grid-template-rows:auto auto!important}" +
+    P + ">div:first-child{grid-column:1/6!important;grid-row:1!important}" +
+    P + " .bsoc{display:contents!important}" +
+    P + " #bIco{grid-column:1;grid-row:2;width:20px!important;height:20px!important}" +
+    P + " #bSoc{grid-column:2;grid-row:2;width:50px!important;min-width:0!important;text-align:left!important;font-size:14px!important;white-space:nowrap}" +
+    P + " .socbar{grid-column:3!important;grid-row:2;min-width:0!important}" +
+    P + " .bamp{grid-column:4!important;grid-row:2!important;width:50px!important;justify-self:stretch!important;justify-content:flex-end;gap:1px!important}" +
+    P + " .bpow{grid-column:5!important;grid-row:2!important;width:58px!important;justify-self:stretch!important;justify-content:flex-end;gap:1px!important}" +
+    P + " #vdTk{grid-column:6!important;grid-row:1/3!important;margin-right:-3.5px}" +
+    P + " .bamp .v," + P + " .bpow .v{font-size:14px!important;font-variant-numeric:tabular-nums;text-align:right}" +
+    P + " .bamp svg," + P + " .bpow svg{width:12px!important;height:12px!important}" +
+    P + " .bamp .u," + P + " .bpow .u{font-size:8px!important;margin-left:0!important}" +
+    Q + ">div:last-child{justify-content:space-between!important;gap:0!important;padding:0 2px!important}" +
+    Q + " button{padding:0!important;min-width:0!important;flex:none!important;width:30px!important}" +
+    Q + " #vdSpP," + Q + " #vdSpN{width:22px!important}" +
+    Q + " #vdSpP svg," + Q + " #vdSpN svg{width:22px!important;height:22px!important}" +
+    Q + " #vdSpY{width:38px!important}" + Q + " #vdSpY svg{width:38px!important;height:38px!important}" +
+    "#vdSpCard #vdSpB span,#vdSpCard #vdSpF span{display:none!important}" +
+    "#vdSpCard #vdSpB svg,#vdSpCard #vdSpF svg{width:27px!important;height:27px!important}";
+  D.head.appendChild(s);
+  ["vdSpB", "vdSpF"].forEach(function (i) {
+    var v = D.querySelector("#" + i + " svg");
+    if (v && !v.querySelector("text")) v.insertAdjacentHTML("beforeend", '<text x="12" y="15.3" text-anchor="middle" font-size="7.4" font-weight="700" fill="#ff8a2b" stroke="none" font-family="-apple-system,sans-serif">15</text>');
+  });
+  var a = D.getElementById("bAmps"), bz = false;
+  function rd() {
+    if (bz || !a) return;
+    var n = parseFloat(a.textContent); if (isNaN(n)) return;
+    var t = String(Math.round(n)); if (a.textContent !== t) { bz = true; a.textContent = t; bz = false; }
+  }
+  if (a) { new MutationObserver(rd).observe(a, { childList: true, characterData: true, subtree: true }); rd(); }
+})();
+</script>
