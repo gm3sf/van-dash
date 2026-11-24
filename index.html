@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 360 -->
+<!-- Van Dash rev 363 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r360</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r363</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -413,6 +413,20 @@
 </div>
 
 <script>
+(function () {
+  var g = navigator.geolocation, W = window; if (!g || W.__vdGeo) return;
+  var L = {}, n = 0; W.__vdGeo = 1; W.__vdRealAt = 0;
+  function wrap(ok) { return function (p) { W.__vdRealAt = Date.now(); if (W.__vdOnReal) { try { W.__vdOnReal(p); } catch (e) {} } ok(p); }; }
+  var S = {
+    watchPosition: function (ok, err, o) { var id = ++n; L[id] = { ok: ok, rid: g.watchPosition(wrap(ok), err || function () {}, o) }; return id; },
+    clearWatch: function (id) { var w = L[id]; if (w) { try { g.clearWatch(w.rid); } catch (e) {} delete L[id]; } },
+    getCurrentPosition: function (ok, err, o) {
+      g.getCurrentPosition(function (p) { W.__vdRealAt = Date.now(); ok(p); }, function (e) { if (W.__vdPhone) ok(W.__vdPhone); else if (err) err(e); }, o);
+    }
+  };
+  W.__vdFeed = function (p) { if (Date.now() - W.__vdRealAt < 20000) return; Object.keys(L).forEach(function (k) { try { L[k].ok(p); } catch (e) {} }); };
+  try { Object.defineProperty(navigator, "geolocation", { value: S, configurable: true }); } catch (e) {}
+})();
 const $ = id => document.getElementById(id);
 const MS_TO_MPH = 2.23694, M_TO_FT = 3.28084, M_TO_MI = 0.000621371;
 const WX_CODES = {0:"Clear",1:"Mostly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Freezing fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",56:"Freezing drizzle",57:"Freezing drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Freezing rain",71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",80:"Rain showers",81:"Rain showers",82:"Violent showers",85:"Snow showers",86:"Heavy snow showers",95:"Thunderstorm",96:"Thunderstorm, hail",99:"Thunderstorm, hail"};
@@ -1013,24 +1027,7 @@ window.addEventListener("orientationchange", () => setTimeout(vResize, 300));
 vResize();
 setTimeout(vResize, 500);
 
-async function keepAwake() {
-  try { if ("wakeLock" in navigator) await navigator.wakeLock.request("screen"); } catch (e) {}
-}
-keepAwake();
-document.addEventListener("visibilitychange", () => { if (!document.hidden) keepAwake(); });
-
-async function checkForUpdate() {
-  try {
-    const res = await fetch(location.pathname + "?v=" + Date.now(), { cache: "no-store" });
-    if (!res.ok) return;
-    const html = await res.text();
-    const m = html.match(/<!-- Van Dash rev (\d+) -->/);
-    const mine = document.documentElement.innerHTML.match(/<!-- Van Dash rev (\d+) -->/);
-    if (m && mine && m[1] !== mine[1]) location.replace(location.pathname + "?v=" + Date.now());
-  } catch (e) {}
-}
-checkForUpdate();
-document.addEventListener("visibilitychange", () => { if (!document.hidden) checkForUpdate(); });
+/* keepAwake and checkForUpdate moved to PART 9 (rev 363) */
 /* ===== Part 2: speed limit + weather favorites ===== */
 
 /* ---------- Speed limit sign ---------- */
@@ -5349,7 +5346,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 360): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 363): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6175,7 +6172,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 360): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 363): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -7781,7 +7778,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
 </body>
 </html>
 <script>
-/* ===== PART 9 (rev 360): square Spotify art; play never moves to a device that is not this phone ===== */
+/* ===== PART 9 (rev 362): square Spotify art; play never moves to a device that is not this phone ===== */
 (function () {
   var W = window, D = document, ua = navigator.userAgent, kd = /iPhone|iPad|Macintosh/.test(ua), o = W.vdDev, st = D.createElement("style");
   st.textContent = "html:not(.camp) #vdSpArt,html:not(.camp) #spArt,html.camp #spArt,html.camp #vdSpArt{border-radius:0!important}";
@@ -7914,18 +7911,18 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
 (function () { /* r359: battery card on one line with fixed widths; Spotify card controls spaced out */
   var D = document, s = D.createElement("style"), P = "html:not(.camp) .battcard", Q = "html:not(.camp) #vdSpCard";
   s.textContent =
-    P + "{grid-template-columns:20px 50px minmax(0,1fr) 50px 58px auto!important;column-gap:5px!important;grid-template-rows:auto auto!important}" +
+    P + "{grid-template-columns:20px 66px minmax(0,1fr) 72px 90px 79px!important;column-gap:5px!important;grid-template-rows:auto auto!important}" +
     P + ">div:first-child{grid-column:1/6!important;grid-row:1!important}" +
     P + " .bsoc{display:contents!important}" +
     P + " #bIco{grid-column:1;grid-row:2;width:20px!important;height:20px!important}" +
-    P + " #bSoc{grid-column:2;grid-row:2;width:50px!important;min-width:0!important;text-align:left!important;font-size:14px!important;white-space:nowrap}" +
+    P + " #bSoc{grid-column:2;grid-row:2;width:66px!important;min-width:0!important;text-align:left!important;font-size:18px!important;white-space:nowrap}" +
     P + " .socbar{grid-column:3!important;grid-row:2;min-width:0!important}" +
-    P + " .bamp{grid-column:4!important;grid-row:2!important;width:50px!important;justify-self:stretch!important;justify-content:flex-end;gap:1px!important}" +
-    P + " .bpow{grid-column:5!important;grid-row:2!important;width:58px!important;justify-self:stretch!important;justify-content:flex-end;gap:1px!important}" +
-    P + " #vdTk{grid-column:6!important;grid-row:1/3!important;margin-right:-3.5px}" +
-    P + " .bamp .v," + P + " .bpow .v{font-size:14px!important;font-variant-numeric:tabular-nums;text-align:right}" +
-    P + " .bamp svg," + P + " .bpow svg{width:12px!important;height:12px!important}" +
-    P + " .bamp .u," + P + " .bpow .u{font-size:8px!important;margin-left:0!important}" +
+    P + " .bamp{grid-column:4!important;grid-row:2!important;width:72px!important;justify-self:stretch!important;justify-content:flex-end;gap:1px!important}" +
+    P + " .bpow{grid-column:5!important;grid-row:2!important;width:90px!important;justify-self:stretch!important;justify-content:flex-end;gap:1px!important}" +
+    P + " #vdTk{grid-column:6!important;grid-row:1/3!important;margin-right:-3.5px;width:79px;box-sizing:border-box}" +
+    P + " .bamp .v," + P + " .bpow .v{font-size:18px!important;font-variant-numeric:tabular-nums;text-align:right}" +
+    P + " .bamp svg," + P + " .bpow svg{width:16px!important;height:16px!important}" +
+    P + " .bamp .u," + P + " .bpow .u{font-size:12px!important;margin-left:0!important}" +
     Q + ">div:last-child{justify-content:space-between!important;gap:0!important;padding:0 2px!important}" +
     Q + " button{padding:0!important;min-width:0!important;flex:none!important;width:30px!important}" +
     Q + " #vdSpP," + Q + " #vdSpN{width:22px!important}" +
@@ -7946,4 +7943,88 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   }
   if (a) { new MutationObserver(rd).observe(a, { childList: true, characterData: true, subtree: true }); rd(); }
 })();
+/* rev 363: the iPad borrows the iPhone's location over the internet (ntfy.sh, private pairing code) */
+(function () {
+  var W = window, D = document, LS = localStorage, phone = /iPhone/.test(navigator.userAgent);
+  var last = null, pubAt = 0, pubLa = null, pubLo = null, es = null, code = "";
+  function ls(k, v) { try { if (v === undefined) return LS.getItem(k) || ""; LS.setItem(k, v); } catch (e) { return ""; } }
+  code = ls("vdPair");
+  if (phone && !code) {
+    var al = "abcdefghjkmnpqrstuvwxyz23456789", r = new Uint8Array(10);
+    try { crypto.getRandomValues(r); } catch (e) { for (var q = 0; q < 10; q++) r[q] = Math.random() * 255; }
+    for (var q2 = 0; q2 < 10; q2++) code += al[r[q2] % al.length];
+    ls("vdPair", code);
+  }
+  var tag = D.createElement("div"); tag.id = "vdPhLoc";
+  tag.style.cssText = "position:fixed;left:6px;bottom:0;z-index:5;padding:6px 6px 4px;font:600 11px -apple-system,sans-serif;color:rgba(255,255,255,.6);display:none";
+  D.body.appendChild(tag);
+  function url() { return "https://ntfy.sh/vd" + code; }
+  function shut() { if (es) { es.close(); es = null; } }
+  function label() {
+    if (phone) { tag.style.display = ls("vdPairHide") ? "none" : "block"; tag.textContent = "iPad pairing code: " + code + "  (tap to hide)"; return; }
+    var real = Date.now() - W.__vdRealAt < 20000;
+    if (real) { tag.style.display = "none"; return; }
+    var age = last ? Date.now() - last.t : 0;
+    tag.style.display = "block";
+    tag.textContent = !code ? "Tap here to pair with your phone's location" : !last ? "Waiting for phone location (tap to change code)" : "Location from phone" + (age > 90000 ? " (" + Math.round(age / 60000) + " min old)" : "");
+  }
+  tag.onclick = function () {
+    if (phone) { ls("vdPairHide", "1"); label(); return; }
+    var c = prompt("Type the pairing code shown at the bottom left of Van Dash on your phone:", code);
+    if (c === null) return;
+    c = c.toLowerCase().replace(/[^a-z0-9]/g, ""); if (!c) return;
+    code = c; ls("vdPair", c); last = null; shut(); label();
+  };
+  function feed() {
+    if (!last) return;
+    var age = Date.now() - last.t;
+    var p = { coords: { latitude: last.la, longitude: last.lo, accuracy: last.ac || 30, altitude: last.al, altitudeAccuracy: null, heading: last.hd, speed: age > 60000 ? 0 : last.sp }, timestamp: Date.now() };
+    W.__vdPhone = p; label();
+    if (W.__vdFeed) W.__vdFeed(p);
+  }
+  W.__vdOnReal = function (p) {
+    if (!phone || !code) return;
+    var now = Date.now(), c = p.coords;
+    var moved = pubLa == null ? 1e9 : Math.abs(c.latitude - pubLa) * 111000 + Math.abs(c.longitude - pubLo) * 85000;
+    if (now - pubAt < 8000 || (moved < 25 && now - pubAt < 60000)) return;
+    pubAt = now; pubLa = c.latitude; pubLo = c.longitude;
+    try { fetch(url(), { method: "POST", body: JSON.stringify({ la: c.latitude, lo: c.longitude, ac: c.accuracy, sp: c.speed, hd: c.heading, al: c.altitude, t: now }) }).catch(function () {}); } catch (e) {}
+  };
+  function open() {
+    if (es || !code) return;
+    try { es = new EventSource(url() + "/sse?since=latest"); } catch (e) { return; }
+    es.onmessage = function (ev) {
+      try { var m = JSON.parse(ev.data), d = JSON.parse(m.message); if (d && d.la != null) { last = d; feed(); } } catch (e) {}
+    };
+  }
+  setInterval(function () {
+    if (D.hidden) return;
+    if (!phone && code && Date.now() - W.__vdRealAt > 15000) open();
+    label();
+  }, 4000);
+  setInterval(function () { if (!phone) feed(); }, 10000);
+  label();
+})();
+
+
+
+/* moved here from Part 1 in rev 362 */
+async function keepAwake() {
+  try { if ("wakeLock" in navigator) await navigator.wakeLock.request("screen"); } catch (e) {}
+}
+keepAwake();
+document.addEventListener("visibilitychange", () => { if (!document.hidden) keepAwake(); });
+
+async function checkForUpdate() {
+  try {
+    const res = await fetch(location.pathname + "?v=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) return;
+    const html = await res.text();
+    const m = html.match(/<!-- Van Dash rev (\d+) -->/);
+    const mine = document.documentElement.innerHTML.match(/<!-- Van Dash rev (\d+) -->/);
+    if (m && mine && m[1] !== mine[1]) location.replace(location.pathname + "?v=" + Date.now());
+  } catch (e) {}
+}
+checkForUpdate();
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkForUpdate(); });
 </script>
