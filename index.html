@@ -408,7 +408,7 @@
     <div class="stat"><div class="label">Rain today</div><div class="v" id="wRain">--</div></div>
   </div>
 
-  <div class="section-title">10-day forecast</div>
+  <div class="section-title">9-day forecast</div>
   <div id="forecast"></div>
 </div>
 
@@ -8029,7 +8029,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
 (function () {
   var D = document, s = D.createElement("style");
   s.textContent = "html.camp #weatherScreen #forecast{max-height:none!important;overflow:visible!important}" +
-    "html.camp #weatherScreen #forecast .day:nth-child(n+8){display:none!important}" +
+    "html.camp #weatherScreen #forecast .day:nth-child(n+10){display:none!important}html.camp #cSunT .sr:nth-child(n+7){display:none!important}" +
     "html.camp #cSunT .sr{flex:none!important;height:var(--vdRowH,32px)!important;box-sizing:border-box!important;padding:0!important;font-size:14px!important}" +
     "html.camp #cSunT .mn{font-size:14px!important}html.camp #cSunT .mn span{font-size:20px!important}" +
     "html.camp #spotScreen>.card:not(#vdPlW){padding-top:24px!important}" +
@@ -8050,16 +8050,16 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   NW.prototype = OW.prototype; ["CONNECTING", "OPEN", "CLOSING", "CLOSED"].forEach(function (k) { NW[k] = OW[k]; }); W.WebSocket = NW;
   var st = D.createElement("style");
   st.textContent = "html:not(.camp) .vdXp{display:none!important}" +
-    "html.camp #bgDial .bgb{justify-content:space-between;gap:0!important;height:126px;max-height:126px}" +
-    "html.camp #bgDial .bgx{flex:none;height:28px;min-height:0;padding:0 10px 0 12px;gap:6px;overflow:hidden}" +
+    "html.camp .vdXp{display:none!important}html.camp #bgDial .bgb{justify-content:space-between;gap:10px!important;height:126px;max-height:126px}" +
+    "html.camp #bgDial .bgx{flex:none;height:58px;min-height:0;padding:0 10px 0 12px;gap:6px;overflow:hidden}" +
     "html.camp #bgDial .bgx svg{width:20px;height:20px;flex:0 0 20px;margin:0}" +
-    "html.camp #bgDial .bgx span{flex:none;text-align:left;font-size:19px}" +
-    "html.camp #bgDial .bgx i{flex:none;font-size:12px;margin-right:6px}" +
+    "html.camp #bgDial .bgx span{flex:none;text-align:left;font-size:26px}" +
+    "html.camp #bgDial .bgx i{flex:none;font-size:14px;margin-right:6px}" +
     "html.camp #bgDial .vdXp span{font-size:15px}html.camp #bgDial .vdXp i{font-size:11px;margin-right:3px}" +
     "html.camp .tankcard .tk .b{height:10px!important;border-radius:5px!important;background:#2b3542!important;box-shadow:none!important}" +
     "html.camp .tankcard .tk .b::after{display:none!important}" +
     "html.camp .tankcard .tk .b i{border-radius:5px!important;background-image:none!important;box-shadow:none!important}" +
-    "html.camp #bgP span{font-size:.5em!important;margin-left:1px!important}html.camp #bgDial .bgc{top:63%!important}#vdHeads.vdXh{display:none!important}";
+    "html.camp #bgP span{font-size:.5em!important;margin-left:1px!important}html.camp #bgDial .bgc{top:59%!important;transform:translate(3px,-50%)!important}#vdHeads.vdXh{display:none!important}";
   D.head.appendChild(st);
   /* ---- solar (gross) and loads ---- */
   var SUN = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>';
@@ -8125,7 +8125,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   setInterval(function () {
     if (D.hidden) return;
     if (lastAt && Date.now() - lastAt > 40000) reconnect();
-    if (camp() && gx.got) { loads(); sconn(); }
+    if (camp() && gx.got) { loads(); }
   }, 4000);
   D.addEventListener("visibilitychange", function () { if (!D.hidden && lastAt && Date.now() - lastAt > 8000) reconnect(); });
   var bc = D.querySelector(".battcard");
