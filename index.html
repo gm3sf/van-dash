@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 363 -->
+<!-- Van Dash rev 366 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r363</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r366</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1027,7 +1027,7 @@ window.addEventListener("orientationchange", () => setTimeout(vResize, 300));
 vResize();
 setTimeout(vResize, 500);
 
-/* keepAwake and checkForUpdate moved to PART 9 (rev 363) */
+/* keepAwake and checkForUpdate moved to PART 9 (rev 366) */
 /* ===== Part 2: speed limit + weather favorites ===== */
 
 /* ---------- Speed limit sign ---------- */
@@ -5346,7 +5346,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 363): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 366): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6172,7 +6172,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 363): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 366): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -7949,6 +7949,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
   var last = null, pubAt = 0, pubLa = null, pubLo = null, es = null, code = "";
   function ls(k, v) { try { if (v === undefined) return LS.getItem(k) || ""; LS.setItem(k, v); } catch (e) { return ""; } }
   code = ls("vdPair");
+  if (/[?&]pair/.test(location.search)) ls("vdPairHide2", "");
   if (phone && !code) {
     var al = "abcdefghjkmnpqrstuvwxyz23456789", r = new Uint8Array(10);
     try { crypto.getRandomValues(r); } catch (e) { for (var q = 0; q < 10; q++) r[q] = Math.random() * 255; }
@@ -7956,25 +7957,32 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     ls("vdPair", code);
   }
   var tag = D.createElement("div"); tag.id = "vdPhLoc";
-  tag.style.cssText = "position:fixed;left:6px;bottom:0;z-index:5;padding:6px 6px 4px;font:600 11px -apple-system,sans-serif;color:rgba(255,255,255,.6);display:none";
+  tag.style.cssText = "position:fixed;left:8px;bottom:8px;z-index:5;padding:8px 12px;border-radius:10px;background:rgba(0,0,0,.78);border:1px solid #ff8a2b;font:700 17px -apple-system,sans-serif;color:#ff8a2b;display:none";
   D.body.appendChild(tag);
   function url() { return "https://ntfy.sh/vd" + code; }
   function shut() { if (es) { es.close(); es = null; } }
   function label() {
-    if (phone) { tag.style.display = ls("vdPairHide") ? "none" : "block"; tag.textContent = "iPad pairing code: " + code + "  (tap to hide)"; return; }
+    if (phone) { tag.style.display = ls("vdPairHide2") ? "none" : "block"; tag.style.font = "700 13px -apple-system,sans-serif"; tag.style.padding = "6px 10px"; tag.innerHTML = 'iPad code &#8250;<span id="vdPhX" style="margin-left:10px;padding:2px 6px;color:#fff">✕</span>'; return; }
     var real = Date.now() - W.__vdRealAt < 20000;
     if (real) { tag.style.display = "none"; return; }
     var age = last ? Date.now() - last.t : 0;
+    tag.style.font = "600 13px -apple-system,sans-serif"; tag.style.padding = "5px 10px";
     tag.style.display = "block";
     tag.textContent = !code ? "Tap here to pair with your phone's location" : !last ? "Waiting for phone location (tap to change code)" : "Location from phone" + (age > 90000 ? " (" + Math.round(age / 60000) + " min old)" : "");
   }
-  tag.onclick = function () {
-    if (phone) { ls("vdPairHide", "1"); label(); return; }
+  tag.onclick = function (e) {
+    if (phone) { if (e.target.id === "vdPhX") { ls("vdPairHide2", "1"); label(); } else showCode(); return; }
     var c = prompt("Type the pairing code shown at the bottom left of Van Dash on your phone:", code);
     if (c === null) return;
     c = c.toLowerCase().replace(/[^a-z0-9]/g, ""); if (!c) return;
     code = c; ls("vdPair", c); last = null; shut(); label();
   };
+  function showCode() {
+    var o = D.createElement("div");
+    o.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:#0b0f14;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:-apple-system,sans-serif";
+    o.innerHTML = '<div style="color:#ff8a2b;font-size:20px;font-weight:700;margin-bottom:22px">iPad pairing code</div><div style="font:700 40px ui-monospace,Menlo,monospace;letter-spacing:4px;-webkit-user-select:text;user-select:text">' + code.slice(0, 5) + " " + code.slice(5) + '</div><div style="color:#9fb0c3;font-size:16px;max-width:320px;margin:22px 0 30px">On the iPad, tap the message at the bottom left of Van Dash and type this code.</div><button style="font-size:18px;font-weight:700;color:#fff;background:#26303c;border:1px solid #ff8a2b;border-radius:12px;padding:12px 36px">Close</button>';
+    D.body.appendChild(o); o.querySelector("button").onclick = function () { o.remove(); };
+  }
   function feed() {
     if (!last) return;
     var age = Date.now() - last.t;
@@ -8008,6 +8016,14 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
 
 
 
+/* rev 366: camp (iPad) layout: Playlists card separated from the Spotify card, all three columns end on the same line */
+(function () {
+  var s = document.createElement("style");
+  s.textContent = "html.camp #spotScreen>.card:not(#vdPlW){margin-bottom:12px!important;border-radius:14px!important;border-bottom:1px solid #8a96a6!important}" +
+    "html.camp #spotScreen #vdPlW{border-radius:14px!important;margin:0!important}" +
+    "html.camp #spotScreen>div:last-child:not(.card){display:none!important}";
+  document.head.appendChild(s);
+})();
 /* moved here from Part 1 in rev 362 */
 async function keepAwake() {
   try { if ("wakeLock" in navigator) await navigator.wakeLock.request("screen"); } catch (e) {}
