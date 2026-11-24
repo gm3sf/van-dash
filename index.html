@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- Van Dash rev 366 -->
+<!-- Van Dash rev 368 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -318,7 +318,7 @@
     <div class="attr">&copy; OpenStreetMap</div>
   </div>
 
-  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r366</div>
+  <div style="text-align:center;font-size:10px;line-height:1;color:#5f7288;padding:2px 0 0">r368</div>
   <div id="status">Waiting for GPS...</div>
   
 </div>
@@ -1027,7 +1027,7 @@ window.addEventListener("orientationchange", () => setTimeout(vResize, 300));
 vResize();
 setTimeout(vResize, 500);
 
-/* keepAwake and checkForUpdate moved to PART 9 (rev 366) */
+/* keepAwake and checkForUpdate moved to PART 9 (rev 368) */
 /* ===== Part 2: speed limit + weather favorites ===== */
 
 /* ---------- Speed limit sign ---------- */
@@ -5346,7 +5346,7 @@ R.last = now; R.i = (R.i + 1) % R.frames.length; draw(); label();
   box.style.cursor = 'pointer';
   box.addEventListener('click', function (e) { e.stopPropagation(); open(); });
 })();
-/* ===== Part 6 (rev 366): 10-day forecast, device pick, song lists, speed limit fix ===== */
+/* ===== Part 6 (rev 368): 10-day forecast, device pick, song lists, speed limit fix ===== */
 (function () {
 const W = window, D = document, F = W.fetch, Q = i => D.getElementById(i);
 const M = ['ncep_nbm_conus', 'ecmwf_ifs', 'gfs_seamless'], K = ['temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max', 'weather_code'];
@@ -6172,7 +6172,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     });
   };
 })();
-/* ===== Part 7 (rev 366): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
+/* ===== Part 7 (rev 368): city name, GPS map heading, smooth big map, round speedometer on the big map ===== */
 (function () { /* rev 301: Overpass mirrors race (park lookup) + city name that prefers the real city */
   var W = window, bo = 0, S = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.openstreetmap.fr/api/interpreter'];
   W.__vdOv = function (q) {
@@ -7967,6 +7967,7 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     if (real) { tag.style.display = "none"; return; }
     var age = last ? Date.now() - last.t : 0;
     tag.style.font = "600 13px -apple-system,sans-serif"; tag.style.padding = "5px 10px";
+    if (code && last) { tag.style.display = "none"; return; }
     tag.style.display = "block";
     tag.textContent = !code ? "Tap here to pair with your phone's location" : !last ? "Waiting for phone location (tap to change code)" : "Location from phone" + (age > 90000 ? " (" + Math.round(age / 60000) + " min old)" : "");
   }
@@ -8023,6 +8024,23 @@ D.addEventListener('pointerup', end); D.addEventListener('pointercancel', end);
     "html.camp #spotScreen #vdPlW{border-radius:14px!important;margin:0!important}" +
     "html.camp #spotScreen>div:last-child:not(.card){display:none!important}";
   document.head.appendChild(s);
+})();
+/* rev 367: camp (iPad): all 10 forecast days shown, Sun & Moon rows as tight as the forecast rows, more room above the album art, no box inside the Playlists card */
+(function () {
+  var D = document, s = D.createElement("style");
+  s.textContent = "html.camp #weatherScreen #forecast{max-height:none!important;overflow:visible!important}" +
+    "html.camp #weatherScreen #forecast .day:nth-child(n+8){display:none!important}" +
+    "html.camp #cSunT .sr{flex:none!important;box-sizing:border-box!important;padding:0!important;font-size:14px!important}" +
+    "html.camp #cSunT .mn{font-size:14px!important}html.camp #cSunT .mn span{font-size:20px!important}" +
+    "html.camp #spotScreen>.card:not(#vdPlW){padding-top:24px!important}" +
+    "html.camp #spotScreen #plList{background:transparent!important;border:0!important;border-radius:0!important}";
+  D.head.appendChild(s);
+  setInterval(function () {
+    var f = D.getElementById("forecast"), t = D.getElementById("cSunT");
+    if (!f || !t || !f.children.length) return;
+    var h = f.children[0].offsetHeight; if (!h) return;
+    Array.prototype.forEach.call(t.children, function (e) { e.style.setProperty("height", h + "px", "important"); });
+  }, 700);
 })();
 /* moved here from Part 1 in rev 362 */
 async function keepAwake() {
