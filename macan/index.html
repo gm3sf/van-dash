@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Macan Dash rev 6 -->
+<!-- Macan Dash rev 7 -->
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#000000">
@@ -14,7 +14,7 @@
 :root{--red:#d5001c;--w:#f2f2f2;--g:#8b9098;--line:#1c1c1e;--line2:#2c2c2e;--bez:#9ba0a6;--btn:#5d6168;
 --f:"DIN Alternate","DIN Condensed","Barlow Semi Condensed","Arial Narrow",-apple-system,sans-serif}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:#000;color:var(--w);font-family:var(--f);letter-spacing:.04em;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+html,body{margin:0;height:100%;width:100%;overflow-x:hidden;background:#000;color:var(--w);font-family:var(--f);letter-spacing:.04em;-webkit-text-size-adjust:100%;overscroll-behavior:none}
 body{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 button{font:inherit;color:inherit;text-transform:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;letter-spacing:inherit}
 input{font:inherit;letter-spacing:inherit}
@@ -54,7 +54,7 @@ input{font:inherit;letter-spacing:inherit}
 .rb:active{background:#1c1c1e}
 #bPlay{width:78px;height:78px;border:2px solid var(--red)}
 #bPlay svg{width:34px;height:34px}
-#msg{display:flex;justify-content:center;gap:26px;margin-top:20px}
+#msg{display:flex;justify-content:center;gap:26px;margin-top:40px}
 .qb{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--g)}
 .qb .rb{width:54px;height:54px;border:1.5px solid var(--bez);background:#0a0a0a}
 .qb i{font-style:normal;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
@@ -165,7 +165,7 @@ input{font:inherit;letter-spacing:inherit}
 #ph .bar2{display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-size:14px;text-transform:uppercase}
 #ph .bar2 button{border:1px solid var(--btn);border-radius:16px;padding:7px 14px;font-size:14px;text-transform:uppercase}
 #mapsRow{display:flex;justify-content:space-around;margin-top:14px}
-.pg{position:fixed;inset:0;z-index:60;background:#000;display:none;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.pg{position:fixed;inset:0;z-index:60;overflow-x:hidden;background:#000;display:none;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
 .pg.on{display:flex}
 .pgH{flex:none;display:grid;grid-template-columns:76px minmax(0,1fr) 76px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line2)}
 .pgB{display:flex;align-items:center;gap:4px;font-size:13px;letter-spacing:.14em;color:var(--g);text-transform:uppercase;padding:8px 2px}
@@ -203,6 +203,9 @@ input{font:inherit;letter-spacing:inherit}
 .shB > button:first-child{font-size:14px;letter-spacing:.12em;color:var(--g);text-transform:uppercase;padding:10px 4px}
 .shB .obtn{margin-top:0;color:var(--w);text-decoration:none}
 #trk .tap{cursor:pointer}
+.navIn{width:100%;margin-top:8px;background:#000;border:1px solid #3a3a3c;border-radius:10px;color:var(--w);font-size:16px;padding:11px;outline:0}
+#cmNote{display:none;margin:18px auto 0;max-width:330px;text-align:center;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#ff5a6e;line-height:1.4}
+body.night #app,body.night .pg,body.night .shC{filter:brightness(.72)}
 .strow{display:flex;justify-content:space-between;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);font-size:15px}
 .strow span{color:var(--g);text-transform:uppercase;font-size:12px;letter-spacing:.12em;flex:none}
 .strow b{font-weight:400;text-align:right}
@@ -229,7 +232,7 @@ input{font:inherit;letter-spacing:inherit}
 <circle cx="134" cy="134" r="62" fill="none" stroke="#9ba0a6" stroke-width="1.5"/>
 <line id="needle" x1="134" y1="30" x2="134" y2="12" stroke="#d5001c" stroke-width="3.5" stroke-linecap="round"/>
 <circle id="knob" r="7" fill="#d5001c" opacity="0"/>
-<path d="M100 214L168 214C190 214 194.57 220 203.57 233A121 121 0 0 1 64.43 233C73.43 220 78 214 100 214Z" fill="#0a0a0a" stroke="#8b9098" stroke-width="1.4"/>
+<path d="M57.7 238C67 222 78 214 100 214L168 214C190 214 201 222 210.3 238" fill="none" stroke="#8b9098" stroke-width="1.4"/>
 <text x="134" y="239" text-anchor="middle" font-size="16" fill="#f2f2f2" font-family="DIN Alternate,Barlow Semi Condensed,sans-serif"><tspan id="tCur">0:00</tspan> <tspan id="tDur" fill="#8b9098">/ 0:00</tspan></text>
 </svg><img id="art" alt=""></div>
 <div id="trk"><span class="tsp"></span><div style="min-width:0"><div id="tT">Spotify</div><div id="tA">&nbsp;</div><div id="tC"></div></div><button class="rb" id="bList" aria-label="Song list"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></button></div>
@@ -243,9 +246,10 @@ input{font:inherit;letter-spacing:inherit}
 <div id="msg">
 <a class="qb" id="openSp" href="spotify:"><span class="rb"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></span><i>Spotify</i></a>
 <button class="qb" id="openCm"><span class="rb" id="cmRing"><svg viewBox="0 0 24 24"><path d="M5 21L10 3M19 21L14 3"/><path d="M12 19v-2.5M12 12.5v-2M12 7V5.5"/></svg><b id="cmDot"></b></span><i>Route wx</i></button>
-<a class="qb" id="openGm" href="comgooglemaps://"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span><i>Maps</i></a>
+<button class="qb" id="openNav"><span class="rb"><svg viewBox="0 0 24 24"><path d="M12 3l7 18-7-4-7 4z"/></svg></span><i id="navT">To work</i></button>
 <button class="qb" id="openCam"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></span><i>Camera</i></button>
 </div>
+<button id="cmNote"></button>
 </div>
 
 <div class="scr" id="sList">
@@ -271,8 +275,8 @@ input{font:inherit;letter-spacing:inherit}
 <div id="fc"></div>
 <div class="lab"><span>Maps</span></div>
 <div id="mapsRow"><button class="qb" data-m="radar"><span class="rb"><svg viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 1-7.9A5 5 0 0 1 18 9a3.5 3.5 0 0 1-.5 7H7"/><path d="M9 19l-1 2M13 19l-1 2M17 19l-1 2"/></svg></span><i>Radar</i></button><button class="qb" data-m="route"><span class="rb"><svg viewBox="0 0 24 24"><path d="M5 21L10 3M19 21L14 3"/><path d="M12 19v-2.5M12 12.5v-2M12 7V5.5"/></svg></span><i>Route</i></button><button class="qb" data-m="map"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span><i>Map</i></button></div>
-<div class="lab"><span id="cmT">Commute · Jackson to Fremont</span><button id="cmMapB" style="color:var(--w);font-size:12px;letter-spacing:.14em">Map ›</button></div>
-<div id="cmB"><div class="cmRow"><button class="chip on" data-d="w">To work</button><button class="chip" data-d="h">To home</button><span style="flex:1"></span><button class="chip on" data-l="0">Now</button><button class="chip" data-l="30">+30</button><button class="chip" data-l="60">+60</button></div><div id="cmL"><div class="note">Loading…</div></div></div>
+<div class="lab" id="cmH" style="cursor:pointer"><span><svg id="cmChev" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="vertical-align:-1px;margin-right:6px;transition:transform .2s"><path d="M9 6l6 6-6 6"/></svg><span id="cmT">Commute · Jackson to Fremont</span></span><button id="cmMapB" style="color:var(--w);font-size:12px;letter-spacing:.14em">Map ›</button></div>
+<div id="cmB" style="display:none"><div class="cmRow"><button class="chip on" data-d="w">To work</button><button class="chip" data-d="h">To home</button><span style="flex:1"></span><button class="chip on" data-l="0">Now</button><button class="chip" data-l="30">+30</button><button class="chip" data-l="60">+60</button></div><div id="cmL"><div class="note">Loading…</div></div></div>
 <div id="wUpd"></div>
 </div>
 
@@ -299,6 +303,12 @@ input{font:inherit;letter-spacing:inherit}
 <div id="sRes"></div><div class="lab"><span>Saved places</span></div><div id="favs"></div></div></div>
 <div class="pg" id="sunPg"><div class="pgH"><button class="pgB" id="sunX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Sunrise · Sunset</span><span></span></div><div class="pgC"><div id="sunName"></div><div id="sunTop"></div><div class="sr sh"><span></span><span>Sunrise</span><span>Sunset</span><span>Daylight</span></div><div id="sunL"></div></div></div>
 <div class="sheet" id="capS"><div class="shC"><img id="capI" alt=""><div class="lab" style="margin-top:12px"><span>Description</span></div><div id="capChips"></div><input id="capT" placeholder="Type a description" autocomplete="off" enterkeyhint="done" maxlength="40"><div class="shB"><button id="capX">Cancel</button><button id="capOk" class="obtn">Save photo</button></div></div></div>
+<div class="sheet" id="navS"><div class="shC"><div style="font-size:19px;text-transform:uppercase;letter-spacing:.06em">Navigate</div>
+<div id="navGo" style="display:flex;gap:10px;margin-top:14px"><button class="obtn" data-to="w" style="flex:1;margin:0">To work</button><button class="obtn" data-to="h" style="flex:1;margin:0">To home</button></div>
+<div id="navEd"><div class="lab" style="margin-top:16px"><span>Home address</span></div><input class="navIn" id="navH" placeholder="Street, city" autocomplete="off">
+<div class="lab" style="margin-top:12px"><span>Work address</span></div><input class="navIn" id="navW" placeholder="Street, city" autocomplete="off">
+<div class="mut" style="font-size:13px;margin-top:8px;line-height:1.4">Saved only on this phone.</div></div>
+<div class="shB"><button id="navX">Close</button><button class="obtn" id="navSave">Save</button></div></div></div>
 <div class="pg" id="stPg"><div class="pgH"><button class="pgB" id="stX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Spotify status</span><span></span></div><div class="pgC"><div id="stB"></div><div style="display:flex;gap:10px;margin-top:16px"><button class="obtn" id="stRe" style="font-size:13px">Check again</button><button class="obtn" id="stOut" style="font-size:13px;border-color:#5d6168">Switch account</button></div></div></div>
 <div id="toast"></div>
 <script>
@@ -505,7 +515,7 @@ function openIn(body) {
 function viaDevice(body) {
   return api("GET", "/me/player/devices").then(function (r) { return r && r.ok ? r.json() : { devices: [] }; }).then(function (j) {
     var d = j.devices || [], last = MD.lsGet("mdDev", null);
-    var t = pick(d) || d.filter(function (x) { return x.id === last; })[0] || d.filter(function (x) { return x.is_active; })[0] || d[0];
+    var t = pick(d) || d.filter(function (x) { return x.id === last; })[0] || d.filter(function (x) { return x.is_active; })[0] || d[0] || (last ? { id: last } : null);
     if (!t) return null;
     return api("PUT", "/me/player", { device_ids: [t.id], play: !body }).then(function (y) {
       if (!y || !(y.ok || y.status === 202)) return null;
@@ -516,10 +526,10 @@ function viaDevice(body) {
     });
   });
 }
-function go(body) {
+function go(body, quiet) {
   return api("PUT", "/me/player/play", body).then(function (r) {
     if (!r || r.status !== 404) return r;
-    return viaDevice(body).then(function (y) { if (y) return y; openIn(body); return r; });
+    return viaDevice(body).then(function (y) { if (y) return y; if (!quiet) openIn(body); return r; });
   }).then(function (r) { if (r && r.status === 403) MD.toast("Spotify Premium is needed for that."); setTimeout(poll, 700); return r; });
 }
 MD.spGo = go;
@@ -560,7 +570,7 @@ function local(e) { var r = svg.getBoundingClientRect(); return [(e.clientX - r.
 function fracAt(p) { var deg = (Math.atan2(p[0] - cx, -(p[1] - cy)) * 180 / Math.PI + 360) % 360, f = ((deg - A0) % 360 + 360) % 360 / SW; if (f > 1) f = f < (1 + (360 / SW - 1) / 2) ? 1 : 0; return f; }
 svg.addEventListener("pointerdown", function (e) {
   var p = local(e), d = Math.hypot(p[0] - cx, p[1] - cy);
-  if (d < 66) { if (!tok) login(); return; }
+  if (d < 66) { if (!tok) login(); else { artX = e.clientX; artY = e.clientY; artT = Date.now(); } return; }
   if (!tok || !S.dur) return;
   drag = true; scrubMs = cur(); lastF = scrubMs / scale; svg.setPointerCapture(e.pointerId);
   $("knob").setAttribute("opacity", "1"); $("tCur").setAttribute("fill", "#d5001c"); move(e);
@@ -574,6 +584,15 @@ function up() {
   api("PUT", "/me/player/seek?position_ms=" + Math.round(scrubMs)).then(function () { setTimeout(poll, 600); });
 }
 svg.addEventListener("pointerup", up); svg.addEventListener("pointercancel", up);
+/* album art in the middle: tap to play/pause, swipe left/right to skip. The outer ring stays for scrubbing. */
+var artX = null, artY = 0, artT = 0;
+svg.addEventListener("pointerup", function (e) {
+  if (artX == null) return;
+  var dx = e.clientX - artX, dy = e.clientY - artY, dt = Date.now() - artT; artX = null;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5 && dt < 800) act("POST", dx < 0 ? "/me/player/next" : "/me/player/previous");
+  else if (Math.abs(dx) < 12 && Math.abs(dy) < 12 && dt < 500) playPause();
+});
+svg.addEventListener("pointercancel", function () { artX = null; });
 
 /* ---- now playing ---- */
 var artNow = null, PLAY = "M8 5v14l11-7z", PAUSE = "M8 5v14M16 5v14";
@@ -588,7 +607,9 @@ function paint() {
   D.dispatchEvent(new Event("md:track"));
 }
 $("trk").addEventListener("click", function (e) { if (tok && !S.uri && !e.target.closest("#bList")) MD.show("sList"); });
-function idle(t, a) { S.playing = false; S.prog = 0; S.dur = 0; S.art = ""; S.uri = ""; S.name = t || (tok ? "Nothing playing" : "Connect Spotify"); S.artist = a || (tok ? "Pick a playlist" : "Tap the dial to log in"); S.ctxName = ""; paint(); }
+/* Spotify went quiet (long pause): keep the last song on screen and pick it back up on play */
+function hold() { if (S.playing) { S.prog = cur(); S.at = Date.now(); } S.playing = false; S.lost = true; paint(); }
+function idle(t, a) { var L = MD.lsGet("mdLast", null); S.playing = false; S.prog = 0; S.dur = 0; S.art = ""; S.uri = ""; S.name = t || (tok ? "Nothing playing" : "Connect Spotify"); S.artist = a || (tok ? (L && L.n ? "Tap play for " + L.n : "Pick a playlist") : "Tap the dial to log in"); S.ctxName = ""; paint(); }
 var ctxNames = {};
 MD.ctxNames = ctxNames;
 function poll() {
@@ -596,13 +617,14 @@ function poll() {
   lastPoll = Date.now();
   api("GET", "/me/player?additional_types=episode").then(function (r) {
     if (!r) return;
-    if (r.status === 204) return idle();
+    if (r.status === 204) return S.uri ? hold() : idle();
     if (!r.ok) return;
     return r.json().then(function (j) {
       var it = j.item;
-      if (!it) return idle();
+      if (!it) return S.uri ? hold() : idle();
       S.playing = !!j.is_playing; S.shuffle = !!j.shuffle_state; S.prog = j.progress_ms || 0; S.dur = it.duration_ms || 0; S.at = Date.now();
-      S.uri = it.uri; S.ctx = j.context ? j.context.uri : ""; if (j.device && j.device.id) MD.lsSet("mdDev", j.device.id);
+      S.uri = it.uri; S.ctx = j.context ? j.context.uri : ""; S.lost = false; if (j.device && j.device.id) MD.lsSet("mdDev", j.device.id);
+      if (S.ctx) MD.lsSet("mdLast", { c: S.ctx, n: ctxNames[S.ctx] || MD.lsGet("mdLast", {}).n || "", u: it.uri, p: j.progress_ms || 0 });
       S.name = it.name; S.artist = it.artists ? it.artists.map(function (x) { return x.name; }).join(", ") : (it.show ? it.show.name : "");
       var im = (it.album && it.album.images) || it.images || [];
       S.art = im.length ? (im[1] || im[0]).url : "";
@@ -623,7 +645,15 @@ function skip(ms) {
 function playPause() {
   if (!tok) return login();
   if (S.playing) { S.playing = false; S.prog = cur(); S.at = Date.now(); paint(); act("PUT", "/me/player/pause"); }
-  else go(null);
+  else {
+    var L = MD.lsGet("mdLast", null);
+    if (!S.uri && L && L.c) { MD.ctxNames[L.c] = L.n; return go({ context_uri: L.c }); }
+    go(null, true).then(function (r) {
+      if (r && (r.ok || r.status === 202)) return;
+      if (!(L && L.c)) return openIn(null);
+      go({ context_uri: L.c, offset: { uri: S.uri || L.u }, position_ms: Math.round(S.uri ? cur() : L.p || 0) }, true).then(function (r2) { if (!r2 || !(r2.ok || r2.status === 202)) openIn(null); });
+    });
+  }
 }
 $("bPlay").onclick = playPause; $("miniP").onclick = function (e) { e.stopPropagation(); playPause(); };
 $("mini").addEventListener("click", function (e) { if (!e.target.closest("#miniP")) MD.show("sNow"); });
@@ -1050,6 +1080,7 @@ function paint() {
   var sr = y.sunrise && y.sunrise[0], ss = y.sunset && y.sunset[0];
   if (!sr && view == null && MD.pos) { var su = sunCalc(MD.pos.lat, MD.pos.lon); sr = su[0]; ss = su[1]; } else if (!sr && view) { var su2 = sunCalc(view.lat, view.lon); sr = su2[0]; ss = su2[1]; }
   $("sRise").textContent = hm(sr); $("sSet").textContent = hm(ss);
+  if (!view && sr && ss) { MD.sun = { r: tms(sr), s: tms(ss) }; nightCheck(); }
   forecast(d);
   $("wUpd").textContent = "Updated " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + " · " + d.src;
 }
@@ -1107,7 +1138,7 @@ function rainLine(d) {
   for (i = s + 1; i < ts.length; i++) if (wet(i)) break;
   return i >= ts.length ? "No rain in the next 4 hours" : "Rain in ~" + fm((ts[i] - now) / 60000);
 }
-var openDay = 0;
+var openDay = -1;
 function forecast(d) {
   var y = d.daily, fc = $("fc"), lo = Math.min.apply(null, y.temperature_2m_min), hi = Math.max.apply(null, y.temperature_2m_max), sp = Math.max(1, hi - lo);
   fc.innerHTML = "";
@@ -1209,6 +1240,10 @@ function openSun() {
   $("sunPg").classList.add("on");
 }
 $("wSun").onclick = openSun;
+/* night mode: dim the screen between sunset and sunrise */
+function mod(t) { var d = new Date(t); return d.getHours() * 60 + d.getMinutes(); }
+function nightCheck() { var z = MD.sun; if (!z) return; var n = mod(Date.now()); D.body.classList.toggle("night", n < mod(z.r) - 10 || n > mod(z.s) + 10); }
+setInterval(nightCheck, 60000);
 $("sunX").onclick = function () { $("sunPg").classList.remove("on"); };
 $("wStar").onclick = function () {
   if (!view) return;
@@ -1544,7 +1579,10 @@ MD.routeDraw = function (c, m) {
     if (hot || end) lbl(c, (p[0] + (hot ? " · " + hot : "")).toUpperCase(), i === 0 ? q[0] - 11 : q[0] + 10, q[1] + (i === ROUTE.length - 1 ? 14 : 4), hot ? "#ff5a6e" : "#fff", i === 0 ? "right" : "left");
   });
 };
-$("cmMapB").onclick = function () { MD.openMap("route"); };
+$("cmMapB").onclick = function (e) { e.stopPropagation(); MD.openMap("route"); };
+/* commute section stays folded until she taps its header */
+function cmOpen(on) { $("cmB").style.display = on ? "" : "none"; $("cmChev").style.transform = on ? "rotate(90deg)" : ""; if (on) paint(); }
+$("cmH").onclick = function () { cmOpen($("cmB").style.display === "none"); };
 function load() {
   if (data && Date.now() - at < 900000) return Promise.resolve(data);
   var u = "https://api.open-meteo.com/v1/forecast?latitude=" + ROUTE.map(function (p) { return p[1]; }).join(",") + "&longitude=" + ROUTE.map(function (p) { return p[2]; }).join(",") +
@@ -1556,16 +1594,51 @@ function hourAt(loc, t) {
   for (var i = 0; i < h.time.length; i++) if (h.time[i] * 1000 <= t) best = i;
   return { tp: h.temperature_2m[best], c: h.weather_code[best], pp: h.precipitation_probability[best] || 0, ws: h.wind_speed_10m[best], wg: h.wind_gusts_10m[best], vis: h.visibility ? h.visibility[best] : null };
 }
-function warn() { var f = MD.cmFlags || []; $("cmRing").classList.toggle("warn", f.length > 0); $("cmDot").style.display = f.length ? "block" : "none"; }
+function warn() {
+  var f = MD.cmFlags || []; $("cmRing").classList.toggle("warn", f.length > 0); $("cmDot").style.display = f.length ? "block" : "none";
+  var n = $("cmNote"); n.style.display = f.length ? "block" : "none";
+  n.textContent = f.length ? "Route: " + f.slice(0, 2).join(" · ").replace(/:/g, "") + (f.length > 2 ? " +" + (f.length - 2) + " more" : "") : "";
+}
+$("cmNote").onclick = function () { $("openCm").onclick(); };
 function check() {
   load().then(function (d) {
     var start = Date.now(), tot = ROUTE[ROUTE.length - 1][3], f = [];
-    ROUTE.forEach(function (p, i) { var m = dir === "w" ? p[3] : tot - p[3], w = hourAt(d[i], start + m * 60000); if (w.pp >= 40 || (w.c >= 51 && w.c < 100) || w.c === 45 || w.c === 48 || w.wg >= 30) f.push(p[0]); });
+    ROUTE.forEach(function (p, i) { var m = dir === "w" ? p[3] : tot - p[3], w = hourAt(d[i], start + m * 60000), snow = w.c >= 71 && w.c <= 77 || w.c === 85 || w.c === 86, fog = w.c === 45 || w.c === 48, wet = w.pp >= 40 || (w.c >= 51 && w.c < 100); if (wet || fog || snow || w.wg >= 30) f.push(p[0] + ": " + (snow ? "snow" : fog ? "fog" : wet ? "rain " + w.pp + "%" : "gusts " + Math.round(w.wg))); });
     MD.cmFlags = f; warn();
   }).catch(function () {});
 }
+autoDir(); navLabel();
 setTimeout(check, 3000); setInterval(function () { if (!D.hidden && !$("sWx").classList.contains("on")) check(); }, 900000);
-$("openCm").onclick = function () { MD.show("sWx"); setTimeout(function () { var l = $("cmT").parentNode; $("sWx").scrollTop = l.offsetTop - $("sWx").offsetTop - 8; }, 50); };
+/* Route wx: jump to the commute section, and stay there while the page fills in above it */
+$("openCm").onclick = function () {
+  MD.show("sWx");
+  cmOpen(true);
+  function go() { var l = $("cmH"), sc = $("sWx"); sc.scrollTop += l.getBoundingClientRect().top - sc.getBoundingClientRect().top - 8; }
+  [60, 400, 1200, 2500].forEach(function (t) { setTimeout(go, t); });
+};
+/* Navigate: one tap to Google Maps, direction by her schedule; hold for both choices and addresses */
+function navLabel() { $("navT").textContent = dir === "w" ? "To work" : "To home"; }
+function addr(k) { return MD.lsGet("mdNav", {})[k] || ""; }
+function nav(k) {
+  var a = addr(k); if (!a) return navOpen(true);
+  location.href = "comgooglemaps://?daddr=" + encodeURIComponent(a) + "&directionsmode=driving";
+}
+function navOpen(edit) {
+  $("navH").value = addr("h"); $("navW").value = addr("w");
+  var need = edit || !addr("h") || !addr("w");
+  $("navEd").style.display = need ? "" : "none"; $("navSave").style.display = need ? "" : "none";
+  $("navGo").style.display = need ? "none" : "flex"; $("navEdB").style.display = need ? "none" : "";
+  $("navS").style.display = "flex";
+}
+var hold = null, held = false;
+$("openNav").addEventListener("pointerdown", function () { held = false; hold = setTimeout(function () { held = true; navOpen(false); }, 600); });
+["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) { $("openNav").addEventListener(ev, function () { clearTimeout(hold); }); });
+$("openNav").addEventListener("contextmenu", function (e) { e.preventDefault(); });
+$("openNav").onclick = function () { if (held) return; nav(dir); };
+Array.prototype.forEach.call(D.querySelectorAll("#navGo button"), function (b) { b.onclick = function () { $("navS").style.display = "none"; nav(b.dataset.to); }; });
+$("navX").onclick = function () { $("navS").style.display = "none"; };
+$("navSave").onclick = function () { MD.lsSet("mdNav", { h: $("navH").value.trim(), w: $("navW").value.trim() }); $("navS").style.display = "none"; MD.toast("Saved on this phone."); };
+(function () { var e = D.createElement("button"); e.id = "navEdB"; e.className = "mut"; e.style.cssText = "display:block;margin:14px auto 0;font-size:12px;letter-spacing:.14em;text-transform:uppercase"; e.textContent = "Edit addresses"; $("navGo").after(e); e.onclick = function () { $("navEd").style.display = ""; $("navSave").style.display = ""; $("navGo").style.display = "none"; e.style.display = "none"; }; })();
 function paint() {
   var L = $("cmL");
   $("cmT").textContent = dir === "w" ? "Commute · Jackson to Fremont" : "Commute · Fremont to Jackson";
@@ -1589,9 +1662,12 @@ function paint() {
     var n = D.createElement("div"); n.className = "mut"; n.style.cssText = "font-size:11px;margin-top:6px;letter-spacing:.08em"; n.textContent = "TIMES ARE ESTIMATES · WIND MPH / GUSTS"; L.appendChild(n);
   }).catch(function () { L.innerHTML = '<div class="note">Route forecast isn\'t answering right now.</div>'; });
 }
-Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-d]"), function (b) { b.onclick = function () { dir = b.dataset.d; Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-d]"), function (x) { x.classList.toggle("on", x === b); }); paint(); }; });
+Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-d]"), function (b) { b.onclick = function () { dir = b.dataset.d; picked = Date.now(); navLabel(); Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-d]"), function (x) { x.classList.toggle("on", x === b); }); paint(); }; });
 Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-l]"), function (b) { b.onclick = function () { lead = +b.dataset.l; Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-l]"), function (x) { x.classList.toggle("on", x === b); }); paint(); }; });
-if (new Date().getHours() >= 12) { dir = "h"; Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-d]"), function (x) { x.classList.toggle("on", x.dataset.d === "h"); }); }
+/* her schedule: afternoon/evening = heading to work, early morning = heading home */
+var picked = 0;
+function autoDir() { if (Date.now() - picked < 7200000) return; var h = new Date().getHours(), nd = h >= 11 ? "w" : "h"; if (nd === dir) return; dir = nd; Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-d]"), function (x) { x.classList.toggle("on", x.dataset.d === dir); }); navLabel(); }
+D.addEventListener("visibilitychange", function () { if (!D.hidden) { autoDir(); check(); } });
 D.addEventListener("md:screen", function (e) { if (e.detail === "sWx") paint(); });
 setInterval(function () { if ($("sWx").classList.contains("on") && !D.hidden) paint(); }, 300000);
 if ($("sWx").classList.contains("on")) paint();
