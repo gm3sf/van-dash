@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Macan Dash rev 8 -->
+<!-- Macan Dash rev 9 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -102,29 +102,29 @@ input{font:inherit;letter-spacing:inherit}
 #sRes button{display:block;width:100%;text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);font-size:15px;text-transform:uppercase}
 .chip{flex:none;border:1px solid #3a3a3c;border-radius:16px;padding:7px 12px;font-size:13px;text-transform:uppercase;color:var(--g)}
 .chip.on{border-color:var(--red);color:var(--w)}
-#wHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
-#wName{font-size:18px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#wSub{font-size:12px;letter-spacing:.14em;color:var(--g);text-transform:uppercase;margin-top:2px;display:flex;align-items:center;gap:8px}
+#wHead,#kHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+#wName,#kName{font-size:18px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#wSub,#kSub{font-size:12px;letter-spacing:.14em;color:var(--g);text-transform:uppercase;margin-top:2px;display:flex;align-items:center;gap:8px}
 #wStar svg{width:18px;height:18px;fill:none;stroke:var(--g);stroke-width:1.7;stroke-linejoin:round;vertical-align:-3px}
 #wStar.on svg{stroke:var(--red);fill:var(--red)}
 #home{flex:none;display:flex;align-items:center;gap:7px;border:1px solid var(--red);border-radius:20px;padding:5px 12px 5px 6px;font-size:12px;letter-spacing:.08em;line-height:1.15;text-transform:uppercase;text-align:left}
 #home.off{display:none}
-#wNow{display:flex;align-items:center;gap:14px;margin-top:14px}
-#wTemp{font-size:66px;line-height:1}
-#wCond{display:flex;align-items:center;gap:6px;font-size:17px;text-transform:uppercase}
-#wCond svg{width:26px;height:26px}
-#wDet{color:var(--g);font-size:14px;margin-top:5px;line-height:1.5}
-#wRain{font-size:15px;color:#9fc4e8;margin-top:10px;text-transform:uppercase;min-height:18px}
-#wWind{display:flex;align-items:center;gap:14px;white-space:nowrap;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
-#wWind>svg{flex:none;width:92px;height:92px}#wRot,#wNd{transition:transform .6s ease}
-#wNd{--d:2.2s}#wNd .wc{animation:wv var(--d) linear infinite}#wNd .wc:nth-child(2){animation-delay:calc(var(--d)*.2)}#wNd .wc:nth-child(3){animation-delay:calc(var(--d)*.4)}#wNd.calm{opacity:0}
+#wNow,#kNow{display:flex;align-items:center;gap:14px;margin-top:14px}
+#wTemp,#kTemp{font-size:66px;line-height:1}
+#wCond,#kCond{display:flex;align-items:center;gap:6px;font-size:17px;text-transform:uppercase}
+#wCond svg,#kCond svg{width:26px;height:26px}
+#wDet,#kDet{color:var(--g);font-size:14px;margin-top:5px;line-height:1.5}
+#wRain,#kRain{font-size:15px;color:#9fc4e8;margin-top:10px;text-transform:uppercase;min-height:18px}
+#wWind,#kWind{display:flex;align-items:center;gap:14px;white-space:nowrap;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+#wWind>svg,#kWind>svg{flex:none;width:92px;height:92px}#wRot,#wNd{transition:transform .6s ease}
+#wNd,#kNd{--d:2.2s}#wNd .wc,#kNd .wc{animation:wv var(--d) linear infinite}#wNd .wc:nth-child(2),#kNd .wc:nth-child(2){animation-delay:calc(var(--d)*.2)}#wNd .wc:nth-child(3),#kNd .wc:nth-child(3){animation-delay:calc(var(--d)*.4)}#wNd.calm,#kNd.calm{opacity:0}#kNd{transition:transform .6s ease}#kSun{cursor:default}
 @keyframes wv{0%,55%,100%{opacity:.18}20%{opacity:1}}
-@media (prefers-reduced-motion:reduce){#wNd .wc{animation:none}}
-#wSun{margin-left:auto;margin-right:40px;white-space:nowrap;cursor:pointer;position:relative;top:4px;display:flex;flex-direction:column;gap:10px;padding-left:12px;border-left:1px solid var(--line)}
-#wSun div{display:grid;grid-template-columns:22px auto;column-gap:8px;align-items:center}
-#wSun svg{width:22px;height:22px;fill:none;stroke:#f2f2f2;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;grid-row:1/3}
-#wSun span{font-size:18px;line-height:1.1}#wSun i{font-style:normal;font-size:11px;letter-spacing:.14em;color:var(--g);text-transform:uppercase}
-#wsN{font-size:30px;line-height:1.1;margin-top:4px}
+@media (prefers-reduced-motion:reduce){#wNd .wc,#kNd .wc{animation:none}}
+#wSun,#kSun{margin-left:auto;margin-right:40px;white-space:nowrap;cursor:pointer;position:relative;top:4px;display:flex;flex-direction:column;gap:10px;padding-left:12px;border-left:1px solid var(--line)}
+#wSun div,#kSun div{display:grid;grid-template-columns:22px auto;column-gap:8px;align-items:center}
+#wSun svg,#kSun svg{width:22px;height:22px;fill:none;stroke:#f2f2f2;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;grid-row:1/3}
+#wSun span,#kSun span{font-size:18px;line-height:1.1}#wSun i,#kSun i{font-style:normal;font-size:11px;letter-spacing:.14em;color:var(--g);text-transform:uppercase}
+#wsN,#ksN{font-size:30px;line-height:1.1;margin-top:4px}
 .dy{display:grid;grid-template-columns:58px 26px 32px minmax(0,1fr) 32px 34px;align-items:center;gap:6px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:16px}
 .dy svg{width:22px;height:22px}
 .dy .pp{font-size:12px;color:#9fc4e8;text-align:right}
@@ -139,6 +139,8 @@ input{font:inherit;letter-spacing:inherit}
 .cmRow{display:flex;gap:5px;margin-top:10px;align-items:center}.cmRow .chip{padding:6px 9px;font-size:12px}
 .cm{display:grid;grid-template-columns:48px minmax(0,1fr) 24px 32px 38px 42px;align-items:center;gap:6px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:15px}
 .cm svg{width:22px;height:22px}.cm .t{color:var(--g);font-size:13px}.cm .p{text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cm .r{font-size:12px;color:#9fc4e8;text-align:right}.cm .w{font-size:12px;color:var(--g);text-align:right}.cm .bad{color:var(--red)!important}
+#kRain{color:var(--w)}#kCond span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#kRain b{font-weight:400;color:var(--red)}
+.qb i .inf{width:11px;height:11px;margin-left:4px;vertical-align:-1px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 #cmS{font-size:14px;margin:10px 2px 0;text-transform:uppercase;letter-spacing:.06em}
 #wUpd{font-size:12px;color:#5d6168;text-align:center;margin-top:14px;text-transform:uppercase;letter-spacing:.1em}
 /* maps */
@@ -164,7 +166,7 @@ input{font:inherit;letter-spacing:inherit}
 #ph img{flex:1;min-height:0;width:100%;object-fit:contain}
 #ph .bar2{display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-size:14px;text-transform:uppercase}
 #ph .bar2 button{border:1px solid var(--btn);border-radius:16px;padding:7px 14px;font-size:14px;text-transform:uppercase}
-#mapsRow{display:flex;justify-content:space-around;margin-top:14px}
+#mapsRow,#kMaps{display:flex;justify-content:space-around;margin-top:14px}
 .pg{position:fixed;inset:0;z-index:60;overflow-x:hidden;background:#000;display:none;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
 .pg.on{display:flex}
 .pgH{flex:none;display:grid;grid-template-columns:76px minmax(0,1fr) 76px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line2)}
@@ -252,7 +254,7 @@ body.night #app,body.night .pg,body.night .shC{filter:brightness(.72)}
 </div>
 <div id="msg">
 <a class="qb" id="openSp" href="spotify:"><span class="rb"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></span><i>Spotify</i></a>
-<button class="qb" id="openCm"><span class="rb" id="cmRing"><svg viewBox="0 0 24 24"><path d="M5 21L10 3M19 21L14 3"/><path d="M12 19v-2.5M12 12.5v-2M12 7V5.5"/></svg><b id="cmDot"></b></span><i>Route wx</i></button>
+<button class="qb" id="openCm"><span class="rb" id="cmRing"><svg viewBox="0 0 24 24"><path d="M5 21L10 3M19 21L14 3"/><path d="M12 19v-2.5M12 12.5v-2M12 7V5.5"/></svg><b id="cmDot"></b></span><i>Commute<svg class="inf" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><circle cx="12" cy="7.3" r=".9" fill="currentColor" stroke="none"/></svg></i></button>
 <button class="qb" id="openNav"><span class="rb"><svg viewBox="0 0 24 24"><path d="M12 3l7 18-7-4-7 4z"/></svg></span><i id="navT">To work</i></button>
 <button class="qb" id="openCam"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></span><i>Camera</i></button>
 </div>
@@ -281,13 +283,25 @@ body.night #app,body.night .pg,body.night .shC{filter:brightness(.72)}
 <div class="lab"><span>7-day forecast · tap a day</span></div>
 <div id="fc"></div>
 <div class="lab"><span>Maps</span></div>
-<div id="mapsRow"><button class="qb" data-m="radar"><span class="rb"><svg viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 1-7.9A5 5 0 0 1 18 9a3.5 3.5 0 0 1-.5 7H7"/><path d="M9 19l-1 2M13 19l-1 2M17 19l-1 2"/></svg></span><i>Radar</i></button><button class="qb" data-m="route"><span class="rb"><svg viewBox="0 0 24 24"><path d="M5 21L10 3M19 21L14 3"/><path d="M12 19v-2.5M12 12.5v-2M12 7V5.5"/></svg></span><i>Route</i></button><button class="qb" data-m="map"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span><i>Map</i></button></div>
-<div class="lab" id="cmH" style="cursor:pointer"><span><svg id="cmChev" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="vertical-align:-1px;margin-right:6px;transition:transform .2s"><path d="M9 6l6 6-6 6"/></svg><span id="cmT">Commute · Jackson to Fremont</span></span><button id="cmMapB" style="color:var(--w);font-size:12px;letter-spacing:.14em">Map ›</button></div>
-<div id="cmB" style="display:none"><div class="cmRow"><button class="chip on" data-d="w">To work</button><button class="chip" data-d="h">To home</button><span style="flex:1"></span><button class="chip on" data-l="0">Now</button><button class="chip" data-l="30">+30</button><button class="chip" data-l="60">+60</button></div><div id="cmL"><div class="note">Loading…</div></div></div>
+<div id="mapsRow"><button class="qb" data-m="radar"><span class="rb"><svg viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 1-7.9A5 5 0 0 1 18 9a3.5 3.5 0 0 1-.5 7H7"/><path d="M9 19l-1 2M13 19l-1 2M17 19l-1 2"/></svg></span><i>Radar</i></button><button class="qb" data-m="map"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span><i>Map</i></button></div>
 <div id="wUpd"></div>
 </div>
 
-<div id="tabs"><button class="on" data-s="sNow">Home</button><button data-s="sList">Playlists</button><button data-s="sWx">Weather</button></div>
+<div class="scr" id="sCm">
+<div id="kHead"><div style="min-width:0"><div id="kName">Jackson → Fremont</div><div id="kSub">To work</div></div></div>
+<div id="kNow"><div id="kTemp">--°</div><div style="flex:1;min-width:0"><div id="kCond"></div><div id="kDet">Checking the route…</div></div></div>
+<div id="kRain"></div>
+<div id="kWind"><svg id="kDial" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#0a0a0a" stroke="#9ba0a6" stroke-width="1.8"/><g id="kRot"><g id="kTk"></g>
+<text x="50" y="27" text-anchor="middle" font-size="11" fill="#f2f2f2" font-family="DIN Alternate,sans-serif">N</text><text x="77" y="54" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">E</text><text x="50" y="81" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">S</text><text x="23" y="54" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">W</text></g>
+<g id="kNd"><g fill="none" stroke="#d5001c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path class="wc" d="M40 34L50 44L60 34" opacity=".25"/><path class="wc" d="M40 45L50 55L60 45" opacity=".55"/><path class="wc" d="M40 56L50 66L60 56"/></g></g></svg>
+<div><div class="lab" id="kWl" style="margin:0;border:0;padding:0">Wind</div><div id="ksN">-- <span class="mut cap" style="font-size:13px;letter-spacing:.14em">mph</span></div><div id="ksD" class="cap" style="font-size:15px;margin-top:2px"></div><div id="ksG" class="mut cap" style="font-size:12px;margin-top:3px"></div></div>
+<div id="kSun"><div><svg viewBox="0 0 24 24"><path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg><span id="kArr">--</span><i>Arrive</i></div><div><svg id="kSi" viewBox="0 0 24 24"></svg><span id="kSt">--</span><i id="kSl">Sunset</i></div></div></div>
+<div class="lab"><span>Route maps</span></div>
+<div id="kMaps"><button class="qb" data-m="route"><span class="rb"><svg viewBox="0 0 24 24"><path d="M5 21L10 3M19 21L14 3"/><path d="M12 19v-2.5M12 12.5v-2M12 7V5.5"/></svg></span><i>Route</i></button><button class="qb" data-m="radar"><span class="rb"><svg viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 1-7.9A5 5 0 0 1 18 9a3.5 3.5 0 0 1-.5 7H7"/><path d="M9 19l-1 2M13 19l-1 2M17 19l-1 2"/></svg></span><i>Radar</i></button><button class="qb" data-m="map"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span><i>Map</i></button></div>
+<div class="lab"><span id="cmT">Along the way</span></div>
+<div id="cmB"><div class="cmRow"><button class="chip on" data-d="w">To work</button><button class="chip" data-d="h">To home</button><span style="flex:1"></span><button class="chip on" data-l="0">Now</button><button class="chip" data-l="30">+30</button><button class="chip" data-l="60">+60</button></div><div id="cmL"><div class="note">Loading…</div></div></div>
+</div>
+<div id="tabs"><button class="on" data-s="sNow">Home</button><button data-s="sList">Playlists</button><button data-s="sCm">Commute</button><button data-s="sWx">Weather</button></div>
 </div>
 <div id="ph"><div class="bar2"><span id="phD"></span><button id="phX">Close</button></div><img id="phI" alt=""><div class="bar2"><button id="phS">Share</button><button id="phDel">Delete</button></div></div>
 <div class="pg" id="mapPg"><div class="pgH"><button class="pgB" id="mapX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><div class="seg" id="mSeg"><button data-m="radar">Radar</button><button data-m="route">Route</button><button data-m="map">Map</button></div><span></span></div>
@@ -958,7 +972,7 @@ function icon(c) {
   if ((c >= 71 && c <= 77) || c === 85 || c === 86) return b + '<path d="M7 15a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 17 6.5a4 4 0 0 1 0 8.5"/><path d="M8 18.5h.01M12 20.5h.01M16 18.5h.01M10 22h.01M14 22h.01"/>' + e;
   return b + '<path d="M7 15a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 17 6.5a4 4 0 0 1 0 8.5"/><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#9fc4e8"/>' + e;
 }
-MD.wxIcon = icon;
+MD.wxIcon = icon; MD.wxText = TXT; MD.DIRS = DIRS;
 
 /* ---- data: Open-Meteo, with the National Weather Service as backup ---- */
 var MODELS = ["ncep_nbm_conus", "ecmwf_ifs", "gfs_seamless"], DK = ["temperature_2m_max", "temperature_2m_min", "precipitation_probability_max", "weather_code"];
@@ -1173,7 +1187,7 @@ function hours(d, idx) {
   return box;
 }
 /* wind gauge ticks */
-(function () { var g = $("wTk"); for (var i = 0; i < 12; i++) { var a = i * 30 * Math.PI / 180, m = i % 3 === 0, r2 = m ? 38 : 41, l = D.createElementNS(MD.NS, "line"); l.setAttribute("x1", 50 + 44 * Math.sin(a)); l.setAttribute("y1", 50 - 44 * Math.cos(a)); l.setAttribute("x2", 50 + r2 * Math.sin(a)); l.setAttribute("y2", 50 - r2 * Math.cos(a)); l.setAttribute("stroke", m ? "#f2f2f2" : "#5d6168"); l.setAttribute("stroke-width", m ? 1.6 : 0.8); g.appendChild(l); } })();
+["wTk", "kTk"].forEach(function (id) { var g = $(id); for (var i = 0; i < 12; i++) { var a = i * 30 * Math.PI / 180, m = i % 3 === 0, r2 = m ? 38 : 41, l = D.createElementNS(MD.NS, "line"); l.setAttribute("x1", 50 + 44 * Math.sin(a)); l.setAttribute("y1", 50 - 44 * Math.cos(a)); l.setAttribute("x2", 50 + r2 * Math.sin(a)); l.setAttribute("y2", 50 - r2 * Math.cos(a)); l.setAttribute("stroke", m ? "#f2f2f2" : "#5d6168"); l.setAttribute("stroke-width", m ? 1.6 : 0.8); g.appendChild(l); } });
 
 /* ---- search and favorites ---- */
 var sT = 0, sN = 0;
@@ -1389,7 +1403,7 @@ function setMode2(m) {
 MD.openMap = function (m) { $("mapPg").classList.add("on"); setMode2(m); };
 MD.mapRedraw = function () { if (bm) bm.redraw(); };
 Array.prototype.forEach.call(D.querySelectorAll("#mSeg button"), function (b) { b.onclick = function () { setMode2(b.dataset.m); }; });
-Array.prototype.forEach.call(D.querySelectorAll("#mapsRow button"), function (b) { b.onclick = function () { MD.openMap(b.dataset.m); }; });
+Array.prototype.forEach.call(D.querySelectorAll("#mapsRow button, #kMaps button"), function (b) { b.onclick = function () { MD.openMap(b.dataset.m); }; });
 $("mapX").onclick = function () { $("mapPg").classList.remove("on"); $("layM").style.display = "none"; };
 
 /* ---- the map: satellite, radar, measure, pins, photos ---- */
@@ -1586,20 +1600,16 @@ MD.routeDraw = function (c, m) {
     if (hot || end) lbl(c, (p[0] + (hot ? " · " + hot : "")).toUpperCase(), i === 0 ? q[0] - 11 : q[0] + 10, q[1] + (i === ROUTE.length - 1 ? 14 : 4), hot ? "#ff5a6e" : "#fff", i === 0 ? "right" : "left");
   });
 };
-$("cmMapB").onclick = function (e) { e.stopPropagation(); MD.openMap("route"); };
-/* commute section stays folded until she taps its header */
-function cmOpen(on) { $("cmB").style.display = on ? "" : "none"; $("cmChev").style.transform = on ? "rotate(90deg)" : ""; if (on) paint(); }
-$("cmH").onclick = function () { cmOpen($("cmB").style.display === "none"); };
 function load() {
   if (data && Date.now() - at < 900000) return Promise.resolve(data);
   var u = "https://api.open-meteo.com/v1/forecast?latitude=" + ROUTE.map(function (p) { return p[1]; }).join(",") + "&longitude=" + ROUTE.map(function (p) { return p[2]; }).join(",") +
-    "&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_gusts_10m,visibility&forecast_days=2&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FLos_Angeles&timeformat=unixtime";
+    "&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_gusts_10m,wind_direction_10m,visibility&forecast_days=2&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FLos_Angeles&timeformat=unixtime";
   return fetch(u, { signal: MD.timeout(10000) }).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (j) { data = Array.isArray(j) ? j : [j]; at = Date.now(); return data; });
 }
 function hourAt(loc, t) {
   var h = loc.hourly, best = 0;
   for (var i = 0; i < h.time.length; i++) if (h.time[i] * 1000 <= t) best = i;
-  return { tp: h.temperature_2m[best], c: h.weather_code[best], pp: h.precipitation_probability[best] || 0, ws: h.wind_speed_10m[best], wg: h.wind_gusts_10m[best], vis: h.visibility ? h.visibility[best] : null };
+  return { tp: h.temperature_2m[best], c: h.weather_code[best], pp: h.precipitation_probability[best] || 0, ws: h.wind_speed_10m[best], wg: h.wind_gusts_10m[best], wd: h.wind_direction_10m ? h.wind_direction_10m[best] : 0, vis: h.visibility ? h.visibility[best] : null };
 }
 function warn() {
   var f = MD.cmFlags || []; $("cmRing").classList.toggle("warn", f.length > 0); $("cmDot").style.display = f.length ? "block" : "none";
@@ -1615,14 +1625,9 @@ function check() {
   }).catch(function () {});
 }
 autoDir(); navLabel();
-setTimeout(check, 3000); setInterval(function () { if (!D.hidden && !$("sWx").classList.contains("on")) check(); }, 900000);
-/* Route wx: jump to the commute section, and stay there while the page fills in above it */
-$("openCm").onclick = function () {
-  MD.show("sWx");
-  cmOpen(true);
-  function go() { var l = $("cmH"), sc = $("sWx"); sc.scrollTop += l.getBoundingClientRect().top - sc.getBoundingClientRect().top - 8; }
-  [60, 400, 1200, 2500].forEach(function (t) { setTimeout(go, t); });
-};
+setTimeout(check, 3000); setInterval(function () { if (!D.hidden && !$("sCm").classList.contains("on")) check(); }, 900000);
+/* Commute button on Home: open the Commute page at the top */
+$("openCm").onclick = function () { MD.show("sCm"); $("sCm").scrollTop = 0; };
 /* Navigate: one tap to Google Maps, direction by her schedule; hold for both choices and addresses */
 function navLabel() { $("navT").textContent = dir === "w" ? "To work" : "To home"; }
 function addr(k) { return MD.lsGet("mdNav", {})[k] || ""; }
@@ -1677,28 +1682,55 @@ function fmt(p) {
 });
 Array.prototype.forEach.call(D.querySelectorAll(".navClr"), function (b) { b.onclick = function () { var i = $(b.dataset.f); i.value = ""; $(b.dataset.f === "navH" ? "navSgH" : "navSgW").innerHTML = ""; i.focus(); }; });
 (function () { var e = D.createElement("button"); e.id = "navEdB"; e.className = "mut"; e.style.cssText = "display:block;margin:14px auto 0;font-size:12px;letter-spacing:.14em;text-transform:uppercase"; e.textContent = "Edit addresses"; $("navGo").after(e); e.onclick = function () { $("navEd").style.display = ""; $("navSave").style.display = ""; $("navGo").style.display = "none"; e.style.display = "none"; }; })();
+var SRISE = '<path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 8V5M9.5 10.5 8 9M14.5 10.5 16 9M12 3l-1.5 1.5M12 3l1.5 1.5"/>', SSET = '<path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 5v3M9.5 10.5 8 9M14.5 10.5 16 9M12 9l-1.5-1.5M12 9l1.5-1.5"/>';
+function hm(t) { return new Date(t).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
+function sh(t) { return hm(t).replace(/\s?([AP])M/i, function (a, b) { return b.toLowerCase(); }); }
 function paint() {
-  var L = $("cmL");
-  $("cmT").textContent = dir === "w" ? "Commute · Jackson to Fremont" : "Commute · Fremont to Jackson";
+  var L = $("cmL"), from = dir === "w" ? "Jackson" : "Fremont", to = dir === "w" ? "Fremont" : "Jackson";
+  $("kName").textContent = from + " → " + to;
   load().then(function (d) {
     var start = Date.now() + lead * 60000, tot = ROUTE[ROUTE.length - 1][3], pts = ROUTE.map(function (p, i) { return { p: p, d: d[i], m: dir === "w" ? p[3] : tot - p[3] }; });
     if (dir === "h") pts.reverse();
-    L.innerHTML = ""; var flags = []; bad = {};
+    L.innerHTML = ""; var flags = [], lo = null, hi = null, gw = null, worst = null, end = null; bad = {};
     pts.forEach(function (x) {
       var t = start + x.m * 60000, w = hourAt(x.d, t), wet = w.pp >= 40 || (w.c >= 51 && w.c < 100), fog = w.c === 45 || w.c === 48 || (w.vis != null && w.vis < 1000), windy = w.wg >= 30, snow = (w.c >= 71 && w.c <= 77) || w.c === 85 || w.c === 86;
       if (wet || fog || windy || snow) { var why = snow ? "snow" : fog ? "fog" : wet ? "rain " + w.pp + "%" : "gusts " + Math.round(w.wg); flags.push(x.p[0] + ": " + why); bad[x.p[0]] = why; }
+      if (!lo || w.tp < lo.w.tp) lo = { w: w, n: x.p[0] };
+      if (!hi || w.tp > hi.w.tp) hi = { w: w, n: x.p[0] };
+      if (!gw || Math.max(w.wg, w.ws) > Math.max(gw.w.wg, gw.w.ws)) gw = { w: w, n: x.p[0] };
+      var sev = snow ? 4 : fog ? 3 : wet ? 2 + w.pp / 1000 : windy ? 1 : 0;
+      if (!worst || sev > worst.s || (sev === worst.s && w.c > worst.w.c)) worst = { w: w, n: x.p[0], s: sev, why: snow ? "Snow" : fog ? "Fog" : wet ? "Rain" : windy ? "Gusty" : "" };
+      end = { w: w, t: t, n: x.p[0] };
       var r = D.createElement("div"); r.className = "cm";
-      r.innerHTML = '<span class="t">' + new Date(t).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).replace(/\s?([AP])M/i, function (a, b) { return b.toLowerCase(); }) + '</span><span class="p' + (fog || snow ? " bad" : "") + '"></span>' + MD.wxIcon(w.c) +
+      r.innerHTML = '<span class="t">' + sh(t) + '</span><span class="p' + (fog || snow ? " bad" : "") + '"></span>' + MD.wxIcon(w.c) +
         "<span>" + Math.round(w.tp) + '°</span><span class="r' + (wet ? " bad" : "") + '">' + (w.pp >= 10 ? w.pp + "%" : "") + '</span><span class="w' + (windy ? " bad" : "") + '">' + Math.round(w.ws) + (w.wg >= 25 ? "/" + Math.round(w.wg) : "") + "</span>";
       r.querySelector(".p").textContent = x.p[0];
       L.appendChild(r);
     });
     MD.cmFlags = flags; warn(); if (MD.mapRedraw) MD.mapRedraw();
-    var s = D.createElement("div"); s.id = "cmS";
-    s.innerHTML = flags.length ? '<span style="color:#d5001c">Heads up:</span> ' + MD.esc(flags.join(" · ")) : '<span class="mut">Clear drive, nothing to watch for</span>';
-    L.appendChild(s);
-    var n = D.createElement("div"); n.className = "mut"; n.style.cssText = "font-size:11px;margin-top:6px;letter-spacing:.08em"; n.textContent = "TIMES ARE ESTIMATES · WIND MPH / GUSTS"; L.appendChild(n);
-  }).catch(function () { L.innerHTML = '<div class="note">Route forecast isn\'t answering right now.</div>'; });
+    var n = D.createElement("div"); n.className = "mut"; n.style.cssText = "font-size:11px;margin-top:8px;letter-spacing:.08em"; n.textContent = "TIMES ARE ESTIMATES · WIND MPH / GUSTS · OPEN-METEO"; L.appendChild(n);
+    /* top of the page: the whole drive at a glance */
+    $("kSub").textContent = (dir === "w" ? "To work" : "To home") + " · " + (lead ? "leave in " + lead + " min" : "leave now") + " · " + sh(start) + " – " + sh(end.t);
+    $("kTemp").textContent = Math.round(lo.w.tp) + "°";
+    $("kCond").innerHTML = MD.wxIcon(worst.w.c) + "<span></span>";
+    $("kCond").querySelector("span").textContent = worst.s ? worst.why + " at " + worst.n : MD.wxText[worst.w.c] || "Clear";
+    $("kDet").innerHTML = "Low " + Math.round(lo.w.tp) + "° · High " + Math.round(hi.w.tp) + "°<br>" + MD.esc(to) + " " + Math.round(end.w.tp) + "° on arrival";
+    var k = $("kRain");
+    if (flags.length) k.innerHTML = "<b>Heads up:</b> " + MD.esc(flags.slice(0, 2).join(" · ").replace(/:/g, "") + (flags.length > 2 ? " +" + (flags.length - 2) + " more" : ""));
+    else k.innerHTML = '<span class="mut">Clear the whole way</span>';
+    var g = gw.w, ws = g.ws || 0;
+    $("kWl").textContent = gw.n;
+    $("ksN").firstChild.textContent = Math.round(ws) + " ";
+    $("ksD").textContent = ws < 1 ? "Calm" : "From " + MD.DIRS[Math.round(g.wd / 22.5) % 16];
+    $("ksG").textContent = g.wg > ws + 2 ? "Gusts " + Math.round(g.wg) : "";
+    $("kNd").classList.toggle("calm", ws < 1);
+    $("kNd").style.setProperty("--d", Math.max(0.8, Math.min(3, 3.2 - ws * 0.09)).toFixed(2) + "s");
+    $("kNd").style.transform = "rotate(" + Math.round(g.wd || 0) + "deg)"; $("kNd").style.transformOrigin = "50px 50px";
+    $("kArr").textContent = hm(end.t);
+    var z = MD.sun, rise = dir === "h";
+    $("kSi").innerHTML = rise ? SRISE : SSET; $("kSl").textContent = rise ? "Sunrise" : "Sunset";
+    $("kSt").textContent = z ? hm(rise ? z.r : z.s) : "--";
+  }).catch(function () { L.innerHTML = '<div class="note">Route forecast isn\'t answering right now.</div>'; $("kDet").textContent = "Route forecast isn't answering right now."; });
 }
 Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-d]"), function (b) { b.onclick = function () { dir = b.dataset.d; picked = Date.now(); navLabel(); Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-d]"), function (x) { x.classList.toggle("on", x === b); }); paint(); }; });
 Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-l]"), function (b) { b.onclick = function () { lead = +b.dataset.l; Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-l]"), function (x) { x.classList.toggle("on", x === b); }); paint(); }; });
@@ -1706,9 +1738,9 @@ Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-l]"), function (b) {
 var picked = 0;
 function autoDir() { if (Date.now() - picked < 7200000) return; var h = new Date().getHours(), nd = h >= 11 ? "w" : "h"; if (nd === dir) return; dir = nd; Array.prototype.forEach.call(D.querySelectorAll("#cmB [data-d]"), function (x) { x.classList.toggle("on", x.dataset.d === dir); }); navLabel(); }
 D.addEventListener("visibilitychange", function () { if (!D.hidden) { autoDir(); check(); } });
-D.addEventListener("md:screen", function (e) { if (e.detail === "sWx") paint(); });
-setInterval(function () { if ($("sWx").classList.contains("on") && !D.hidden) paint(); }, 300000);
-if ($("sWx").classList.contains("on")) paint();
+D.addEventListener("md:screen", function (e) { if (e.detail === "sCm") paint(); });
+setInterval(function () { if ($("sCm").classList.contains("on") && !D.hidden) paint(); }, 300000);
+if ($("sCm").classList.contains("on")) paint();
 })();
 
 </script>
