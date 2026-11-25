@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Macan Dash rev 7 -->
+<!-- Macan Dash rev 8 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -203,6 +203,13 @@ input{font:inherit;letter-spacing:inherit}
 .shB > button:first-child{font-size:14px;letter-spacing:.12em;color:var(--g);text-transform:uppercase;padding:10px 4px}
 .shB .obtn{margin-top:0;color:var(--w);text-decoration:none}
 #trk .tap{cursor:pointer}
+.navSg{display:block;width:100%;text-align:left;padding:10px 6px;border-bottom:1px solid var(--line);font-size:14px;color:var(--w);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.navF{position:relative}.navF .navIn{padding-right:44px}
+.navClr{position:absolute;right:2px;top:8px;width:42px;height:44px;display:flex;align-items:center;justify-content:center}
+.navClr svg{width:16px;height:16px;fill:none;stroke:var(--g);stroke-width:2;stroke-linecap:round}
+.navRow{display:block;width:100%;text-align:left;padding:12px 4px;border-bottom:1px solid var(--line2)}
+.navRow b{display:block;font-weight:400;font-size:17px;text-transform:uppercase;color:var(--w)}
+.navRow span{display:block;font-size:14px;color:var(--g);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .navIn{width:100%;margin-top:8px;background:#000;border:1px solid #3a3a3c;border-radius:10px;color:var(--w);font-size:16px;padding:11px;outline:0}
 #cmNote{display:none;margin:18px auto 0;max-width:330px;text-align:center;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#ff5a6e;line-height:1.4}
 body.night #app,body.night .pg,body.night .shC{filter:brightness(.72)}
@@ -304,10 +311,10 @@ body.night #app,body.night .pg,body.night .shC{filter:brightness(.72)}
 <div class="pg" id="sunPg"><div class="pgH"><button class="pgB" id="sunX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Sunrise · Sunset</span><span></span></div><div class="pgC"><div id="sunName"></div><div id="sunTop"></div><div class="sr sh"><span></span><span>Sunrise</span><span>Sunset</span><span>Daylight</span></div><div id="sunL"></div></div></div>
 <div class="sheet" id="capS"><div class="shC"><img id="capI" alt=""><div class="lab" style="margin-top:12px"><span>Description</span></div><div id="capChips"></div><input id="capT" placeholder="Type a description" autocomplete="off" enterkeyhint="done" maxlength="40"><div class="shB"><button id="capX">Cancel</button><button id="capOk" class="obtn">Save photo</button></div></div></div>
 <div class="sheet" id="navS"><div class="shC"><div style="font-size:19px;text-transform:uppercase;letter-spacing:.06em">Navigate</div>
-<div id="navGo" style="display:flex;gap:10px;margin-top:14px"><button class="obtn" data-to="w" style="flex:1;margin:0">To work</button><button class="obtn" data-to="h" style="flex:1;margin:0">To home</button></div>
-<div id="navEd"><div class="lab" style="margin-top:16px"><span>Home address</span></div><input class="navIn" id="navH" placeholder="Street, city" autocomplete="off">
-<div class="lab" style="margin-top:12px"><span>Work address</span></div><input class="navIn" id="navW" placeholder="Street, city" autocomplete="off">
-<div class="mut" style="font-size:13px;margin-top:8px;line-height:1.4">Saved only on this phone.</div></div>
+<div id="navGo" style="margin-top:6px"><button class="navRow" data-to="w"><b>To work</b><span id="navWs"></span></button><button class="navRow" data-to="h"><b>To home</b><span id="navHs"></span></button></div>
+<div id="navEd"><div class="lab" style="margin-top:16px"><span>Home address</span></div><div class="navF"><input class="navIn" id="navH" placeholder="Street and city" autocomplete="off"><button class="navClr" data-f="navH" aria-label="Clear home address"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div id="navSgH"></div>
+<div class="lab" style="margin-top:12px"><span>Work address</span></div><div class="navF"><input class="navIn" id="navW" placeholder="Street and city, or place name" autocomplete="off"><button class="navClr" data-f="navW" aria-label="Clear work address"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div id="navSgW"></div>
+<div class="mut" style="font-size:13px;margin-top:8px;line-height:1.4">Saved only on this phone. Hold the Navigate button any time to see or change these.</div></div>
 <div class="shB"><button id="navX">Close</button><button class="obtn" id="navSave">Save</button></div></div></div>
 <div class="pg" id="stPg"><div class="pgH"><button class="pgB" id="stX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Spotify status</span><span></span></div><div class="pgC"><div id="stB"></div><div style="display:flex;gap:10px;margin-top:16px"><button class="obtn" id="stRe" style="font-size:13px">Check again</button><button class="obtn" id="stOut" style="font-size:13px;border-color:#5d6168">Switch account</button></div></div></div>
 <div id="toast"></div>
@@ -1625,9 +1632,10 @@ function nav(k) {
 }
 function navOpen(edit) {
   $("navH").value = addr("h"); $("navW").value = addr("w");
-  var need = edit || !addr("h") || !addr("w");
+  var need = !!edit; $("navSgH").innerHTML = ""; $("navSgW").innerHTML = "";
   $("navEd").style.display = need ? "" : "none"; $("navSave").style.display = need ? "" : "none";
-  $("navGo").style.display = need ? "none" : "flex"; $("navEdB").style.display = need ? "none" : "";
+  $("navGo").style.display = need ? "none" : ""; $("navEdB").style.display = need ? "none" : "";
+  $("navHs").textContent = addr("h") || "Not set"; $("navWs").textContent = addr("w") || "Not set";
   $("navS").style.display = "flex";
 }
 var hold = null, held = false;
@@ -1637,7 +1645,37 @@ $("openNav").addEventListener("contextmenu", function (e) { e.preventDefault(); 
 $("openNav").onclick = function () { if (held) return; nav(dir); };
 Array.prototype.forEach.call(D.querySelectorAll("#navGo button"), function (b) { b.onclick = function () { $("navS").style.display = "none"; nav(b.dataset.to); }; });
 $("navX").onclick = function () { $("navS").style.display = "none"; };
-$("navSave").onclick = function () { MD.lsSet("mdNav", { h: $("navH").value.trim(), w: $("navW").value.trim() }); $("navS").style.display = "none"; MD.toast("Saved on this phone."); };
+$("navSave").onclick = function () {
+  var h = $("navH").value.trim(), w = $("navW").value.trim();
+  MD.lsSet("mdNav", { h: h, w: w });
+  if (!h || !w) { MD.toast("Saved. Still need the " + (!h && !w ? "home and work addresses" : !h ? "home address" : "work address") + ".", 4000); return; }
+  $("navS").style.display = "none"; MD.toast("Saved on this phone.");
+};
+/* address suggestions as she types (OpenStreetMap lookup, nearest results first) */
+function fmt(p) {
+  var st = [p.housenumber, p.street].filter(Boolean).join(" "), nm = p.name && p.name !== p.street ? p.name : "";
+  return [nm, st, p.city || p.town || p.village || p.county, p.state === "California" ? "CA" : p.state].filter(Boolean).join(", ");
+}
+["navH", "navW"].forEach(function (id) {
+  var inp = $(id), box = $(id === "navH" ? "navSgH" : "navSgW"), t = null, n = 0;
+  inp.addEventListener("input", function () {
+    clearTimeout(t); var q = inp.value.trim(); if (q.length < 3) { box.innerHTML = ""; return; }
+    t = setTimeout(function () {
+      var my = ++n, p = MD.pos, u = "https://photon.komoot.io/api/?limit=5&lang=en&q=" + encodeURIComponent(q) + (p ? "&lat=" + p.lat.toFixed(3) + "&lon=" + p.lon.toFixed(3) : "");
+      fetch(u).then(function (r) { return r.json(); }).then(function (j) {
+        if (my !== n) return; box.innerHTML = "";
+        var seen = {};
+        (j.features || []).forEach(function (f) {
+          var s = fmt(f.properties || {}); if (!s || seen[s]) return; seen[s] = 1;
+          var b = D.createElement("button"); b.className = "navSg"; b.textContent = s;
+          b.onclick = function () { inp.value = s; box.innerHTML = ""; inp.blur(); };
+          box.appendChild(b);
+        });
+      }).catch(function () {});
+    }, 350);
+  });
+});
+Array.prototype.forEach.call(D.querySelectorAll(".navClr"), function (b) { b.onclick = function () { var i = $(b.dataset.f); i.value = ""; $(b.dataset.f === "navH" ? "navSgH" : "navSgW").innerHTML = ""; i.focus(); }; });
 (function () { var e = D.createElement("button"); e.id = "navEdB"; e.className = "mut"; e.style.cssText = "display:block;margin:14px auto 0;font-size:12px;letter-spacing:.14em;text-transform:uppercase"; e.textContent = "Edit addresses"; $("navGo").after(e); e.onclick = function () { $("navEd").style.display = ""; $("navSave").style.display = ""; $("navGo").style.display = "none"; e.style.display = "none"; }; })();
 function paint() {
   var L = $("cmL");
