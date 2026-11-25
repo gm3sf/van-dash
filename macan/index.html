@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Macan Dash rev 3 -->
+<!-- Macan Dash rev 4 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -100,8 +100,6 @@ input{font:inherit;letter-spacing:inherit}
 #sX{width:40px;height:40px;display:flex;align-items:center;justify-content:center}
 #sRes{margin-top:4px}
 #sRes button{display:block;width:100%;text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);font-size:15px;text-transform:uppercase}
-#favs{display:flex;gap:7px;margin-top:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-#favs::-webkit-scrollbar{display:none}
 .chip{flex:none;border:1px solid #3a3a3c;border-radius:16px;padding:7px 12px;font-size:13px;text-transform:uppercase;color:var(--g)}
 .chip.on{border-color:var(--red);color:var(--w)}
 #wHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
@@ -117,12 +115,12 @@ input{font:inherit;letter-spacing:inherit}
 #wCond svg{width:26px;height:26px}
 #wDet{color:var(--g);font-size:14px;margin-top:5px;line-height:1.5}
 #wRain{font-size:15px;color:#9fc4e8;margin-top:10px;text-transform:uppercase;min-height:18px}
-#wWind{display:flex;align-items:center;gap:16px;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+#wWind{display:flex;align-items:center;gap:14px;white-space:nowrap;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
 #wWind>svg{flex:none;width:92px;height:92px}#wRot,#wNd{transition:transform .6s ease}
 #wNd{--d:2.2s}#wNd .wc{animation:wv var(--d) linear infinite}#wNd .wc:nth-child(2){animation-delay:calc(var(--d)*.2)}#wNd .wc:nth-child(3){animation-delay:calc(var(--d)*.4)}#wNd.calm{opacity:0}
 @keyframes wv{0%,55%,100%{opacity:.18}20%{opacity:1}}
 @media (prefers-reduced-motion:reduce){#wNd .wc{animation:none}}
-#wSun{margin-left:auto;margin-right:30px;position:relative;top:4px;display:flex;flex-direction:column;gap:10px;padding-left:12px;border-left:1px solid var(--line)}
+#wSun{margin-left:auto;margin-right:40px;white-space:nowrap;cursor:pointer;position:relative;top:4px;display:flex;flex-direction:column;gap:10px;padding-left:12px;border-left:1px solid var(--line)}
 #wSun div{display:grid;grid-template-columns:22px auto;column-gap:8px;align-items:center}
 #wSun svg{width:22px;height:22px;fill:none;stroke:#f2f2f2;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;grid-row:1/3}
 #wSun span{font-size:18px;line-height:1.1}#wSun i{font-style:normal;font-size:11px;letter-spacing:.14em;color:var(--g);text-transform:uppercase}
@@ -166,6 +164,45 @@ input{font:inherit;letter-spacing:inherit}
 #ph img{flex:1;min-height:0;width:100%;object-fit:contain}
 #ph .bar2{display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-size:14px;text-transform:uppercase}
 #ph .bar2 button{border:1px solid var(--btn);border-radius:16px;padding:7px 14px;font-size:14px;text-transform:uppercase}
+#mapsRow{display:flex;justify-content:space-around;margin-top:14px}
+.pg{position:fixed;inset:0;z-index:60;background:#000;display:none;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.pg.on{display:flex}
+.pgH{flex:none;display:grid;grid-template-columns:76px minmax(0,1fr) 76px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line2)}
+.pgB{display:flex;align-items:center;gap:4px;font-size:13px;letter-spacing:.14em;color:var(--g);text-transform:uppercase;padding:8px 2px}
+.pgB svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.pgT{text-align:center;font-size:14px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.pgC{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 16px 20px}
+.seg{justify-self:center;display:flex;border:1px solid #3a3a3c;border-radius:17px;overflow:hidden}
+.seg button{padding:8px 12px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--g)}
+.seg button.on{background:#1c1c1e;color:var(--w);box-shadow:inset 0 -2px 0 var(--red)}
+#mapPg #bigMap{flex:1;margin:0;border-radius:0}
+#mapPg #mAttr{right:auto;left:62px}
+#rBar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:none;align-items:center;gap:8px;background:rgba(0,0,0,.8);border:1px solid var(--btn);border-radius:20px;padding:3px 14px 3px 3px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+#rPlay{width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+#rPlay svg{width:18px;height:18px;fill:none;stroke:var(--w);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#srPg #srch{margin-top:12px}
+.frow{display:flex;align-items:center;border-bottom:1px solid var(--line);min-height:50px}
+.frow .fn{flex:1;min-width:0;text-align:left;padding:13px 4px;font-size:16px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:10px}
+.frow .fn svg{width:18px;height:18px;flex:none}
+.frow .fn span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.frow .fx{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.frow .fx svg{width:16px;height:16px;fill:none;stroke:var(--g);stroke-width:2;stroke-linecap:round}
+#sunName{font-size:18px;text-transform:uppercase;margin-top:14px}
+#sunTop{color:var(--g);font-size:14px;text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+.sr{display:grid;grid-template-columns:62px 1fr 1fr 1fr;align-items:center;gap:6px;padding:12px 2px;border-bottom:1px solid var(--line);font-size:17px}
+.sr span:not(:first-child){text-align:right}
+.sr .d{font-size:12px;color:var(--g);display:block;margin-top:2px}
+.sr.sh{font-size:11px;letter-spacing:.16em;color:var(--g);text-transform:uppercase;margin-top:16px;padding:0 2px 7px;border-bottom:1px solid var(--line2)}
+.sr.today{border-left:3px solid var(--red);background:#111113;padding-left:8px}
+.sheet{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.7);display:none;align-items:flex-end}
+.shC{width:100%;background:#111113;border-top:1px solid var(--line2);border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+#capI{display:block;width:100%;max-height:34vh;object-fit:contain;border-radius:8px;background:#000}
+#capChips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+#capT{width:100%;margin-top:10px;background:#000;border:1px solid #3a3a3c;border-radius:10px;color:var(--w);font-size:16px;padding:11px;outline:0;text-transform:uppercase}
+.shB{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.shB > button:first-child{font-size:14px;letter-spacing:.12em;color:var(--g);text-transform:uppercase;padding:10px 4px}
+.shB .obtn{margin-top:0;color:var(--w);text-decoration:none}
+#trk .tap{cursor:pointer}
 #toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);width:84%;max-width:360px;background:#111113;border:1px solid var(--line2);border-radius:12px;padding:12px 14px;font-size:14px;text-align:center;z-index:99;display:none;line-height:1.35}
 </style>
 </head>
@@ -215,45 +252,48 @@ input{font:inherit;letter-spacing:inherit}
 </div>
 
 <div class="scr" id="sWx">
-<div id="srch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="sIn" placeholder="City or zip" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sX" aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-<div id="sRes"></div>
-<div id="favs"></div>
 <div id="wHead"><div style="min-width:0"><div id="wName">Current location</div><div id="wSub"><span id="wKind">Current location</span><button id="wStar" aria-label="Save place"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></button></div></div>
-<button id="home" class="off"><svg viewBox="0 0 24 24" width="26" height="26" class="gIc"></svg><span>Current<br>location</span></button></div>
+<div style="display:flex;align-items:center;gap:10px;flex:none"><button id="home" class="off"><svg viewBox="0 0 24 24" width="26" height="26" class="gIc"></svg><span>Current<br>location</span></button><button class="rb" id="sOpen" aria-label="Search places"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></div></div>
 <div id="wNow"><div id="wTemp">--°</div><div style="flex:1;min-width:0"><div id="wCond"></div><div id="wDet"></div></div></div>
 <div id="wRain"></div>
 <div id="wWind"><svg id="wDial" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#0a0a0a" stroke="#9ba0a6" stroke-width="1.8"/><g id="wRot"><g id="wTk"></g>
 <text x="50" y="27" text-anchor="middle" font-size="11" fill="#f2f2f2" font-family="DIN Alternate,sans-serif">N</text><text x="77" y="54" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">E</text><text x="50" y="81" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">S</text><text x="23" y="54" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">W</text></g>
 <g id="wNd"><g fill="none" stroke="#d5001c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path class="wc" d="M40 34L50 44L60 34" opacity=".25"/><path class="wc" d="M40 45L50 55L60 45" opacity=".55"/><path class="wc" d="M40 56L50 66L60 56"/></g></g></svg>
 <div><div class="lab" style="margin:0;border:0;padding:0">Wind</div><div id="wsN">-- <span class="mut cap" style="font-size:13px;letter-spacing:.14em">mph</span></div><div id="wsD" class="cap" style="font-size:15px;margin-top:2px"></div><div id="wsG" class="mut cap" style="font-size:12px;margin-top:3px"></div></div>
-<div id="wSun"><div><svg viewBox="0 0 24 24"><path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 8V5M9.5 10.5 8 9M14.5 10.5 16 9M12 3l-1.5 1.5M12 3l1.5 1.5"/></svg><span id="sRise">--</span><i>Sunrise</i></div><div><svg viewBox="0 0 24 24"><path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 5v3M9.5 10.5 8 9M14.5 10.5 16 9M12 9l-1.5-1.5M12 9l1.5-1.5"/></svg><span id="sSet">--</span><i>Sunset</i></div></div></div>
+<div id="wSun" role="button" aria-label="Sunrise and sunset, next 7 days"><div><svg viewBox="0 0 24 24"><path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 8V5M9.5 10.5 8 9M14.5 10.5 16 9M12 3l-1.5 1.5M12 3l1.5 1.5"/></svg><span id="sRise">--</span><i>Sunrise</i></div><div><svg viewBox="0 0 24 24"><path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 5v3M9.5 10.5 8 9M14.5 10.5 16 9M12 9l-1.5-1.5M12 9l1.5-1.5"/></svg><span id="sSet">--</span><i>Sunset</i></div></div></div>
 <div class="lab"><span>7-day forecast · tap a day</span></div>
 <div id="fc"></div>
-<div class="lab"><span id="cmT">Commute · Jackson to Fremont</span></div>
-<div id="cmB"><div class="cmRow"><button class="chip on" data-d="w">To work</button><button class="chip" data-d="h">To home</button><span style="flex:1"></span><button class="chip on" data-l="0">Now</button><button class="chip" data-l="30">+30</button><button class="chip" data-l="60">+60</button></div><div class="mapc" id="cmMap" style="height:260px"><canvas class="base"></canvas><canvas class="ov"></canvas><div class="attr">© OpenStreetMap · RainViewer</div><div class="mtag" id="cmTag"></div><button class="mb zb" id="cIn" style="right:10px;top:10px" aria-label="Zoom in">+</button><button class="mb zb" id="cOut" style="right:10px;top:60px" aria-label="Zoom out">−</button><button class="mb" id="cFit" style="right:10px;bottom:10px" aria-label="Whole route"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div><div id="cmL"><div class="note">Loading…</div></div></div>
-<div class="lab"><span>Radar · last hour</span><span id="rTime" style="color:var(--w);letter-spacing:.1em"></span></div>
-<div class="mapc" id="radMap" style="height:220px"><canvas class="base"></canvas><canvas class="ov"></canvas><div class="attr">© OpenStreetMap · RainViewer</div>
-<button class="mb" id="rPlay" style="left:10px;bottom:10px" aria-label="Pause radar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button><button class="mb zb" id="rIn" style="right:10px;top:10px" aria-label="Zoom in">+</button><button class="mb zb" id="rOut" style="right:10px;top:60px" aria-label="Zoom out">−</button></div>
-<div class="lab"><span>Map</span><span id="mInfo" style="color:var(--w);letter-spacing:.1em"></span></div>
-<div class="mapc" id="bigMap" style="height:300px"><canvas class="base"></canvas><canvas class="ov"></canvas><div class="attr" id="mAttr">© OpenStreetMap</div>
-<div class="mtag" id="mTag"></div>
-<button class="mb" id="mSat" style="left:10px;top:10px" aria-label="Map layers"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></button><div id="layM"><button data-l="0">Street</button><button data-l="1">Satellite</button><button data-l="2">Topo</button></div><button class="mb zb" id="mIn" style="left:10px;top:110px" aria-label="Zoom in">+</button><button class="mb zb" id="mOut" style="left:10px;top:160px" aria-label="Zoom out">−</button>
-<button class="mb" id="mFull" style="left:10px;top:60px" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-<button class="mb" id="mRad" style="right:10px;top:10px" aria-label="Radar"><svg viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 1-7.9A5 5 0 0 1 18 9a3.5 3.5 0 0 1-.5 7H7"/><path d="M9 19l-1 2M13 19l-1 2M17 19l-1 2"/></svg></button>
-<button class="mb" id="mMeas" style="right:10px;top:60px" aria-label="Measure"><svg viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg></button>
-<button class="mb" id="mPin" style="right:10px;top:110px" aria-label="Pins"><svg viewBox="0 0 24 24"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg></button>
-<button class="mb" id="mPho" style="right:10px;top:160px" aria-label="Photos"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-9 8"/></svg></button>
-<button class="mb" id="mCam" style="right:62px;bottom:10px;display:none" aria-label="Take photo"><svg viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
-<button class="mb" id="mMe" style="left:10px;bottom:10px" aria-label="Center on me"><svg viewBox="0 0 24 24" class="gIc"></svg></button>
-<div id="pinCard"><b id="pcN"></b><div class="mut" id="pcD"></div><div class="acts"><a id="pcGo" target="_blank">Directions</a><button id="pcRen">Rename</button><button id="pcDel">Delete</button></div></div>
-<input type="file" id="camIn" accept="image/*" capture="environment" style="display:none">
-</div>
+<div class="lab"><span>Maps</span></div>
+<div id="mapsRow"><button class="qb" data-m="radar"><span class="rb"><svg viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 1-7.9A5 5 0 0 1 18 9a3.5 3.5 0 0 1-.5 7H7"/><path d="M9 19l-1 2M13 19l-1 2M17 19l-1 2"/></svg></span><i>Radar</i></button><button class="qb" data-m="route"><span class="rb"><svg viewBox="0 0 24 24"><path d="M5 21L10 3M19 21L14 3"/><path d="M12 19v-2.5M12 12.5v-2M12 7V5.5"/></svg></span><i>Route</i></button><button class="qb" data-m="map"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span><i>Map</i></button></div>
+<div class="lab"><span id="cmT">Commute · Jackson to Fremont</span><button id="cmMapB" style="color:var(--w);font-size:12px;letter-spacing:.14em">Map ›</button></div>
+<div id="cmB"><div class="cmRow"><button class="chip on" data-d="w">To work</button><button class="chip" data-d="h">To home</button><span style="flex:1"></span><button class="chip on" data-l="0">Now</button><button class="chip" data-l="30">+30</button><button class="chip" data-l="60">+60</button></div><div id="cmL"><div class="note">Loading…</div></div></div>
 <div id="wUpd"></div>
 </div>
 
 <div id="tabs"><button class="on" data-s="sNow">Now playing</button><button data-s="sList">Playlists</button><button data-s="sWx">Weather</button></div>
 </div>
 <div id="ph"><div class="bar2"><span id="phD"></span><button id="phX">Close</button></div><img id="phI" alt=""><div class="bar2"><button id="phS">Share</button><button id="phDel">Delete</button></div></div>
+<div class="pg" id="mapPg"><div class="pgH"><button class="pgB" id="mapX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><div class="seg" id="mSeg"><button data-m="radar">Radar</button><button data-m="route">Route</button><button data-m="map">Map</button></div><span></span></div>
+<div class="mapc" id="bigMap"><canvas class="base"></canvas><canvas class="ov"></canvas><div class="attr" id="mAttr">© OpenStreetMap</div>
+<div class="mtag" id="mTag"></div>
+<button class="mb" id="mSat" style="left:10px;top:10px" aria-label="Map layers"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></button><div id="layM"><button data-l="0">Street</button><button data-l="1">Satellite</button><button data-l="2">Topo</button></div>
+<button class="mb zb" id="mIn" style="left:10px;top:60px" aria-label="Zoom in">+</button><button class="mb zb" id="mOut" style="left:10px;top:110px" aria-label="Zoom out">−</button>
+<button class="mb" id="mMe" style="left:10px;bottom:10px" aria-label="Center on me"><svg viewBox="0 0 24 24" class="gIc"></svg></button>
+<button class="mb" id="mRad" style="right:10px;top:10px" aria-label="Radar"><svg viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 1-7.9A5 5 0 0 1 18 9a3.5 3.5 0 0 1-.5 7H7"/><path d="M9 19l-1 2M13 19l-1 2M17 19l-1 2"/></svg></button>
+<button class="mb" id="mMeas" style="right:10px;top:60px" aria-label="Measure"><svg viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg></button>
+<button class="mb" id="mPin" style="right:10px;top:110px" aria-label="Pins"><svg viewBox="0 0 24 24"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg></button>
+<button class="mb" id="mPho" style="right:10px;top:160px" aria-label="Show photos"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-9 8"/></svg></button>
+<button class="mb" id="mCam" style="right:10px;bottom:10px;width:52px;height:52px;border:2px solid var(--red)" aria-label="Take photo"><svg viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+<div id="rBar"><button id="rPlay" aria-label="Pause radar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button><span id="rTime">Radar</span></div>
+<div id="pinCard"><b id="pcN"></b><div class="mut" id="pcD"></div><div class="acts"><a id="pcGo" target="_blank">Directions</a><button id="pcRen">Rename</button><button id="pcDel">Delete</button></div></div>
+<input type="file" id="camIn" accept="image/*" capture="environment" style="display:none">
+</div></div>
+<div class="pg" id="srPg"><div class="pgH"><button class="pgB" id="srX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Weather search</span><span></span></div><div class="pgC">
+<div id="srch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="sIn" placeholder="City or zip" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sX" aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div id="sRes"></div><div class="lab"><span>Saved places</span></div><div id="favs"></div></div></div>
+<div class="pg" id="sunPg"><div class="pgH"><button class="pgB" id="sunX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Sunrise · Sunset</span><span></span></div><div class="pgC"><div id="sunName"></div><div id="sunTop"></div><div class="sr sh"><span></span><span>Sunrise</span><span>Sunset</span><span>Daylight</span></div><div id="sunL"></div></div></div>
+<div class="sheet" id="capS"><div class="shC"><img id="capI" alt=""><div class="lab" style="margin-top:12px"><span>Description</span></div><div id="capChips"></div><input id="capT" placeholder="Type a description" autocomplete="off" enterkeyhint="done" maxlength="40"><div class="shB"><button id="capX">Cancel</button><button id="capOk" class="obtn">Save photo</button></div></div></div>
+<div class="sheet" id="spSh"><div class="shC"><div style="font-size:19px;text-transform:uppercase;letter-spacing:.06em">Spotify needs a wake-up</div><div class="mut" style="font-size:15px;line-height:1.45;margin-top:8px">Your iPhone puts Spotify to sleep in the background. Tap Open Spotify, then come straight back here. No need to press play there, the music starts on its own.</div><div class="shB"><button id="spShX">Cancel</button><a class="obtn" id="spShGo" href="spotify:">Open Spotify</a></div></div></div>
 <div id="toast"></div>
 <script>
 (function () {
@@ -437,10 +477,40 @@ function pick(d) {
   if (!h.length && ty) h = d.filter(function (x) { return x.type === ty; });
   return h.filter(function (x) { return x.is_active; })[0] || h[0] || d.filter(function (x) { return x.is_active; })[0] || null;
 }
+/* Spotify asleep on the phone: try the phone we used last, and if that fails
+   ask her to pop into Spotify; when she comes back the music starts by itself */
+var pending = null;
+function asleep(body) { pending = { b: body, t: Date.now() }; $("spSh").style.display = "flex"; }
+$("spShX").onclick = function () { pending = null; $("spSh").style.display = "none"; };
+$("spShGo").addEventListener("click", function () { setTimeout(function () { $("spSh").style.display = "none"; }, 400); });
+function wake(n) {
+  if (!pending || D.hidden) return;
+  if (Date.now() - pending.t > 300000) { pending = null; return; }
+  if (n === 0) MD.toast("Starting your music…", 3000);
+  api("GET", "/me/player/devices").then(function (r) { return r && r.ok ? r.json() : { devices: [] }; }).then(function (j) {
+    var t = pick(j.devices || []);
+    if (!t) { if (n < 5) setTimeout(function () { wake(n + 1); }, 1500); else { pending = null; MD.toast("Spotify didn't wake up. Try playing again."); } return; }
+    var b = pending.b; pending = null; go(b);
+  });
+}
+D.addEventListener("visibilitychange", function () { if (!D.hidden && pending) setTimeout(function () { wake(0); }, 800); });
+function tryLast(body) {
+  var last = MD.lsGet("mdDev", null);
+  if (!last) return Promise.resolve(null);
+  return api("PUT", "/me/player", { device_ids: [last], play: !body }).then(function (y) {
+    if (!y || !(y.ok || y.status === 202)) return null;
+    if (!body) return y;
+    return wait(700).then(function () { return api("PUT", "/me/player/play?device_id=" + last, body); }).then(function (r) { return r && r.ok ? r : null; });
+  });
+}
 function go(body) {
   return api("GET", "/me/player/devices").then(function (r) { return r && r.ok ? r.json() : { devices: [] }; }).then(function (j) {
     var t = pick(j.devices || []);
-    if (!t) return api("PUT", "/me/player/play", body).then(function (r) { if (r && r.status === 404) MD.toast("Open Spotify first (button below the controls), then come back and tap play.", 6000); return r; });
+    if (t) MD.lsSet("mdDev", t.id);
+    if (!t) return tryLast(body).then(function (y) {
+      if (y) return y;
+      return api("PUT", "/me/player/play", body).then(function (r) { if (r && r.status === 404) asleep(body); return r; });
+    });
     if (t.is_active) return api("PUT", "/me/player/play?device_id=" + t.id, body);
     return api("PUT", "/me/player", { device_ids: [t.id], play: !body }).then(function (y) {
       if (!body) return y;
@@ -462,11 +532,11 @@ function ticks(dur) {
   for (var i = 0; i < steps.length; i++) if (Math.ceil(mins / steps[i]) <= 8) { st = steps[i]; break; }
   var majors = Math.ceil(mins / st); scale = majors * st * 60000;
   var g = $("ticks"); g.innerHTML = "";
-  var n = majors * 4;
+  var n = majors * 6;
   for (var k = 0; k <= n; k++) {
-    var f = k / n, d = ang(f), maj = k % 4 === 0, p1 = pt(d, R + 8), p2 = pt(d, maj ? R - 6 : R + 1);
-    el("line", { x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1], stroke: maj ? "#f2f2f2" : "#6b6f76", "stroke-width": maj ? 2.2 : 1 }, g);
-    if (maj) { var tp = pt(d, R - 19), t = el("text", { x: tp[0], y: tp[1] + 6, "text-anchor": "middle", "font-size": 16, fill: "#f2f2f2", "font-family": "DIN Alternate,Barlow Semi Condensed,sans-serif" }, g); t.textContent = (k / 4) * st; }
+    var f = k / n, d = ang(f), maj = k % 6 === 0, mid = k % 6 === 3, p1 = pt(d, R + 8), p2 = pt(d, maj ? R - 6 : mid ? R - 1 : R + 2);
+    el("line", { x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1], stroke: maj ? "#f2f2f2" : mid ? "#8b9098" : "#5d6168", "stroke-width": maj ? 2.2 : mid ? 1.3 : 0.9 }, g);
+    if (maj) { var tp = pt(d, R - 19), t = el("text", { x: tp[0], y: tp[1] + 6, "text-anchor": "middle", "font-size": 16, fill: "#f2f2f2", "font-family": "DIN Alternate,Barlow Semi Condensed,sans-serif" }, g); t.textContent = (k / 6) * st; }
   }
 }
 function arc(f, r) { if (f <= 0.001) return ""; f = Math.min(f, 0.9999); var s = pt(ang(0), r), e = pt(ang(f), r); return "M" + s[0] + " " + s[1] + " A" + r + " " + r + " 0 " + (SW * f > 180 ? 1 : 0) + " 1 " + e[0] + " " + e[1]; }
@@ -515,6 +585,7 @@ function paint() {
   draw();
   D.dispatchEvent(new Event("md:track"));
 }
+$("trk").addEventListener("click", function (e) { if (tok && !S.uri && !e.target.closest("#bList")) MD.show("sList"); });
 function idle(t, a) { S.playing = false; S.prog = 0; S.dur = 0; S.art = ""; S.uri = ""; S.name = t || (tok ? "Nothing playing" : "Connect Spotify"); S.artist = a || (tok ? "Pick a playlist" : "Tap the dial to log in"); S.ctxName = ""; paint(); }
 var ctxNames = {};
 MD.ctxNames = ctxNames;
@@ -927,9 +998,9 @@ function load() {
 }
 function setView(p) {
   view = p ? { n: p.n, lat: p.lat, lon: p.lon } : null; vData = p ? null : live;
-  $("sRes").innerHTML = ""; $("sIn").value = p ? p.n : ""; $("sIn").blur();
+  $("sRes").innerHTML = ""; $("sIn").value = ""; $("sIn").blur(); $("srPg").classList.remove("on");
   if (p) { $("wName").textContent = p.n; $("wTemp").textContent = "--°"; load(); } else { $("wName").textContent = MD.cityName || "Current location"; refreshLive(false); }
-  paint(); favChips();
+  paint(); favList();
   D.dispatchEvent(new Event("md:view"));
 }
 MD.wxHome = function () { if (view) setView(null); };
@@ -965,8 +1036,8 @@ function hm(t) {
   var h = +t.slice(11, 13), m = t.slice(14, 16); return (h % 12 || 12) + ":" + m + (h < 12 ? " AM" : " PM");
 }
 /* sunrise and sunset worked out on the phone when the backup weather source has none */
-function sunCalc(lat, lon) {
-  var now = new Date(), n = Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(now.getFullYear(), 0, 0)) / 864e5), R = Math.PI / 180, g = 2 * Math.PI / 365 * (n - 1);
+function sunCalc(lat, lon, day) {
+  var now = day || new Date(), n = Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(now.getFullYear(), 0, 0)) / 864e5), R = Math.PI / 180, g = 2 * Math.PI / 365 * (n - 1);
   var eq = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
   var dc = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
   var c = (Math.cos(90.833 * R) - Math.sin(lat * R) * Math.sin(dc)) / (Math.cos(lat * R) * Math.cos(dc));
@@ -987,13 +1058,19 @@ function turn() {
 var rA = 0, nA = 0, turned = null;
 function un(prev, target) { var d = ((target - prev) % 360 + 540) % 360 - 180; return prev + d; }
 MD.onPos(function () { if (compass == null) turn(); });
-function onOri(e) { if (e.webkitCompassHeading != null) { compass = e.webkitCompassHeading; } else if (e.absolute && e.alpha != null) compass = 360 - e.alpha; turn(); }
+var gotOri = false;
+function onOri(e) { gotOri = true; if (e.webkitCompassHeading != null) { compass = e.webkitCompassHeading; } else if (e.absolute && e.alpha != null) compass = 360 - e.alpha; turn(); }
+var listening = false;
 function startCompass() {
+  if (gotOri) return;
   var DO = window.DeviceOrientationEvent;
-  if (DO && typeof DO.requestPermission === "function") DO.requestPermission().then(function (r) { if (r === "granted") { window.addEventListener("deviceorientation", onOri); MD.lsSet("mdCmp", 1); } }).catch(function () {});
+  if (DO && typeof DO.requestPermission === "function") DO.requestPermission().then(function (r) { if (r === "granted" && !listening) { listening = true; window.addEventListener("deviceorientation", onOri); MD.lsSet("mdCmp", 1); } }).catch(function () {});
   else window.addEventListener("deviceorientationabsolute", onOri);
 }
+/* iPhone only lets a page ask for the compass on a tap, so ask on the way into Weather */
 $("wDial").addEventListener("click", startCompass);
+D.querySelector('#tabs [data-s="sWx"]').addEventListener("click", startCompass);
+$("topT").addEventListener("click", startCompass);
 if (MD.lsGet("mdCmp", 0)) { try { window.addEventListener("deviceorientation", onOri); } catch (e) {} }
 function rainLine(d) {
   var m = d.minutely_15;
@@ -1059,18 +1136,64 @@ function search(q) {
 $("sIn").addEventListener("input", function () { clearTimeout(sT); var v = this.value; sT = setTimeout(function () { search(v); }, 450); });
 $("sIn").addEventListener("keydown", function (e) { if (e.key === "Enter") { clearTimeout(sT); search(this.value); } });
 $("sX").onclick = function () { $("sIn").value = ""; $("sRes").innerHTML = ""; };
-function favChips() {
+/* search page: search box on top, saved places below it */
+var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="#d5001c" stroke-width="2" stroke-linecap="round"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>';
+var STAR = '<svg viewBox="0 0 24 24" fill="#d5001c" stroke="#d5001c" stroke-width="1.5" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>';
+function favList() {
   var f = $("favs"); f.innerHTML = "";
-  favs.forEach(function (x) { var b = D.createElement("button"); b.className = "chip" + (view && view.n === x.n ? " on" : ""); b.textContent = x.n.replace(/, [A-Z]{2}$/, ""); b.onclick = function () { setView(x); }; f.appendChild(b); });
-  f.style.display = favs.length ? "" : "none";
+  function row(icon, name, on, del) {
+    var r = D.createElement("div"); r.className = "frow";
+    var b = D.createElement("button"); b.className = "fn"; b.innerHTML = icon + "<span></span>"; b.lastChild.textContent = name; if (on) b.style.color = "var(--red)";
+    r.appendChild(b);
+    if (del) { var x = D.createElement("button"); x.className = "fx"; x.setAttribute("aria-label", "Remove " + name); x.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>'; x.onclick = del; r.appendChild(x); }
+    f.appendChild(r); return b;
+  }
+  row(PIN, "Current location" + (MD.cityName ? " · " + MD.cityName : ""), !view).onclick = function () { setView(null); };
+  favs.forEach(function (x, k) {
+    row(STAR, x.n, view && view.n === x.n, function () { favs.splice(k, 1); MD.lsSet("mdFavs", favs); favList(); paint(); }).onclick = function () { setView(x); };
+  });
+  if (!favs.length) { var n = D.createElement("div"); n.className = "note"; n.textContent = "Search a place, then tap the star next to its name to save it here."; f.appendChild(n); }
 }
+$("sOpen").onclick = function () { $("srPg").classList.add("on"); favList(); $("sIn").focus(); };
+$("srX").onclick = function () { $("srPg").classList.remove("on"); $("sIn").blur(); };
+
+/* sun page: sunrise and sunset for the next 7 days */
+function dmin(a, b) { var m = Math.round((b - a) / 60000); return Math.floor(m / 60) + "h " + ("0" + m % 60).slice(-2) + "m"; }
+function tms(t) { if (typeof t === "number") return t; var d0 = new Date(t.slice(0, 10) + "T00:00:00"); return d0.getTime() + (+t.slice(11, 13)) * 3600000 + (+t.slice(14, 16)) * 60000; }
+function openSun() {
+  var v = MD.view(); if (!v) return;
+  var y = vData && vData.daily, L = $("sunL"), rows = [];
+  for (var i = 0; i < 7; i++) {
+    var r = y && y.sunrise && y.sunrise[i], s2 = y && y.sunset && y.sunset[i], day = new Date(Date.now() + i * 864e5);
+    if (!r || !s2) { var c = sunCalc(v.lat, v.lon, day); r = c[0]; s2 = c[1]; }
+    if (y && y.time && y.time[i]) day = new Date(y.time[i] + "T12:00:00");
+    rows.push({ day: day, r: r, s: s2, len: tms(s2) - tms(r) });
+  }
+  $("sunName").textContent = view ? view.n : (MD.cityName || "Current location");
+  var now = Date.now(), t0 = rows[0], top = "";
+  if (!view && t0.r && t0.s) {
+    var rr = tms(t0.r), ss = tms(t0.s);
+    top = now < rr ? "Sunrise in " + dmin(now, rr) : now < ss ? "Daylight left: " + dmin(now, ss) : rows[1] ? "Sunrise in " + dmin(now, tms(rows[1].r)) : "";
+  }
+  $("sunTop").textContent = top;
+  L.innerHTML = "";
+  rows.forEach(function (x, i) {
+    var e = D.createElement("div"); e.className = "sr" + (i === 0 ? " today" : "");
+    var ch = i ? Math.round((x.len - rows[i - 1].len) / 60000) : null;
+    e.innerHTML = '<span class="cap">' + (i === 0 ? "Today" : x.day.toLocaleDateString("en-US", { weekday: "short" })) + '</span><span>' + hm(x.r) + '</span><span>' + hm(x.s) + '</span><span>' + (x.len > 0 ? dmin(0, x.len) : "--") + (ch != null ? '<i class="d" style="font-style:normal">' + (ch >= 0 ? "+" : "−") + Math.abs(ch) + " min</i>" : "") + "</span>";
+    L.appendChild(e);
+  });
+  $("sunPg").classList.add("on");
+}
+$("wSun").onclick = openSun;
+$("sunX").onclick = function () { $("sunPg").classList.remove("on"); };
 $("wStar").onclick = function () {
   if (!view) return;
   var i = -1; favs.forEach(function (f, k) { if (f.n === view.n) i = k; });
   if (i >= 0) favs.splice(i, 1); else if (favs.length < 15) favs.push({ n: view.n, lat: view.lat, lon: view.lon }); else MD.toast("You can save up to 15 places.");
-  MD.lsSet("mdFavs", favs); paint(); favChips();
+  MD.lsSet("mdFavs", favs); paint(); favList();
 };
-favChips(); paint();
+favList(); paint();
 })();
 
 (function () {
@@ -1089,6 +1212,7 @@ function TMap(box, o) {
   var dpr = Math.min(2, window.devicePixelRatio || 1), q = 0;
   me.redraw = function () { if (!q) { q = 1; requestAnimationFrame(function () { q = 0; draw(); }); } };
   function size() { var r = box.getBoundingClientRect(); me.W = r.width; me.H = r.height; [base, ov].forEach(function (c) { c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr); }); me.redraw(); }
+  me.size = size;
   if (window.ResizeObserver) new ResizeObserver(size).observe(box); else window.addEventListener("resize", size);
   size();
   function wp(lat, lon, z) { var n = 256 * Math.pow(2, z), s = Math.sin(Math.max(-85, Math.min(85, lat)) * Math.PI / 180); return [(lon + 180) / 360 * n, (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n]; }
@@ -1168,30 +1292,40 @@ function frames() {
   });
 }
 
-/* ---- weather page radar loop ---- */
-var rm = new TMap($("radMap"), { z: 6.3, overlay: function (c, m) { var v = MD.view(); if (v && !v.live) { var p = m.xy(v.lat, v.lon); c.beginPath(); c.arc(p[0], p[1], 6, 0, 7); c.fillStyle = "#d5001c"; c.fill(); c.lineWidth = 2; c.strokeStyle = "#fff"; c.stroke(); } dot(c, m, MD.pos); } });
-var rIdx = 0, rPlay = true, rLast = 0, rCentered = false;
-function rCenter() { var v = MD.view(); if (v) { rm.center(v.lat, v.lon, 6.3); rCentered = true; } }
-D.addEventListener("md:view", rCenter);
-MD.onPos(function () { if (!rCentered) rCenter(); rm.redraw(); });
+/* ---- the map page: radar, route and map in one place ---- */
+var mMode = "map", radOn = false, rIdx = 0, rPlay = true, rLast = 0;
+function pgOpen() { return $("mapPg").classList.contains("on") && !D.hidden; }
 function rStep() {
   if (!RF.frames.length) return;
   rIdx = (rIdx + 1) % RF.frames.length;
-  var f = RF.frames[rIdx]; rm.radar = { host: RF.host, path: f.path }; rm.redraw();
+  var f = RF.frames[rIdx]; bm.radar = { host: RF.host, path: f.path }; bm.redraw();
   var ago = Math.round((Date.now() / 1000 - f.time) / 60);
-  $("rTime").textContent = rIdx === RF.frames.length - 1 ? "Now" : "-" + ago + " min";
-  MD.radFrame = { r: rm.radar, t: $("rTime").textContent }; D.dispatchEvent(new CustomEvent("md:radar"));
+  $("rTime").textContent = rIdx === RF.frames.length - 1 ? "Radar now" : "Radar -" + ago + " min";
 }
-function wxOn() { return $("sWx").classList.contains("on") && !D.hidden; }
 setInterval(function () {
-  if (!wxOn()) return;
+  if (!radOn || !pgOpen()) return;
   frames().then(function () {
-    if (!rm.radar) { rIdx = RF.frames.length - 2; rStep(); }
+    if (!radOn) return;
+    if (!bm.radar) { rIdx = RF.frames.length - 2; rStep(); }
     var now = Date.now(), last = rIdx === RF.frames.length - 1;
     if (rPlay && now - rLast >= (last ? 1600 : 650)) { rLast = now; rStep(); }
   }).catch(function () { $("rTime").textContent = "Radar offline"; });
 }, 200);
+function setRad(on) { radOn = on; $("mRad").classList.toggle("on", on); $("rBar").style.display = on ? "flex" : "none"; if (!on) bm.radar = null; attr(); bm.redraw(); }
 $("rPlay").onclick = function () { rPlay = !rPlay; this.querySelector("path").setAttribute("d", rPlay ? "M9 6v12M15 6v12" : "M8 5v14l11-7z"); };
+function setMode2(m) {
+  mMode = m; bm.size();
+  Array.prototype.forEach.call(D.querySelectorAll("#mSeg button"), function (b) { b.classList.toggle("on", b.dataset.m === m); });
+  var v = MD.view();
+  if (m === "route" && MD.routeFit) { follow = false; MD.routeFit(bm); }
+  else if (v) { follow = m === "map" && !!v.live; bm.center(v.lat, v.lon, m === "radar" ? 7 : 13); }
+  setRad(m !== "map");
+}
+MD.openMap = function (m) { $("mapPg").classList.add("on"); setMode2(m); };
+MD.mapRedraw = function () { if (bm) bm.redraw(); };
+Array.prototype.forEach.call(D.querySelectorAll("#mSeg button"), function (b) { b.onclick = function () { setMode2(b.dataset.m); }; });
+Array.prototype.forEach.call(D.querySelectorAll("#mapsRow button"), function (b) { b.onclick = function () { MD.openMap(b.dataset.m); }; });
+$("mapX").onclick = function () { $("mapPg").classList.remove("on"); $("layM").style.display = "none"; };
 
 /* ---- the map: satellite, radar, measure, pins, photos ---- */
 var pins = MD.lsGet("mdPins", []), meas = [], mode = "", follow = true, photos = [], showPh = false, selPin = null;
@@ -1209,6 +1343,7 @@ function overlay(c, m) {
     c.fillStyle = "#fff"; c.fillRect(q[0] - 17, q[1] - 17, 34, 34);
     if (p.im.complete && p.im.naturalWidth) c.drawImage(p.im, q[0] - 15, q[1] - 15, 30, 30);
   });
+  if (mMode === "route" && MD.routeDraw) MD.routeDraw(c, m);
   pins.forEach(function (p) {
     var q = m.xy(p.lat, p.lon), x = q[0], y = q[1];
     c.beginPath(); c.moveTo(x, y); c.bezierCurveTo(x - 4, y - 8, x - 10, y - 13, x - 10, y - 20); c.arc(x, y - 20, 10, Math.PI, 0); c.bezierCurveTo(x + 10, y - 13, x + 4, y - 8, x, y); c.closePath();
@@ -1255,27 +1390,20 @@ $("pcRen").onclick = function () { if (!selPin) return; var n = prompt("Rename p
 $("mMeas").onclick = function () { setMode("meas"); };
 $("mPin").onclick = function () { setMode("pin"); };
 var lay = MD.lsGet("mdLay", 0);
+function attr() { $("mAttr").textContent = (lay === 1 ? "Esri, Maxar" : lay === 2 ? "Esri" : "© OpenStreetMap") + (radOn ? " · RainViewer" : ""); }
 function applyLay() {
-  bm.setLay(lay); $("mSat").classList.toggle("on", lay !== 0); $("mAttr").textContent = lay === 1 ? "Esri, Maxar" : lay === 2 ? "Esri" : "© OpenStreetMap";
+  bm.setLay(lay); $("mSat").classList.toggle("on", lay !== 0); attr();
   Array.prototype.forEach.call(D.querySelectorAll("#layM button"), function (b) { b.classList.toggle("on", +b.dataset.l === lay); });
 }
 $("mSat").onclick = function () { var m = $("layM"); m.style.display = m.style.display === "block" ? "none" : "block"; };
 Array.prototype.forEach.call(D.querySelectorAll("#layM button"), function (b) { b.onclick = function () { lay = +b.dataset.l; MD.lsSet("mdLay", lay); applyLay(); $("layM").style.display = "none"; }; });
 applyLay();
 $("mIn").onclick = function () { bm.zoom(1); }; $("mOut").onclick = function () { bm.zoom(-1); };
-$("rIn").onclick = function () { rm.zoom(1); }; $("rOut").onclick = function () { rm.zoom(-1); };
 var radOn = false;
-$("mRad").onclick = function () {
-  radOn = !radOn; this.classList.toggle("on", radOn);
-  if (!radOn) { bm.radar = null; bm.redraw(); $("mInfo").textContent = ""; return; }
-  frames().then(function () { var f = RF.frames[RF.frames.length - 1]; if (f && radOn) { bm.radar = { host: RF.host, path: f.path }; bm.redraw(); $("mInfo").textContent = "Radar " + new Date(f.time * 1000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); } }).catch(function () { MD.toast("Radar isn't answering right now."); });
-};
-setInterval(function () { if (radOn && wxOn()) { RF.at = 0; $("mRad").onclick.call($("mRad")); $("mRad").onclick.call($("mRad")); } }, 300000);
+$("mRad").onclick = function () { setRad(!radOn); };
 $("mMe").onclick = function () { follow = true; var v = MD.pos || MD.view(); if (v) bm.center(v.lat, v.lon, Math.max(bm.z, 12)); };
-$("mFull").onclick = function () { var b = $("bigMap"); b.classList.toggle("full"); this.classList.toggle("on", b.classList.contains("full")); bm.redraw(); };
-MD.onPos(function (p) { var v = MD.view(); if (follow && v && v.live) bm.center(p.lat, p.lon); else bm.redraw(); rm.redraw(); });
-D.addEventListener("md:view", function () { var v = MD.view(); if (v) { follow = !!v.live; bm.center(v.lat, v.lon); } });
-D.addEventListener("md:screen", function (e) { if (e.detail === "sWx") { bm.redraw(); rm.redraw(); } });
+MD.onPos(function (p) { if (!pgOpen()) return; var v = MD.view(); if (follow && v && v.live) bm.center(p.lat, p.lon); else bm.redraw(); });
+D.addEventListener("md:view", function () { var v = MD.view(); if (v && mMode !== "route") { follow = !!v.live; bm.center(v.lat, v.lon); } });
 
 /* ---- photos: kept on the phone with where they were taken ---- */
 var db = null;
@@ -1285,10 +1413,10 @@ function idb() {
 }
 function tx(mode2) { return idb().then(function (d) { return d.transaction("p", mode2).objectStore("p"); }); }
 function loadPhotos() {
-  tx("readonly").then(function (s) { var r = s.getAll(); r.onsuccess = function () { photos = (r.result || []).map(function (p) { return { id: p.id, t: p.t, lat: p.lat, lon: p.lon, th: p.th }; }); bm.redraw(); }; }).catch(function () {});
+  tx("readonly").then(function (s) { var r = s.getAll(); r.onsuccess = function () { photos = (r.result || []).map(function (p) { return { id: p.id, t: p.t, lat: p.lat, lon: p.lon, th: p.th, d: p.d || "" }; }); bm.redraw(); }; }).catch(function () {});
 }
 loadPhotos();
-$("mPho").onclick = function () { showPh = !showPh; this.classList.toggle("on", showPh); $("mCam").style.display = showPh ? "" : "none"; if (showPh && !photos.length) MD.toast("No photos yet. Tap the camera to take one here."); bm.redraw(); };
+$("mPho").onclick = function () { showPh = !showPh; this.classList.toggle("on", showPh); if (showPh && !photos.length) MD.toast("No photos yet. Tap the camera to take one here."); bm.redraw(); };
 $("mCam").onclick = function () { $("camIn").click(); };
 function shrink(file, max, q) {
   return new Promise(function (res, rej) {
@@ -1297,18 +1425,54 @@ function shrink(file, max, q) {
     im.onerror = rej; im.src = u;
   });
 }
+/* camera: pick a description, then stamp it with place, time and coordinates */
+var pend = null, CAPS = ["Parking spot", "Restaurant", "Shopping", "View", "Home", "Work"];
 $("camIn").onchange = function () {
   var f = this.files && this.files[0]; this.value = ""; if (!f) return;
   var p = MD.pos; if (!p) { MD.toast("Waiting for your location. Try again in a moment."); return; }
-  Promise.all([shrink(f, 1600, 0.8), shrink(f, 120, 0.7)]).then(function (a) {
-    var rec = { id: Date.now(), t: Date.now(), lat: p.lat, lon: p.lon, img: a[0], th: a[1] };
-    return tx("readwrite").then(function (s) { s.put(rec); photos.push({ id: rec.id, t: rec.t, lat: rec.lat, lon: rec.lon, th: rec.th }); bm.redraw(); MD.toast("Photo saved on the map."); });
-  }).catch(function () { MD.toast("Couldn't save that photo."); });
+  pend = { f: f, lat: p.lat, lon: p.lon, t: Date.now(), city: MD.cityName || "" };
+  $("capI").src = URL.createObjectURL(f); $("capT").value = "";
+  var b = $("capChips"); b.innerHTML = "";
+  CAPS.forEach(function (c) { var e = D.createElement("button"); e.className = "chip"; e.textContent = c; e.onclick = function () { $("capT").value = c; Array.prototype.forEach.call(b.children, function (x) { x.classList.toggle("on", x === e); }); }; b.appendChild(e); });
+  $("capS").style.display = "flex";
 };
+function capClose() { $("capS").style.display = "none"; var u = $("capI").src; $("capI").removeAttribute("src"); if (u) URL.revokeObjectURL(u); }
+$("capX").onclick = function () { pend = null; capClose(); };
+$("capT").addEventListener("keydown", function (e) { if (e.key === "Enter") this.blur(); });
+$("capOk").onclick = function () { var p = pend; if (!p) return; p.d = $("capT").value.trim(); pend = null; capClose(); savePhoto(p); };
+function stamp(p) {
+  return new Promise(function (res, rej) {
+    var u = URL.createObjectURL(p.f), im = new Image();
+    im.onload = function () {
+      var k = Math.min(1, 1600 / Math.max(im.width, im.height)), c = D.createElement("canvas"), W = c.width = Math.round(im.width * k), H = c.height = Math.round(im.height * k), x = c.getContext("2d");
+      x.drawImage(im, 0, 0, W, H); URL.revokeObjectURL(u);
+      var s = Math.min(W, H) / 100, F = "'DIN Alternate','Barlow Semi Condensed','Helvetica Neue',sans-serif", pad = 4 * s;
+      var when = new Date(p.t).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
+      var lines = [];
+      if (p.d) lines.push([p.d.toUpperCase(), "600 " + 6 * s + "px " + F, "#fff", 7.2 * s]);
+      lines.push([((p.city ? p.city + "  ·  " : "") + when).toUpperCase(), "500 " + 3.1 * s + "px " + F, "#e6e6e6", 4.4 * s]);
+      lines.push([Math.abs(p.lat).toFixed(5) + "° " + (p.lat >= 0 ? "N" : "S") + "   " + Math.abs(p.lon).toFixed(5) + "° " + (p.lon >= 0 ? "E" : "W"), "500 " + 2.6 * s + "px " + F, "#b9bcc2", 3.8 * s]);
+      var tall = lines.reduce(function (a, l) { return a + l[3]; }, 0), top = H - pad - tall;
+      var g = x.createLinearGradient(0, top - 10 * s, 0, H); g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(0.45, "rgba(0,0,0,.55)"); g.addColorStop(1, "rgba(0,0,0,.8)");
+      x.fillStyle = g; x.fillRect(0, top - 10 * s, W, H - top + 10 * s);
+      x.fillStyle = "#d5001c"; x.fillRect(pad, top + 0.6 * s, 0.9 * s, tall - 1.4 * s);
+      var y = top; x.textBaseline = "top";
+      lines.forEach(function (l) { x.font = l[1]; x.fillStyle = l[2]; x.fillText(l[0], pad + 2.6 * s, y + 0.3 * s, W - pad * 2 - 2.6 * s); y += l[3]; });
+      res(c.toDataURL("image/jpeg", 0.82));
+    };
+    im.onerror = rej; im.src = u;
+  });
+}
+function savePhoto(p) {
+  Promise.all([stamp(p), shrink(p.f, 120, 0.7)]).then(function (a) {
+    var rec = { id: p.t, t: p.t, lat: p.lat, lon: p.lon, img: a[0], th: a[1], d: p.d || "", city: p.city };
+    return tx("readwrite").then(function (s2) { s2.put(rec); photos.push({ id: rec.id, t: rec.t, lat: rec.lat, lon: rec.lon, th: rec.th, d: rec.d }); showPh = true; $("mPho").classList.add("on"); bm.redraw(); MD.toast("Photo saved on the map."); });
+  }).catch(function () { MD.toast("Couldn't save that photo."); });
+}
 var cur = null;
 function openPhoto(p) {
   cur = p;
-  tx("readonly").then(function (s) { var r = s.get(p.id); r.onsuccess = function () { if (!r.result) return; $("phI").src = r.result.img; $("phD").textContent = new Date(p.t).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); $("ph").style.display = "flex"; }; });
+  tx("readonly").then(function (s) { var r = s.get(p.id); r.onsuccess = function () { if (!r.result) return; $("phI").src = r.result.img; $("phD").textContent = (p.d ? p.d + " · " : "") + new Date(p.t).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); $("ph").style.display = "flex"; }; });
 }
 $("phX").onclick = function () { $("ph").style.display = "none"; $("phI").src = ""; };
 $("phDel").onclick = function () {
@@ -1337,18 +1501,17 @@ var ROUTE = [
 /* road path for the map: SR-88, I-5, I-205, I-580, I-680 */
 var PATH = [[38.3488,-120.7741],[38.3600,-120.8050],[38.3330,-120.8700],[38.2900,-120.9300],[38.2400,-121.0000],[38.1910,-121.0880],[38.1590,-121.1630],[38.1150,-121.2200],[38.0300,-121.2600],[37.9577,-121.2908],
   [37.9000,-121.3100],[37.8300,-121.2900],[37.7700,-121.3400],[37.7397,-121.4252],[37.7350,-121.5300],[37.7400,-121.6500],[37.7000,-121.7700],[37.7000,-121.9250],[37.6600,-121.9000],[37.5949,-121.8885],[37.5600,-121.9300],[37.5485,-121.9886]];
-var dir = "w", lead = 0, data = null, at = 0, bad = {}, fitted = false;
-var cm = new MD.TMap($("cmMap"), { lat: 37.95, lon: -121.38, z: 8.3, overlay: cmDraw });
-function fit() {
-  if (!cm.W) return;
-  function wp(la, lo) { var s = Math.sin(la * Math.PI / 180); return [(lo + 180) / 360 * 256, (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * 256]; }
+var dir = "w", lead = 0, data = null, at = 0, bad = {};
+/* fit the whole route on a map */
+MD.routeFit = function (m) {
+  if (!m.W) return;
+  function wp(la, lo) { var t = Math.sin(la * Math.PI / 180); return [(lo + 180) / 360 * 256, (0.5 - Math.log((1 + t) / (1 - t)) / (4 * Math.PI)) * 256]; }
   var a = wp(38.40, -122.02), b = wp(37.50, -120.74);
-  cm.z = Math.log(Math.min((cm.W - 130) / (b[0] - a[0]), (cm.H - 50) / (b[1] - a[1]))) / Math.LN2;
-  cm.lat = 37.95; cm.lon = -121.38; var q = cm.ll(cm.W / 2 + 26, cm.H / 2); cm.lat = q[0]; cm.lon = q[1]; fitted = true; cm.redraw();
-}
+  m.z = Math.log(Math.min((m.W - 130) / (b[0] - a[0]), (m.H - 170) / (b[1] - a[1]))) / Math.LN2;
+  m.lat = 37.95; m.lon = -121.38; m.redraw();
+};
 function lbl(c, t, x, y, col, al) { c.font = "600 11px 'DIN Alternate','Barlow Semi Condensed',sans-serif"; c.textAlign = al || "left"; c.lineWidth = 3.5; c.strokeStyle = "rgba(0,0,0,.85)"; c.strokeText(t, x, y); c.fillStyle = col; c.fillText(t, x, y); }
-function cmDraw(c, m) {
-  if (!fitted && m.W) { fit(); return; }
+MD.routeDraw = function (c, m) {
   c.lineJoin = c.lineCap = "round";
   [[7, "rgba(0,0,0,.55)"], [3.5, "#d5001c"]].forEach(function (s) { c.beginPath(); PATH.forEach(function (p, i) { var q = m.xy(p[0], p[1]); if (i) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); }); c.lineWidth = s[0]; c.strokeStyle = s[1]; c.stroke(); });
   ROUTE.forEach(function (p, i) {
@@ -1356,11 +1519,8 @@ function cmDraw(c, m) {
     c.beginPath(); c.arc(q[0], q[1], hot ? 7 : end ? 6 : 4, 0, 7); c.fillStyle = hot ? "#d5001c" : "#fff"; c.fill(); c.lineWidth = 2; c.strokeStyle = hot ? "#fff" : "#000"; c.stroke();
     if (hot || end) lbl(c, (p[0] + (hot ? " · " + hot : "")).toUpperCase(), i === 0 ? q[0] - 11 : q[0] + 10, q[1] + (i === ROUTE.length - 1 ? 14 : 4), hot ? "#ff5a6e" : "#fff", i === 0 ? "right" : "left");
   });
-  MD.mapDot(c, m, MD.pos);
-}
-D.addEventListener("md:radar", function () { var f = MD.radFrame; cm.radar = f.r; var t = $("cmTag"); t.textContent = "Radar " + (f.t === "Now" ? "now" : f.t); t.style.display = "block"; cm.redraw(); });
-MD.onPos(function () { cm.redraw(); });
-$("cIn").onclick = function () { cm.zoom(1); }; $("cOut").onclick = function () { cm.zoom(-1); }; $("cFit").onclick = fit;
+};
+$("cmMapB").onclick = function () { MD.openMap("route"); };
 function load() {
   if (data && Date.now() - at < 900000) return Promise.resolve(data);
   var u = "https://api.open-meteo.com/v1/forecast?latitude=" + ROUTE.map(function (p) { return p[1]; }).join(",") + "&longitude=" + ROUTE.map(function (p) { return p[2]; }).join(",") +
@@ -1398,7 +1558,7 @@ function paint() {
       r.querySelector(".p").textContent = x.p[0];
       L.appendChild(r);
     });
-    MD.cmFlags = flags; warn(); cm.redraw();
+    MD.cmFlags = flags; warn(); if (MD.mapRedraw) MD.mapRedraw();
     var s = D.createElement("div"); s.id = "cmS";
     s.innerHTML = flags.length ? '<span style="color:#d5001c">Heads up:</span> ' + MD.esc(flags.join(" · ")) : '<span class="mut">Clear drive, nothing to watch for</span>';
     L.appendChild(s);
