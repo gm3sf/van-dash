@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Macan Dash rev 4 -->
+<!-- Macan Dash rev 5 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -52,9 +52,9 @@ input{font:inherit;letter-spacing:inherit}
 .rb svg{width:24px;height:24px;fill:none;stroke:var(--w);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .rb .n{position:absolute;font-size:11px;top:50%;left:0;right:0;text-align:center;transform:translateY(-45%)}
 .rb:active{background:#1c1c1e}
-#bPlay{width:68px;height:68px;border:2px solid var(--red)}
-#bPlay svg{width:30px;height:30px}
-#msg{display:flex;justify-content:center;gap:34px;margin-top:16px}
+#bPlay{width:78px;height:78px;border:2px solid var(--red)}
+#bPlay svg{width:34px;height:34px}
+#msg{display:flex;justify-content:center;gap:26px;margin-top:20px}
 .qb{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--g)}
 .qb .rb{width:54px;height:54px;border:1.5px solid var(--bez);background:#0a0a0a}
 .qb i{font-style:normal;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
@@ -215,7 +215,7 @@ input{font:inherit;letter-spacing:inherit}
 <div id="lim" class="none"><span>Limit</span><span id="limN">--</span></div></div>
 <div id="dialW"><svg id="dial" viewBox="0 0 268 268">
 <defs><clipPath id="artC"><circle cx="134" cy="134" r="62"/></clipPath></defs>
-<circle cx="134" cy="134" r="130" fill="#0a0a0a" stroke="#9ba0a6" stroke-width="2.5"/>
+<circle cx="134" cy="134" r="130" fill="#0a0a0a" stroke="#f2f2f2" stroke-width="2.5"/>
 <circle cx="134" cy="134" r="124" fill="none" stroke="#2c2c2e" stroke-width="1"/>
 <g id="ticks"></g>
 <path id="arcBg" fill="none" stroke="#1f1f21" stroke-width="5"/>
@@ -225,7 +225,8 @@ input{font:inherit;letter-spacing:inherit}
 <circle cx="134" cy="134" r="62" fill="none" stroke="#9ba0a6" stroke-width="1.5"/>
 <line id="needle" x1="134" y1="30" x2="134" y2="12" stroke="#d5001c" stroke-width="3.5" stroke-linecap="round"/>
 <circle id="knob" r="7" fill="#d5001c" opacity="0"/>
-<text x="134" y="246" text-anchor="middle" font-size="16" fill="#f2f2f2" font-family="DIN Alternate,Barlow Semi Condensed,sans-serif"><tspan id="tCur">0:00</tspan> <tspan id="tDur" fill="#8b9098">/ 0:00</tspan></text>
+<path d="M100 214L168 214C190 214 194.57 220 203.57 233A121 121 0 0 1 64.43 233C73.43 220 78 214 100 214Z" fill="#0a0a0a" stroke="#8b9098" stroke-width="1.4"/>
+<text x="134" y="239" text-anchor="middle" font-size="16" fill="#f2f2f2" font-family="DIN Alternate,Barlow Semi Condensed,sans-serif"><tspan id="tCur">0:00</tspan> <tspan id="tDur" fill="#8b9098">/ 0:00</tspan></text>
 </svg><img id="art" alt=""></div>
 <div id="trk"><span class="tsp"></span><div style="min-width:0"><div id="tT">Spotify</div><div id="tA">&nbsp;</div><div id="tC"></div></div><button class="rb" id="bList" aria-label="Song list"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></button></div>
 <div id="ctl">
@@ -239,6 +240,7 @@ input{font:inherit;letter-spacing:inherit}
 <a class="qb" id="openSp" href="spotify:"><span class="rb"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></span><i>Spotify</i></a>
 <button class="qb" id="openCm"><span class="rb" id="cmRing"><svg viewBox="0 0 24 24"><path d="M5 21L10 3M19 21L14 3"/><path d="M12 19v-2.5M12 12.5v-2M12 7V5.5"/></svg><b id="cmDot"></b></span><i>Route wx</i></button>
 <a class="qb" id="openGm" href="comgooglemaps://"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span><i>Maps</i></a>
+<button class="qb" id="openCam"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></span><i>Camera</i></button>
 </div>
 </div>
 
@@ -293,7 +295,6 @@ input{font:inherit;letter-spacing:inherit}
 <div id="sRes"></div><div class="lab"><span>Saved places</span></div><div id="favs"></div></div></div>
 <div class="pg" id="sunPg"><div class="pgH"><button class="pgB" id="sunX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Sunrise · Sunset</span><span></span></div><div class="pgC"><div id="sunName"></div><div id="sunTop"></div><div class="sr sh"><span></span><span>Sunrise</span><span>Sunset</span><span>Daylight</span></div><div id="sunL"></div></div></div>
 <div class="sheet" id="capS"><div class="shC"><img id="capI" alt=""><div class="lab" style="margin-top:12px"><span>Description</span></div><div id="capChips"></div><input id="capT" placeholder="Type a description" autocomplete="off" enterkeyhint="done" maxlength="40"><div class="shB"><button id="capX">Cancel</button><button id="capOk" class="obtn">Save photo</button></div></div></div>
-<div class="sheet" id="spSh"><div class="shC"><div style="font-size:19px;text-transform:uppercase;letter-spacing:.06em">Spotify needs a wake-up</div><div class="mut" style="font-size:15px;line-height:1.45;margin-top:8px">Your iPhone puts Spotify to sleep in the background. Tap Open Spotify, then come straight back here. No need to press play there, the music starts on its own.</div><div class="shB"><button id="spShX">Cancel</button><a class="obtn" id="spShGo" href="spotify:">Open Spotify</a></div></div></div>
 <div id="toast"></div>
 <script>
 (function () {
@@ -477,47 +478,31 @@ function pick(d) {
   if (!h.length && ty) h = d.filter(function (x) { return x.type === ty; });
   return h.filter(function (x) { return x.is_active; })[0] || h[0] || d.filter(function (x) { return x.is_active; })[0] || null;
 }
-/* Spotify asleep on the phone: try the phone we used last, and if that fails
-   ask her to pop into Spotify; when she comes back the music starts by itself */
-var pending = null;
-function asleep(body) { pending = { b: body, t: Date.now() }; $("spSh").style.display = "flex"; }
-$("spShX").onclick = function () { pending = null; $("spSh").style.display = "none"; };
-$("spShGo").addEventListener("click", function () { setTimeout(function () { $("spSh").style.display = "none"; }, 400); });
-function wake(n) {
-  if (!pending || D.hidden) return;
-  if (Date.now() - pending.t > 300000) { pending = null; return; }
-  if (n === 0) MD.toast("Starting your music…", 3000);
-  api("GET", "/me/player/devices").then(function (r) { return r && r.ok ? r.json() : { devices: [] }; }).then(function (j) {
-    var t = pick(j.devices || []);
-    if (!t) { if (n < 5) setTimeout(function () { wake(n + 1); }, 1500); else { pending = null; MD.toast("Spotify didn't wake up. Try playing again."); } return; }
-    var b = pending.b; pending = null; go(b);
-  });
+/* Same order as Van Dash: just play; if Spotify says no player, hand it to her phone
+   (or the last phone that played); if Spotify is fully asleep, open the playlist in Spotify */
+function openIn(body) {
+  var u = body && (body.context_uri || (body.uris && body.uris[0]));
+  var m = u && u.match(/^spotify:(\w+):(\w+)/);
+  location.href = m ? "https://open.spotify.com/" + m[1] + "/" + m[2] : "spotify:";
 }
-D.addEventListener("visibilitychange", function () { if (!D.hidden && pending) setTimeout(function () { wake(0); }, 800); });
-function tryLast(body) {
-  var last = MD.lsGet("mdDev", null);
-  if (!last) return Promise.resolve(null);
-  return api("PUT", "/me/player", { device_ids: [last], play: !body }).then(function (y) {
-    if (!y || !(y.ok || y.status === 202)) return null;
-    if (!body) return y;
-    return wait(700).then(function () { return api("PUT", "/me/player/play?device_id=" + last, body); }).then(function (r) { return r && r.ok ? r : null; });
+function viaDevice(body) {
+  return api("GET", "/me/player/devices").then(function (r) { return r && r.ok ? r.json() : { devices: [] }; }).then(function (j) {
+    var d = j.devices || [], last = MD.lsGet("mdDev", null);
+    var t = pick(d) || d.filter(function (x) { return x.id === last; })[0] || d.filter(function (x) { return x.is_active; })[0] || d[0];
+    if (!t) return null;
+    return api("PUT", "/me/player", { device_ids: [t.id], play: !body }).then(function (y) {
+      if (!y || !(y.ok || y.status === 202)) return null;
+      if (!body) return y;
+      return wait(700).then(function () { return api("PUT", "/me/player/play?device_id=" + t.id, body); }).then(function (r) {
+        return r && r.ok ? r : wait(900).then(function () { return api("PUT", "/me/player/play?device_id=" + t.id, body); }).then(function (r2) { return r2 && r2.ok ? r2 : null; });
+      });
+    });
   });
 }
 function go(body) {
-  return api("GET", "/me/player/devices").then(function (r) { return r && r.ok ? r.json() : { devices: [] }; }).then(function (j) {
-    var t = pick(j.devices || []);
-    if (t) MD.lsSet("mdDev", t.id);
-    if (!t) return tryLast(body).then(function (y) {
-      if (y) return y;
-      return api("PUT", "/me/player/play", body).then(function (r) { if (r && r.status === 404) asleep(body); return r; });
-    });
-    if (t.is_active) return api("PUT", "/me/player/play?device_id=" + t.id, body);
-    return api("PUT", "/me/player", { device_ids: [t.id], play: !body }).then(function (y) {
-      if (!body) return y;
-      return wait(700).then(function () { return api("PUT", "/me/player/play?device_id=" + t.id, body); }).then(function (r) {
-        return r && r.ok ? r : wait(900).then(function () { return api("PUT", "/me/player/play?device_id=" + t.id, body); });
-      });
-    });
+  return api("PUT", "/me/player/play", body).then(function (r) {
+    if (!r || r.status !== 404) return r;
+    return viaDevice(body).then(function (y) { if (y) return y; openIn(body); return r; });
   }).then(function (r) { if (r && r.status === 403) MD.toast("Spotify Premium is needed for that."); setTimeout(poll, 700); return r; });
 }
 MD.spGo = go;
@@ -600,7 +585,7 @@ function poll() {
       var it = j.item;
       if (!it) return idle();
       S.playing = !!j.is_playing; S.shuffle = !!j.shuffle_state; S.prog = j.progress_ms || 0; S.dur = it.duration_ms || 0; S.at = Date.now();
-      S.uri = it.uri; S.ctx = j.context ? j.context.uri : "";
+      S.uri = it.uri; S.ctx = j.context ? j.context.uri : ""; if (j.device && j.device.id) MD.lsSet("mdDev", j.device.id);
       S.name = it.name; S.artist = it.artists ? it.artists.map(function (x) { return x.name; }).join(", ") : (it.show ? it.show.name : "");
       var im = (it.album && it.album.images) || it.images || [];
       S.art = im.length ? (im[1] || im[0]).url : "";
@@ -834,7 +819,7 @@ function fetchSongs(id) {
 var openCtx = "", fromMain = false, qU = [];
 function fill(id, list, ctx) {
   var L = $("trL"); L.innerHTML = "";
-  if (!list.length) return msg("Spotify only lists the songs for playlists you own or follow. Tap the playlist name to play it.");
+  if (!list.length) return msg("Spotify only shows the songs in playlists she owns or is a collaborator on. Tap the playlist name to play it.");
   var cu = MD.sp && MD.sp.uri, ci = -1, idx = list.map(function (t, i) { if (t[2] === cu) ci = i; return i; }), later = [], labTxt = "";
   if (ci >= 0) {
     if (MD.sp.shuffle && qU.length) {
@@ -868,7 +853,7 @@ function openSongs(id, name, ctx, main) {
   msg("Loading songs…");
   fetchSongs(id).then(function (L) { SC[id] = L; if (openId === id) fill(id, L, ctx); }).catch(function (s) {
     if (openId !== id) return;
-    msg(s === 401 || s === 403 ? "Spotify only lists the songs for playlists you own or follow. You can still tap the playlist name to play it." : "Couldn't load the songs (" + s + "). Try again in a moment.", s === 401);
+    msg(s === 401 ? "Spotify needs you to log in again." : s === 403 || s === 404 ? "Spotify only shows the songs in playlists she owns or is a collaborator on. Tap the playlist name to play it." : "Couldn't load the songs right now. Try again in a moment.", s === 401);
   });
 }
 $("trBack").onclick = function () { openId = ""; $("trV").style.display = "none"; $("plV").style.display = ""; if (fromMain) MD.show("sNow"); };
@@ -1418,6 +1403,7 @@ function loadPhotos() {
 loadPhotos();
 $("mPho").onclick = function () { showPh = !showPh; this.classList.toggle("on", showPh); if (showPh && !photos.length) MD.toast("No photos yet. Tap the camera to take one here."); bm.redraw(); };
 $("mCam").onclick = function () { $("camIn").click(); };
+$("openCam").onclick = function () { $("camIn").click(); };
 function shrink(file, max, q) {
   return new Promise(function (res, rej) {
     var u = URL.createObjectURL(file), im = new Image();
