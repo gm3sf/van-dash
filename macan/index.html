@@ -54,7 +54,8 @@ input{font:inherit;letter-spacing:inherit}
 .rb:active{background:#1c1c1e}
 #bPlay{width:78px;height:78px;border:2px solid var(--red)}
 #bPlay svg{width:34px;height:34px}
-#msg{display:flex;justify-content:center;gap:26px;margin-top:40px}
+#msg{display:grid;grid-template-columns:repeat(4,1fr);margin:0 -6px;flex:none}#msg .qb i{white-space:nowrap}
+#sNow.on{display:flex;flex-direction:column}#sNow>#band,#sNow>#trk,#sNow>#ctl,#sNow>#cmNote{flex:none}.gr{flex:none}.g1,.g5{flex:1 1 0;min-height:14px}.g2{height:12px}.g3{height:16px}.g4{height:30px}
 .qb{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--g)}
 .qb .rb{width:54px;height:54px;border:1.5px solid var(--bez);background:#0a0a0a}
 .qb i{font-style:normal;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
@@ -137,8 +138,8 @@ input{font:inherit;letter-spacing:inherit}
 .hr b{display:block;font-weight:400;font-size:15px;color:var(--w)}
 .hr i{display:block;font-style:normal;font-size:11px;color:#9fc4e8;min-height:13px}
 .cmRow{display:flex;gap:5px;margin-top:10px;align-items:center}.cmRow .chip{padding:6px 9px;font-size:12px}
-.cm{display:grid;grid-template-columns:48px minmax(0,1fr) 24px 32px 38px 42px;align-items:center;gap:6px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:15px}
-.cm svg{width:22px;height:22px}.cm .t{color:var(--g);font-size:13px}.cm .p{text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cm .r{font-size:12px;color:#9fc4e8;text-align:right}.cm .w{font-size:12px;color:var(--g);text-align:right}.cm .bad{color:var(--red)!important}
+.cm{display:grid;grid-template-columns:48px minmax(0,1fr) 24px 34px 34px 68px;align-items:center;gap:6px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:15px}
+.cm svg{width:22px;height:22px}.cm .t{color:var(--g);font-size:13px}.cm .p{text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cm .r{font-size:12px;color:#9fc4e8;text-align:right}.cm .w{font-size:15px;color:var(--w);display:flex;align-items:center;gap:5px;padding-left:4px;white-space:nowrap}.cm .w svg{width:20px;height:20px;flex:none;color:var(--w)}.cm .w b{font-weight:400}.cm .w i{font-style:normal;font-size:12px;margin-left:-4px}.cm .w.bad svg{color:var(--red)}.cm .bad{color:var(--red)!important}
 #kRain{color:var(--w)}#kCond span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#kRain b{font-weight:400;color:var(--red)}
 .qb i .inf{width:11px;height:11px;margin-left:4px;vertical-align:-1px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 #cmS{font-size:14px;margin:10px 2px 0;text-transform:uppercase;letter-spacing:.06em}
@@ -162,6 +163,17 @@ input{font:inherit;letter-spacing:inherit}
 #pinCard .mut{font-size:13px;margin-top:2px}
 #pinCard .acts{display:flex;gap:8px;margin-top:8px}
 #pinCard .acts button,#pinCard .acts a{border:1px solid var(--btn);border-radius:14px;padding:6px 12px;font-size:13px;text-transform:uppercase;color:var(--w);text-decoration:none}
+#phPg .pgC{padding-top:10px}.phN{display:flex;gap:7px;align-items:flex-start;font-size:12px;line-height:1.35;color:var(--g);margin:2px 2px 12px}.phN svg{width:14px;height:14px;flex:none;fill:none;stroke:var(--red);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
+.phB{display:flex;gap:8px;margin-bottom:8px}.phB .obtn{flex:1;margin:0;text-align:center;padding:11px 6px;font-size:12px;letter-spacing:.08em;white-space:nowrap;color:var(--w)}.phB .obtn.alt{border-color:#3a3a3c}.phB .obtn.off{opacity:.45}
+.phR{display:flex;gap:12px;align-items:center;border:1px solid #2c2c2e;border-radius:14px;padding:9px;margin-bottom:8px;cursor:pointer}.phR.on{border-color:var(--red)}
+.phR img{width:70px;height:70px;object-fit:cover;border-radius:8px;flex:none;background:#141416}.phR .tx{flex:1;min-width:0}.phR b{display:block;font-weight:400;font-size:16px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phR .s{font-size:12px;color:var(--g);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.phR .x{flex:none;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--g)}.phR .x svg,.phR .ck svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.phR .ck{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid #5d6168;display:flex;align-items:center;justify-content:center;color:#000}.phR.on .ck{background:var(--red);border-color:var(--red);color:#fff}
+#pvW{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px 12px 0}#pvI{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+#pvInfo{text-align:center;font-size:12px;letter-spacing:.06em;color:var(--g);padding:10px 16px 0;line-height:1.5;text-transform:uppercase}#pvInfo b{display:block;font-weight:400;font-size:16px;color:var(--w)}
+#pvA{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px 14px}#pvA .obtn{margin:0;text-align:center;padding:11px 6px;font-size:13px;color:var(--w);border-color:#3a3a3c}#pvA #pvShare{border-color:var(--red)}#pvA #pvDel{color:#ff5a6e}
+#spBar{position:absolute;left:10px;right:62px;bottom:10px;display:none;align-items:center;gap:8px;background:rgba(0,0,0,.88);border:1px solid var(--red);border-radius:12px;padding:8px 10px;z-index:5}#spBar span{flex:1;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+#spBar button{border:1px solid var(--btn);border-radius:14px;padding:6px 10px;font-size:12px;text-transform:uppercase;color:var(--w);flex:none}#spBar #spPin{border-color:var(--red)}
 #ph{position:fixed;inset:0;z-index:80;background:#000;display:none;flex-direction:column;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
 #ph img{flex:1;min-height:0;width:100%;object-fit:contain}
 #ph .bar2{display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-size:14px;text-transform:uppercase}
@@ -229,8 +241,8 @@ body.night #app,body.night .pg,body.night .shC{filter:brightness(.72)}
 <div class="scr on" id="sNow">
 <div id="band"><div id="spdW"><span id="spd">--</span><span id="mph">mph</span></div>
 <div id="lim" class="none"><span>Limit</span><span id="limN">--</span></div></div>
-<div id="dialW"><svg id="dial" viewBox="0 0 268 268">
-<defs><clipPath id="artC"><circle cx="134" cy="134" r="62"/></clipPath></defs>
+<div class="gr g1"></div><div id="dialW"><svg id="dial" viewBox="0 0 268 268">
+<defs><filter id="ng" x="-2" y="-1" width="5" height="3"><feGaussianBlur stdDeviation="2.2"/></filter><clipPath id="artC"><circle cx="134" cy="134" r="62"/></clipPath></defs>
 <circle cx="134" cy="134" r="130" fill="#0a0a0a" stroke="#f2f2f2" stroke-width="2.5"/>
 <circle cx="134" cy="134" r="124" fill="none" stroke="#2c2c2e" stroke-width="1"/>
 <g id="ticks"></g>
@@ -239,26 +251,26 @@ body.night #app,body.night .pg,body.night .shC{filter:brightness(.72)}
 <circle cx="134" cy="134" r="62" fill="#141416"/>
 <text id="artTx" x="134" y="139" text-anchor="middle" font-size="15" fill="#8b9098" letter-spacing="2" font-family="DIN Alternate,Barlow Semi Condensed,sans-serif">SPOTIFY</text>
 <circle cx="134" cy="134" r="62" fill="none" stroke="#9ba0a6" stroke-width="1.5"/>
-<line id="needle" x1="134" y1="30" x2="134" y2="12" stroke="#d5001c" stroke-width="3.5" stroke-linecap="round"/>
+<g id="needle"><path d="M131 70L137 70L135.2 8L132.8 8Z" fill="#ff1a35" filter="url(#ng)" opacity=".7"/><path d="M131 70L137 70L135.2 8L132.8 8Z" fill="#d5001c"/><path d="M133.6 66L134.4 66L134.2 12L133.8 12Z" fill="#ff8a96"/></g>
 <circle id="knob" r="7" fill="#d5001c" opacity="0"/>
 <path d="M57.7 238C67 222 78 214 100 214L168 214C190 214 201 222 210.3 238" fill="none" stroke="#8b9098" stroke-width="1.4"/>
 <text x="134" y="239" text-anchor="middle" font-size="16" fill="#f2f2f2" font-family="DIN Alternate,Barlow Semi Condensed,sans-serif"><tspan id="tCur">0:00</tspan> <tspan id="tDur" fill="#8b9098">/ 0:00</tspan></text>
 </svg><img id="art" alt=""></div>
-<div id="trk"><span class="tsp"></span><div style="min-width:0"><div id="tT">Spotify</div><div id="tA">&nbsp;</div><div id="tC"></div></div><button class="rb" id="bList" aria-label="Song list"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></button></div>
-<div id="ctl">
+<div class="gr g2"></div><div id="trk"><span class="tsp"></span><div style="min-width:0"><div id="tT">Spotify</div><div id="tA">&nbsp;</div><div id="tC"></div></div><button class="rb" id="bList" aria-label="Song list"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></button></div>
+<div class="gr g3"></div><div id="ctl">
 <button class="rb" id="bPrev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 5v14M19 5L9 12l10 7z"/></svg></button>
 <button class="rb" id="bBack" aria-label="Back 15 seconds"><svg viewBox="0 0 24 24" style="width:34px;height:34px;stroke:#8b9098;stroke-width:1.3"><path d="M4.5 12a7.5 7.5 0 1 0 2.6-5.7M4.5 4v4h4"/></svg><span class="n">15</span></button>
 <button class="rb" id="bPlay" aria-label="Play"><svg viewBox="0 0 24 24"><path id="pIc" d="M8 5v14l11-7z"/></svg></button>
 <button class="rb" id="bFwd" aria-label="Forward 15 seconds"><svg viewBox="0 0 24 24" style="width:34px;height:34px;stroke:#8b9098;stroke-width:1.3"><path d="M19.5 12a7.5 7.5 0 1 1-2.6-5.7M19.5 4v4h-4"/></svg><span class="n">15</span></button>
 <button class="rb" id="bNext" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5l10 7-10 7z"/></svg></button>
 </div>
-<div id="msg">
+<div class="gr g4"></div><div id="msg">
 <a class="qb" id="openSp" href="spotify:"><span class="rb"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></span><i>Spotify</i></a>
 <button class="qb" id="openCm"><span class="rb" id="cmRing"><svg viewBox="0 0 24 24"><path d="M5 21L10 3M19 21L14 3"/><path d="M12 19v-2.5M12 12.5v-2M12 7V5.5"/></svg><b id="cmDot"></b></span><i>Commute<svg class="inf" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><circle cx="12" cy="7.3" r=".9" fill="currentColor" stroke="none"/></svg></i></button>
 <button class="qb" id="openNav"><span class="rb"><svg viewBox="0 0 24 24"><path d="M12 3l7 18-7-4-7 4z"/></svg></span><i id="navT">To work</i></button>
 <button class="qb" id="openCam"><span class="rb"><svg viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></span><i>Camera</i></button>
 </div>
-<button id="cmNote"></button>
+<button id="cmNote"></button><div class="gr g5"></div>
 </div>
 
 <div class="scr" id="sList">
@@ -316,13 +328,15 @@ body.night #app,body.night .pg,body.night .shC{filter:brightness(.72)}
 <button class="mb" id="mPho" style="right:10px;top:160px" aria-label="Show photos"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-9 8"/></svg></button>
 <button class="mb" id="mCam" style="right:10px;bottom:10px;width:52px;height:52px;border:2px solid var(--red)" aria-label="Take photo"><svg viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
 <div id="rBar"><button id="rPlay" aria-label="Pause radar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button><span id="rTime">Radar</span></div>
-<div id="pinCard"><b id="pcN"></b><div class="mut" id="pcD"></div><div class="acts"><a id="pcGo" target="_blank">Directions</a><button id="pcRen">Rename</button><button id="pcDel">Delete</button></div></div>
+<div id="spBar"><span>Spot</span><button id="spPin">Leave a pin</button><button id="spBk">Back to photo</button></div><div id="pinCard"><b id="pcN"></b><div class="mut" id="pcD"></div><div class="acts"><a id="pcGo" target="_blank">Directions</a><button id="pcRen">Rename</button><button id="pcDel">Delete</button></div></div>
 <input type="file" id="camIn" accept="image/*" capture="environment" style="display:none">
 </div></div>
 <div class="pg" id="srPg"><div class="pgH"><button class="pgB" id="srX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Weather search</span><span></span></div><div class="pgC">
 <div id="srch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="sIn" placeholder="City or zip" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sX" aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
 <div id="sRes"></div><div class="lab"><span>Saved places</span></div><div id="favs"></div></div></div>
 <div class="pg" id="sunPg"><div class="pgH"><button class="pgB" id="sunX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Sunrise · Sunset</span><span></span></div><div class="pgC"><div id="sunName"></div><div id="sunTop"></div><div class="sr sh"><span></span><span>Sunrise</span><span>Sunset</span><span>Daylight</span></div><div id="sunL"></div></div></div>
+<div class="pg" id="phPg"><div class="pgH"><button class="pgB" id="phBk"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Photos</span><button class="rb" id="phCam" aria-label="Take photo" style="justify-self:end;width:40px;height:40px"><svg viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></button></div><div class="pgC" id="phL"></div></div>
+<div class="pg" id="pvPg"><div class="pgH"><button class="pgB" id="pvBk"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT" id="pvT"></span><span></span></div><div id="pvW"><img id="pvI" alt=""></div><div id="pvInfo"></div><div id="pvA"><button class="obtn" id="pvShare">Share</button><button class="obtn" id="pvLoc">See location</button><button class="obtn" id="pvEd">Edit description</button><button class="obtn" id="pvDel">Delete</button></div></div>
 <div class="sheet" id="capS"><div class="shC"><img id="capI" alt=""><div class="lab" style="margin-top:12px"><span>Description</span></div><div id="capChips"></div><input id="capT" placeholder="Type a description" autocomplete="off" enterkeyhint="done" maxlength="40"><div class="shB"><button id="capX">Cancel</button><button id="capOk" class="obtn">Save photo</button></div></div></div>
 <div class="sheet" id="navS"><div class="shC"><div style="font-size:19px;text-transform:uppercase;letter-spacing:.06em">Navigate</div>
 <div id="navGo" style="margin-top:6px"><button class="navRow" data-to="w"><b>To work</b><span id="navWs"></span></button><button class="navRow" data-to="h"><b>To home</b><span id="navHs"></span></button></div>
@@ -464,6 +478,56 @@ MD.onPos(function (p) {
   }).catch(function () {}).then(function () { lBusy = false; });
 });
 setInterval(function () { if (MD.pos && Date.now() - MD.pos.t > 8000) { MD.mph = null; paintSpeed(); } }, 4000);
+/* swipe right from the left edge to go back (closes whatever page is on top) */
+(function () {
+  var sx = 0, sy = 0, el = null, go = false;
+  function top() {
+    var ph = $("ph"); if (ph && ph.style.display === "flex") return { el: ph, back: $("phX") };
+    var ps = D.querySelectorAll(".pg.on"); if (ps.length) { var p = ps[ps.length - 1]; return { el: p, back: p.querySelector(".pgB") }; }
+    var tv = $("trV"); if (tv && tv.style.display !== "none" && $("sList").classList.contains("on")) return { el: tv, back: $("trBack") };
+    return null;
+  }
+  D.addEventListener("touchstart", function (e) {
+    var t = e.touches[0]; el = null; go = false;
+    if (e.touches.length !== 1 || t.clientX > 26) return;
+    var o = top(); if (!o || !o.back) return;
+    el = o; sx = t.clientX; sy = t.clientY;
+  }, { passive: true });
+  D.addEventListener("touchmove", function (e) {
+    if (!el) return; var t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    if (!go) { if (Math.abs(dy) > 14 && Math.abs(dy) > dx) { el = null; return; } if (dx > 10) go = true; else return; }
+    e.preventDefault(); el.el.style.transition = "none"; el.el.style.transform = "translateX(" + Math.max(0, dx) + "px)";
+  }, { passive: false });
+  D.addEventListener("touchend", function (e) {
+    if (!el || !go) { el = null; return; }
+    var o = el, dx = e.changedTouches[0].clientX - sx; el = null;
+    o.el.style.transition = "transform .18s ease";
+    if (dx > 80) { o.el.style.transform = "translateX(100%)"; setTimeout(function () { o.back.click(); o.el.style.transition = ""; o.el.style.transform = ""; }, 180); }
+    else { o.el.style.transform = ""; setTimeout(function () { o.el.style.transition = ""; }, 200); }
+  });
+})();
+/* Home: buttons and text keep fixed spacing; the dial takes what room is left (up to 340px) */
+(function () {
+  function fit() {
+    var s = $("sNow"), d = $("dialW"); if (!s.classList.contains("on")) return;
+    var cur = d.offsetWidth, rest = 0;
+    Array.prototype.forEach.call(s.children, function (c) { if (c !== d && !c.classList.contains("g1") && !c.classList.contains("g5")) rest += c.offsetHeight + (parseFloat(getComputedStyle(c).marginTop) || 0) + (parseFloat(getComputedStyle(c).marginBottom) || 0); });
+    var avail = s.clientHeight - rest - 28 - (cur - d.offsetHeight);
+    var w = Math.max(230, Math.min(s.clientWidth * 0.9, 340, avail));
+    if (Math.abs(w - cur) > 1) d.style.setProperty("--dw", Math.round(w) + "px");
+  }
+  window.addEventListener("resize", fit); D.addEventListener("md:screen", function () { setTimeout(fit, 0); });
+  setTimeout(fit, 0); setTimeout(fit, 600); setInterval(fit, 3000);
+})();
+/* if the phone is showing the page zoomed out (Safari page zoom), scale it back to normal size */
+(function () {
+  function fix() {
+    var sw = Math.min(screen.width, screen.height), iw = window.innerWidth;
+    if (window.matchMedia && matchMedia("(orientation: landscape)").matches) sw = Math.max(screen.width, screen.height);
+    var z = iw / sw; D.documentElement.style.zoom = (z > 1.06 && z < 2) ? z.toFixed(3) : "";
+  }
+  fix(); window.addEventListener("resize", fix);
+})();
 })();
 
 (function () {
@@ -1492,12 +1556,11 @@ function idb() {
 }
 function tx(mode2) { return idb().then(function (d) { return d.transaction("p", mode2).objectStore("p"); }); }
 function loadPhotos() {
-  tx("readonly").then(function (s) { var r = s.getAll(); r.onsuccess = function () { photos = (r.result || []).map(function (p) { return { id: p.id, t: p.t, lat: p.lat, lon: p.lon, th: p.th, d: p.d || "" }; }); bm.redraw(); }; }).catch(function () {});
+  tx("readonly").then(function (s) { var r = s.getAll(); r.onsuccess = function () { photos = (r.result || []).map(function (p) { return { id: p.id, t: p.t, lat: p.lat, lon: p.lon, th: p.th, d: p.d || "", nm: p.nm || "", city: p.city || "" }; }); bm.redraw(); }; }).catch(function () {});
 }
 loadPhotos();
 $("mPho").onclick = function () { showPh = !showPh; this.classList.toggle("on", showPh); if (showPh && !photos.length) MD.toast("No photos yet. Tap the camera to take one here."); bm.redraw(); };
 $("mCam").onclick = function () { $("camIn").click(); };
-$("openCam").onclick = function () { $("camIn").click(); };
 function shrink(file, max, q) {
   return new Promise(function (res, rej) {
     var u = URL.createObjectURL(file), im = new Image();
@@ -1511,6 +1574,7 @@ $("camIn").onchange = function () {
   var f = this.files && this.files[0]; this.value = ""; if (!f) return;
   var p = MD.pos; if (!p) { MD.toast("Waiting for your location. Try again in a moment."); return; }
   pend = { f: f, lat: p.lat, lon: p.lon, t: Date.now(), city: MD.cityName || "" };
+  var pn = MD.lsGet("mdPhN", 0) + 1; MD.lsSet("mdPhN", pn); pend.nm = "Macan-dash-photo-" + ("000" + pn).slice(-4);
   $("capI").src = URL.createObjectURL(f); $("capT").value = "";
   var b = $("capChips"); b.innerHTML = "";
   CAPS.forEach(function (c) { var e = D.createElement("button"); e.className = "chip"; e.textContent = c; e.onclick = function () { $("capT").value = c; Array.prototype.forEach.call(b.children, function (x) { x.classList.toggle("on", x === e); }); }; b.appendChild(e); });
@@ -1519,7 +1583,6 @@ $("camIn").onchange = function () {
 function capClose() { $("capS").style.display = "none"; var u = $("capI").src; $("capI").removeAttribute("src"); if (u) URL.revokeObjectURL(u); }
 $("capX").onclick = function () { pend = null; capClose(); };
 $("capT").addEventListener("keydown", function (e) { if (e.key === "Enter") this.blur(); });
-$("capOk").onclick = function () { var p = pend; if (!p) return; p.d = $("capT").value.trim(); pend = null; capClose(); savePhoto(p); };
 function stamp(p) {
   return new Promise(function (res, rej) {
     var u = URL.createObjectURL(p.f), im = new Image();
@@ -1532,6 +1595,7 @@ function stamp(p) {
       if (p.d) lines.push([p.d.toUpperCase(), "600 " + 6 * s + "px " + F, "#fff", 7.2 * s]);
       lines.push([((p.city ? p.city + "  ·  " : "") + when).toUpperCase(), "500 " + 3.1 * s + "px " + F, "#e6e6e6", 4.4 * s]);
       lines.push([Math.abs(p.lat).toFixed(5) + "° " + (p.lat >= 0 ? "N" : "S") + "   " + Math.abs(p.lon).toFixed(5) + "° " + (p.lon >= 0 ? "E" : "W"), "500 " + 2.6 * s + "px " + F, "#b9bcc2", 3.8 * s]);
+      if (p.nm) lines.push([p.nm + ".jpg", "500 " + 2.6 * s + "px " + F, "#b9bcc2", 3.8 * s]);
       var tall = lines.reduce(function (a, l) { return a + l[3]; }, 0), top = H - pad - tall;
       var g = x.createLinearGradient(0, top - 10 * s, 0, H); g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(0.45, "rgba(0,0,0,.55)"); g.addColorStop(1, "rgba(0,0,0,.8)");
       x.fillStyle = g; x.fillRect(0, top - 10 * s, W, H - top + 10 * s);
@@ -1544,29 +1608,122 @@ function stamp(p) {
   });
 }
 function savePhoto(p) {
-  Promise.all([stamp(p), shrink(p.f, 120, 0.7)]).then(function (a) {
-    var rec = { id: p.t, t: p.t, lat: p.lat, lon: p.lon, img: a[0], th: a[1], d: p.d || "", city: p.city };
-    return tx("readwrite").then(function (s2) { s2.put(rec); photos.push({ id: rec.id, t: rec.t, lat: rec.lat, lon: rec.lon, th: rec.th, d: rec.d }); showPh = true; $("mPho").classList.add("on"); bm.redraw(); MD.toast("Photo saved on the map."); });
+  Promise.all([stamp(p), shrink(p.f, 120, 0.7), shrink(p.f, 1600, 0.85)]).then(function (a) {
+    var rec = { id: p.t, t: p.t, lat: p.lat, lon: p.lon, img: a[0], th: a[1], raw: a[2], d: p.d || "", city: p.city, nm: p.nm || "" };
+    return tx("readwrite").then(function (s2) { s2.put(rec); photos.push({ id: rec.id, t: rec.t, lat: rec.lat, lon: rec.lon, th: rec.th, d: rec.d, nm: rec.nm, city: rec.city }); showPh = true; $("mPho").classList.add("on"); bm.redraw(); MD.toast("Photo saved."); if ($("phPg").classList.contains("on")) phList(); });
   }).catch(function () { MD.toast("Couldn't save that photo."); });
 }
-var cur = null;
-function openPhoto(p) {
-  cur = p;
-  tx("readonly").then(function (s) { var r = s.get(p.id); r.onsuccess = function () { if (!r.result) return; $("phI").src = r.result.img; $("phD").textContent = (p.d ? p.d + " · " : "") + new Date(p.t).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); $("ph").style.display = "flex"; }; });
-}
-$("phX").onclick = function () { $("ph").style.display = "none"; $("phI").src = ""; };
-$("phDel").onclick = function () {
-  if (!cur || !confirm("Delete this photo?")) return;
-  var id = cur.id; tx("readwrite").then(function (s) { s.delete(id); photos = photos.filter(function (x) { return x.id !== id; }); bm.redraw(); $("phX").onclick(); });
-};
-$("phS").onclick = function () {
-  var src = $("phI").src; if (!src || !cur) return;
-  fetch(src).then(function (r) { return r.blob(); }).then(function (b) {
-    var file = new File([b], "macan-" + cur.id + ".jpg", { type: "image/jpeg" }), txt = "https://maps.apple.com/?ll=" + cur.lat + "," + cur.lon;
-    if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], text: txt }).catch(function () {});
-    else MD.toast("Sharing isn't available here.");
+/* ---- Photos page: list, select, share, save to iCloud, delete ---- */
+var cur = null, selMode = false, sel = {}, X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>', CK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+function when(t) { var d = new Date(t); return d.toLocaleDateString([], { month: "short", day: "numeric" }) + " · " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
+function fname(p) { return (p.nm || "Macan-dash-photo-" + p.id) + ".jpg"; }
+function gmap(p) { return "https://maps.google.com/?q=" + p.lat.toFixed(5) + "," + p.lon.toFixed(5); }
+function line(p) { return (p.d ? p.d + " - " : "") + when(p.t).replace(" · ", " ") + " - " + p.lat.toFixed(5) + ", " + p.lon.toFixed(5) + " " + gmap(p); }
+function blob(u) { var b = atob(u.split(",")[1]), a = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return new Blob([a], { type: "image/jpeg" }); }
+function full(ids) { return tx("readonly").then(function (s) { return Promise.all(ids.map(function (id) { return new Promise(function (r) { var g = s.get(id); g.onsuccess = function () { r(g.result); }; g.onerror = function () { r(null); }; }); })); }).then(function (a) { return a.filter(Boolean); }); }
+function shareThese(ids, withText) {
+  if (!ids.length) return;
+  full(ids).then(function (recs) {
+    var files = recs.map(function (r) { return new File([blob(r.img)], fname(r), { type: "image/jpeg" }); });
+    var text = recs.map(function (r, i) { return (recs.length > 1 ? (i + 1) + ". " : "") + line(r); }).join("\n");
+    var o = withText ? { files: files, text: text } : { files: files };
+    if (navigator.canShare && navigator.canShare({ files: files })) return navigator.share(o).catch(function () {});
+    if (withText && navigator.share) return navigator.share({ text: text }).catch(function () {});
+    MD.toast("Sharing isn't available here.");
   });
+}
+function delThese(ids) {
+  return tx("readwrite").then(function (s) { ids.forEach(function (id) { s.delete(id); }); photos = photos.filter(function (x) { return ids.indexOf(x.id) < 0; }); sel = {}; if (!photos.length) selMode = false; bm.redraw(); phList(); });
+}
+function phList() {
+  var L = $("phL"), list = photos.slice().sort(function (a, b) { return b.t - a.t; }), n = list.filter(function (p) { return sel[p.id]; }).length, h = "";
+  h += '<div class="phN"><svg viewBox="0 0 24 24"><path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18v.5"/></svg><span>Saved only on this phone. Back up to iCloud so they can\'t be lost.</span></div>';
+  if (!list.length) { L.innerHTML = h + '<div class="note" style="text-align:center">No photos yet. Tap the camera to take one.</div>'; return; }
+  h += '<div class="phB"><button class="obtn" id="phSh">' + (selMode && n ? "Share selected (" + n + ")" : "Share all (" + list.length + ")") + '</button><button class="obtn alt" id="phSel" style="flex:none;padding:11px 16px">' + (selMode ? "Done" : "Select") + "</button></div>";
+  if (selMode) h += '<div class="phB"><button class="obtn alt" id="phAll">' + (n === list.length ? "Select none" : "Select all") + '</button><button class="obtn alt' + (n ? "" : " off") + '" id="phDelS" style="color:#ff5a6e">Delete selected (' + n + ")</button></div>" +
+    '<div class="phB"><button class="obtn alt' + (n ? "" : " off") + '" id="phIc">Save to iCloud (' + n + ")</button></div>";
+  list.forEach(function (p) {
+    h += '<div class="phR' + (selMode && sel[p.id] ? " on" : "") + '" data-id="' + p.id + '">' + (selMode ? '<span class="ck">' + CK + "</span>" : "") + '<img src="' + p.th + '" alt=""><div class="tx"><b>' + MD.esc(p.d || "Photo") + '</b><div class="s">' + MD.esc((p.city ? p.city + " · " : "") + when(p.t)) + '</div><div class="s">' + p.lat.toFixed(5) + ", " + p.lon.toFixed(5) + "</div></div>" + (selMode ? "" : '<button class="x" data-del="' + p.id + '" aria-label="Delete">' + X + "</button>") + "</div>";
+  });
+  L.innerHTML = h;
+}
+$("phL").addEventListener("click", function (e) {
+  var b = e.target.closest("button"), r = e.target.closest(".phR");
+  if (b && b.id === "phSel") { selMode = !selMode; sel = {}; return phList(); }
+  if (b && b.id === "phAll") { var all = photos.every(function (p) { return sel[p.id]; }); sel = {}; if (!all) photos.forEach(function (p) { sel[p.id] = 1; }); return phList(); }
+  var ks = photos.filter(function (p) { return sel[p.id]; }).map(function (p) { return p.id; });
+  if (b && b.id === "phSh") return shareThese(selMode && ks.length ? ks : photos.slice().sort(function (a, c) { return c.t - a.t; }).map(function (p) { return p.id; }), true);
+  if (b && b.id === "phIc") { if (!ks.length) return MD.toast("Tap the photos you want to save first."); return shareThese(ks, false); }
+  if (b && b.id === "phDelS") { if (ks.length && confirm("Delete " + ks.length + " photo" + (ks.length > 1 ? "s" : "") + "?")) delThese(ks); return; }
+  if (b && b.dataset.del) { if (confirm("Delete this photo?")) delThese([+b.dataset.del]); return; }
+  if (r) { var id = +r.dataset.id; if (selMode) { if (sel[id]) delete sel[id]; else sel[id] = 1; phList(); } else openPhoto(photos.filter(function (p) { return p.id === id; })[0]); }
+});
+MD.openPhotos = function () { selMode = false; sel = {}; phList(); $("phPg").classList.add("on"); $("phL").scrollTop = 0; };
+$("phBk").onclick = function () { $("phPg").classList.remove("on"); };
+$("phCam").onclick = function () { $("camIn").click(); };
+/* hold the camera button on Home for the Photos page; a tap still takes a photo */
+(function () {
+  var b = $("openCam"), t = null, held = false;
+  b.addEventListener("pointerdown", function () { held = false; t = setTimeout(function () { held = true; MD.openPhotos(); }, 600); });
+  ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) { b.addEventListener(ev, function () { clearTimeout(t); }); });
+  b.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  b.onclick = function () { if (held) { held = false; return; } $("camIn").click(); };
+})();
+/* ---- one photo, full size ---- */
+function openPhoto(p) {
+  if (!p) return; cur = p;
+  full([p.id]).then(function (a) {
+    var r = a[0]; if (!r) return;
+    $("pvI").src = r.img; $("pvT").textContent = p.nm || "Photo";
+    $("pvInfo").innerHTML = "<b>" + MD.esc(p.d || "Photo") + "</b>" + MD.esc((p.city ? p.city + " · " : "") + when(p.t)) + "<br>" + p.lat.toFixed(5) + ", " + p.lon.toFixed(5);
+    $("pvPg").classList.add("on");
+  });
+}
+$("pvBk").onclick = function () { $("pvPg").classList.remove("on"); $("pvI").removeAttribute("src"); };
+$("pvShare").onclick = function () { if (cur) shareThese([cur.id], true); };
+$("pvDel").onclick = function () { if (cur && confirm("Delete this photo?")) delThese([cur.id]).then(function () { $("pvBk").onclick(); }); };
+/* edit the description: reprints it on the photo (photos from before this update keep their old print) */
+var editing = null;
+$("pvEd").onclick = function () {
+  if (!cur) return; editing = cur;
+  $("capI").src = $("pvI").src; $("capT").value = cur.d || "";
+  var b = $("capChips"); b.innerHTML = "";
+  CAPS.forEach(function (c) { var e = D.createElement("button"); e.className = "chip"; e.textContent = c; e.onclick = function () { $("capT").value = c; Array.prototype.forEach.call(b.children, function (x) { x.classList.toggle("on", x === e); }); }; b.appendChild(e); });
+  $("capOk").textContent = "Save"; $("capS").style.display = "flex";
 };
+function capReset() { editing = null; $("capOk").textContent = "Save photo"; }
+$("capX").addEventListener("click", capReset);
+$("capOk").onclick = function () {
+  if (editing) {
+    var p = editing, d = $("capT").value.trim(); capReset(); $("capS").style.display = "none";
+    full([p.id]).then(function (a) {
+      var r = a[0]; if (!r) return;
+      r.d = d; p.d = d;
+      var done = function () { return tx("readwrite").then(function (s) { s.put(r); phList(); if (cur === p) openPhoto(p); MD.toast(r.raw ? "Description updated." : "Description updated. This older photo keeps its original print."); }); };
+      if (r.raw) stamp({ f: blob(r.raw), t: r.t, lat: r.lat, lon: r.lon, city: r.city, nm: r.nm, d: d }).then(function (img) { r.img = img; return done(); });
+      else done();
+    });
+    return;
+  }
+  var q = pend; if (!q) return; q.d = $("capT").value.trim(); pend = null; capClose(); savePhoto(q);
+};
+/* see where it was taken, then leave a pin or go back to the photo */
+var spot = null;
+$("pvLoc").onclick = function () {
+  if (!cur) return; spot = cur;
+  $("pvPg").classList.remove("on"); var fromList = $("phPg").classList.contains("on"); $("phPg").classList.remove("on"); spot.fromList = fromList;
+  MD.openMap("map"); follow = false; bm.center(spot.lat, spot.lon, 16); $("spBar").style.display = "flex";
+};
+function spotEnd(back) {
+  var s = spot; spot = null; $("spBar").style.display = "none"; if (!s) return;
+  if (back) { $("mapPg").classList.remove("on"); if (s.fromList) $("phPg").classList.add("on"); openPhoto(s); }
+}
+$("spBk").onclick = function () { spotEnd(true); };
+$("spPin").onclick = function () {
+  if (!spot) return; var def = spot.d || "Photo " + when(spot.t), n = prompt("Name this pin:", def); if (n === null) return;
+  var p = { id: Date.now(), n: n || def, lat: spot.lat, lon: spot.lon }; pins.push(p); savePins(); spotEnd(false); openPin(p);
+};
+$("mapX").addEventListener("click", function () { if (spot) spotEnd(true); });
 })();
 
 (function () {
@@ -1683,6 +1840,7 @@ function fmt(p) {
 Array.prototype.forEach.call(D.querySelectorAll(".navClr"), function (b) { b.onclick = function () { var i = $(b.dataset.f); i.value = ""; $(b.dataset.f === "navH" ? "navSgH" : "navSgW").innerHTML = ""; i.focus(); }; });
 (function () { var e = D.createElement("button"); e.id = "navEdB"; e.className = "mut"; e.style.cssText = "display:block;margin:14px auto 0;font-size:12px;letter-spacing:.14em;text-transform:uppercase"; e.textContent = "Edit addresses"; $("navGo").after(e); e.onclick = function () { $("navEd").style.display = ""; $("navSave").style.display = ""; $("navGo").style.display = "none"; e.style.display = "none"; }; })();
 var SRISE = '<path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 8V5M9.5 10.5 8 9M14.5 10.5 16 9M12 3l-1.5 1.5M12 3l1.5 1.5"/>', SSET = '<path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 5v3M9.5 10.5 8 9M14.5 10.5 16 9M12 9l-1.5-1.5M12 9l1.5-1.5"/>';
+var WIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 9h10a3 3 0 1 0-3-3M3 13h15a3 3 0 1 1-3 3M3 17h7"/></svg>';
 function hm(t) { return new Date(t).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
 function sh(t) { return hm(t).replace(/\s?([AP])M/i, function (a, b) { return b.toLowerCase(); }); }
 function paint() {
@@ -1703,7 +1861,7 @@ function paint() {
       end = { w: w, t: t, n: x.p[0] };
       var r = D.createElement("div"); r.className = "cm";
       r.innerHTML = '<span class="t">' + sh(t) + '</span><span class="p' + (fog || snow ? " bad" : "") + '"></span>' + MD.wxIcon(w.c) +
-        "<span>" + Math.round(w.tp) + '°</span><span class="r' + (wet ? " bad" : "") + '">' + (w.pp >= 10 ? w.pp + "%" : "") + '</span><span class="w' + (windy ? " bad" : "") + '">' + Math.round(w.ws) + (w.wg >= 25 ? "/" + Math.round(w.wg) : "") + "</span>";
+        "<span>" + Math.round(w.tp) + '°</span><span class="r' + (wet ? " bad" : "") + '">' + (w.pp >= 10 ? w.pp + "%" : "") + '</span><span class="w' + (windy ? " bad" : "") + '">' + WIC + "<b>" + Math.round(w.ws) + "</b>" + (w.wg >= 25 ? "<i>/" + Math.round(w.wg) + "</i>" : "") + "</span>";
       r.querySelector(".p").textContent = x.p[0];
       L.appendChild(r);
     });
