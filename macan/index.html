@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Macan Dash rev 9 -->
+<!-- Macan Dash rev 11 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -39,15 +39,15 @@ input{font:inherit;letter-spacing:inherit}
 #lim span:first-child{font-size:10px;letter-spacing:.06em;text-transform:uppercase}
 #limN{font-size:24px;margin-top:1px;font-variant-numeric:tabular-nums}
 #lim.none{opacity:.35}
-#dialW{position:relative;width:min(86vw,45vh,360px);margin:12px auto 0}
+#dialW{position:relative;width:var(--dw,min(86vw,340px));margin:0 auto;flex:none}
 #dial{display:block;width:100%;height:auto;touch-action:none}
 #art{position:absolute;left:26.87%;top:26.87%;width:46.27%;height:46.27%;border-radius:50%;object-fit:cover;pointer-events:none;display:none;box-shadow:0 0 0 1.5px #9ba0a6;background:#141416}
-#trk{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:6px;text-align:center;margin-top:8px}
+#trk{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:6px;text-align:center;margin-top:0}
 #bList{width:44px;height:44px}#bList svg{width:20px;height:20px}
 #tT{font-size:24px;line-height:1.1;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #tA{font-size:15px;margin-top:4px;color:var(--g);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #tC{font-size:12px;color:var(--red);margin-top:6px;letter-spacing:.16em;text-transform:uppercase;min-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#ctl{display:flex;justify-content:space-between;align-items:center;margin:16px 4px 4px}
+#ctl{display:flex;justify-content:space-between;align-items:center;margin:0 4px}
 .rb{width:50px;height:50px;border-radius:50%;border:1px solid var(--btn);display:flex;align-items:center;justify-content:center;position:relative;flex:none}
 .rb svg{width:24px;height:24px;fill:none;stroke:var(--w);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .rb .n{position:absolute;font-size:11px;top:50%;left:0;right:0;text-align:center;transform:translateY(-45%)}
@@ -117,8 +117,8 @@ input{font:inherit;letter-spacing:inherit}
 #wDet,#kDet{color:var(--g);font-size:14px;margin-top:5px;line-height:1.5}
 #wRain,#kRain{font-size:15px;color:#9fc4e8;margin-top:10px;text-transform:uppercase;min-height:18px}
 #wWind,#kWind{display:flex;align-items:center;gap:14px;white-space:nowrap;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
-#wWind>svg,#kWind>svg{flex:none;width:92px;height:92px}#wRot,#wNd{transition:transform .6s ease}
-#wNd,#kNd{--d:2.2s}#wNd .wc,#kNd .wc{animation:wv var(--d) linear infinite}#wNd .wc:nth-child(2),#kNd .wc:nth-child(2){animation-delay:calc(var(--d)*.2)}#wNd .wc:nth-child(3),#kNd .wc:nth-child(3){animation-delay:calc(var(--d)*.4)}#wNd.calm,#kNd.calm{opacity:0}#kNd{transition:transform .6s ease}#kSun{cursor:default}
+#wWind>svg,#kWind>svg{flex:none;width:92px;height:92px}
+#wNd,#kNd{--d:2.2s}#wNd .wc,#kNd .wc{animation:wv var(--d) linear infinite}#wNd .wc:nth-child(2),#kNd .wc:nth-child(2){animation-delay:calc(var(--d)*.2)}#wNd .wc:nth-child(3),#kNd .wc:nth-child(3){animation-delay:calc(var(--d)*.4)}#wNd.calm,#kNd.calm{opacity:0}#kSun{cursor:default}
 @keyframes wv{0%,55%,100%{opacity:.18}20%{opacity:1}}
 @media (prefers-reduced-motion:reduce){#wNd .wc,#kNd .wc{animation:none}}
 #wSun,#kSun{margin-left:auto;margin-right:40px;white-space:nowrap;cursor:pointer;position:relative;top:4px;display:flex;flex-direction:column;gap:10px;padding-left:12px;border-left:1px solid var(--line)}
@@ -370,7 +370,9 @@ W.MD = { $: $, lsGet: lsGet, lsSet: lsSet, fmt: fmt, esc: esc, dist: dist, beari
 function clock() { var d = new Date(); $("clock").textContent = d.getHours() + ":" + ("0" + d.getMinutes()).slice(-2); }
 clock(); setInterval(clock, 5000);
 var tabs = D.querySelectorAll("#tabs button");
-function show(id) {
+var hist = [];
+function show(id, back) {
+  var was = D.querySelector(".scr.on"); if (!back && was && was.id !== id) { hist.push(was.id); if (hist.length > 20) hist.shift(); }
   Array.prototype.forEach.call(D.querySelectorAll(".scr"), function (s) { s.classList.toggle("on", s.id === id); });
   Array.prototype.forEach.call(tabs, function (b) { b.classList.toggle("on", b.dataset.s === id); });
   lsSet("mdTab", id);
@@ -485,24 +487,28 @@ setInterval(function () { if (MD.pos && Date.now() - MD.pos.t > 8000) { MD.mph =
     var ph = $("ph"); if (ph && ph.style.display === "flex") return { el: ph, back: $("phX") };
     var ps = D.querySelectorAll(".pg.on"); if (ps.length) { var p = ps[ps.length - 1]; return { el: p, back: p.querySelector(".pgB") }; }
     var tv = $("trV"); if (tv && tv.style.display !== "none" && $("sList").classList.contains("on")) return { el: tv, back: $("trBack") };
+    /* on Playlists, Commute or Weather: go back to the page she came from (Home if none) */
+    var sc = D.querySelector(".scr.on"); if (sc && sc.id !== "sNow") return { el: sc, back: { click: function () { var p = hist.pop(); while (p === sc.id) p = hist.pop(); show(p || "sNow", true); } } };
     return null;
   }
   D.addEventListener("touchstart", function (e) {
     var t = e.touches[0]; el = null; go = false;
-    if (e.touches.length !== 1 || t.clientX > 26) return;
+    if (e.touches.length !== 1) return;
     var o = top(); if (!o || !o.back) return;
+    /* on a map only from the left edge (so dragging the map still works); elsewhere from anywhere */
+    if ((o.el.id === "mapPg" || e.target.closest("#bigMap,.hr,input")) && t.clientX > window.innerWidth * 0.12) return;
     el = o; sx = t.clientX; sy = t.clientY;
   }, { passive: true });
   D.addEventListener("touchmove", function (e) {
     if (!el) return; var t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
-    if (!go) { if (Math.abs(dy) > 14 && Math.abs(dy) > dx) { el = null; return; } if (dx > 10) go = true; else return; }
+    if (!go) { if (Math.abs(dy) > 12 && Math.abs(dy) > dx) { el = null; return; } if (dx > 12 && dx > Math.abs(dy) * 1.5) go = true; else return; }
     e.preventDefault(); el.el.style.transition = "none"; el.el.style.transform = "translateX(" + Math.max(0, dx) + "px)";
   }, { passive: false });
   D.addEventListener("touchend", function (e) {
     if (!el || !go) { el = null; return; }
     var o = el, dx = e.changedTouches[0].clientX - sx; el = null;
     o.el.style.transition = "transform .18s ease";
-    if (dx > 80) { o.el.style.transform = "translateX(100%)"; setTimeout(function () { o.back.click(); o.el.style.transition = ""; o.el.style.transform = ""; }, 180); }
+    if (dx > window.innerWidth * 0.22) { o.el.style.transform = "translateX(100%)"; setTimeout(function () { o.back.click(); o.el.style.transition = ""; o.el.style.transform = ""; }, 180); }
     else { o.el.style.transform = ""; setTimeout(function () { o.el.style.transition = ""; }, 200); }
   });
 })();
@@ -1187,16 +1193,26 @@ function sunCalc(lat, lon, day) {
 /* wind dial turns with the car (GPS direction while moving, or the phone's compass once allowed) */
 var windDir = 0, head = 0.001, compass = null;
 function turn() {
-  var h = compass != null ? compass : (MD.heading != null && MD.mph > 3 ? MD.heading : head);
+  /* like Van Dash: while driving use the GPS direction of travel (works however the phone sits in its cradle); stopped, use the phone's compass */
+  var mph = MD.mph || 0; moving = MD.heading != null && (moving ? mph > 4.5 : mph > 5.5);
+  var h = moving ? MD.heading : compass != null ? compass : head;
   if (Math.abs(((h || 0) - head + 540) % 360 - 180) < 2 && turned === windDir) return;
   head = h || 0; turned = windDir;
   rA = un(rA, -head); nA = un(nA, windDir - head);
-  $("wRot").style.transform = "rotate(" + rA + "deg)"; $("wRot").style.transformOrigin = "50px 50px";
-  $("wNd").style.transform = "rotate(" + nA + "deg)"; $("wNd").style.transformOrigin = "50px 50px";
+  spin($("wRot"), rA); spin($("wNd"), nA);
+  if (MD.kWD != null) { kR = un(kR, -head); kN = un(kN, MD.kWD - head); spin($("kRot"), kR); spin($("kNd"), kN); }
 }
-var rA = 0, nA = 0, turned = null;
+var rA = 0, nA = 0, kR = 0, kN = 0, turned = null, moving = false;
+/* turn a dial part around the dial's center (uses the SVG's own coordinates, so page zoom can't knock it off center) */
+function spin(el, to) {
+  if (!el) return; var from = el._a == null ? to : el._a, t0 = 0; el._to = to;
+  if (from === to) { el.setAttribute("transform", "rotate(" + to + " 50 50)"); el._a = to; return; }
+  function step(t) { if (el._to !== to) return; if (!t0) t0 = t; var k = Math.min(1, (t - t0) / 600), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2, a = from + (to - from) * e; el._a = a; el.setAttribute("transform", "rotate(" + a.toFixed(2) + " 50 50)"); if (k < 1) requestAnimationFrame(step); }
+  requestAnimationFrame(step);
+}
+MD.windTurn = function () { turned = null; turn(); };
 function un(prev, target) { var d = ((target - prev) % 360 + 540) % 360 - 180; return prev + d; }
-MD.onPos(function () { if (compass == null) turn(); });
+MD.onPos(function () { turn(); });
 var gotOri = false;
 function onOri(e) { gotOri = true; if (e.webkitCompassHeading != null) { compass = e.webkitCompassHeading; } else if (e.absolute && e.alpha != null) compass = 360 - e.alpha; turn(); }
 var listening = false;
@@ -1209,6 +1225,8 @@ function startCompass() {
 /* iPhone only lets a page ask for the compass on a tap, so ask on the way into Weather */
 $("wDial").addEventListener("click", startCompass);
 D.querySelector('#tabs [data-s="sWx"]').addEventListener("click", startCompass);
+D.querySelector('#tabs [data-s="sCm"]').addEventListener("click", startCompass);
+$("openCm").addEventListener("click", startCompass); $("kDial").addEventListener("click", startCompass);
 $("topT").addEventListener("click", startCompass);
 if (MD.lsGet("mdCmp", 0)) { try { window.addEventListener("deviceorientation", onOri); } catch (e) {} }
 function rainLine(d) {
@@ -1883,7 +1901,7 @@ function paint() {
     $("ksG").textContent = g.wg > ws + 2 ? "Gusts " + Math.round(g.wg) : "";
     $("kNd").classList.toggle("calm", ws < 1);
     $("kNd").style.setProperty("--d", Math.max(0.8, Math.min(3, 3.2 - ws * 0.09)).toFixed(2) + "s");
-    $("kNd").style.transform = "rotate(" + Math.round(g.wd || 0) + "deg)"; $("kNd").style.transformOrigin = "50px 50px";
+    MD.kWD = g.wd || 0; if (MD.windTurn) MD.windTurn();
     $("kArr").textContent = hm(end.t);
     var z = MD.sun, rise = dir === "h";
     $("kSi").innerHTML = rise ? SRISE : SSET; $("kSl").textContent = rise ? "Sunrise" : "Sunset";
