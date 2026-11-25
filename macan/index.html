@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Macan Dash rev 1 -->
+<!-- Macan Dash rev 3 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-title" content="Macan">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
 <title>Macan Dash</title>
 <style>
 :root{--red:#d5001c;--w:#f2f2f2;--g:#8b9098;--line:#1c1c1e;--line2:#2c2c2e;--bez:#9ba0a6;--btn:#5d6168;
@@ -37,8 +39,11 @@ input{font:inherit;letter-spacing:inherit}
 #lim span:first-child{font-size:10px;letter-spacing:.06em;text-transform:uppercase}
 #limN{font-size:24px;margin-top:1px;font-variant-numeric:tabular-nums}
 #lim.none{opacity:.35}
-#dial{display:block;width:min(86vw,45vh,360px);height:auto;margin:12px auto 0;touch-action:none}
-#trk{text-align:center;margin-top:8px}
+#dialW{position:relative;width:min(86vw,45vh,360px);margin:12px auto 0}
+#dial{display:block;width:100%;height:auto;touch-action:none}
+#art{position:absolute;left:26.87%;top:26.87%;width:46.27%;height:46.27%;border-radius:50%;object-fit:cover;pointer-events:none;display:none;box-shadow:0 0 0 1.5px #9ba0a6;background:#141416}
+#trk{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:6px;text-align:center;margin-top:8px}
+#bList{width:44px;height:44px}#bList svg{width:20px;height:20px}
 #tT{font-size:24px;line-height:1.1;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #tA{font-size:15px;margin-top:4px;color:var(--g);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #tC{font-size:12px;color:var(--red);margin-top:6px;letter-spacing:.16em;text-transform:uppercase;min-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -57,7 +62,9 @@ input{font:inherit;letter-spacing:inherit}
 #cmRing.warn{border-color:var(--red)}
 /* lists */
 #mini{display:flex;align-items:center;gap:14px;margin:8px 0 14px}
-#mini svg.md{flex:none;width:76px;height:76px}
+#miniW{position:relative;flex:none;width:76px;height:76px}#mini svg.md{display:block;width:76px;height:76px}
+#miniArt{position:absolute;left:14px;top:14px;width:48px;height:48px;border-radius:50%;object-fit:cover;display:none;pointer-events:none}
+#mini{cursor:pointer}
 #miniT{font-size:18px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #miniA{font-size:13px;margin-top:2px;color:var(--g);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #miniP{width:44px;height:44px;border:2px solid var(--red)}
@@ -79,6 +86,11 @@ input{font:inherit;letter-spacing:inherit}
 .trow.on div:first-child{color:var(--red)}
 .note{color:var(--g);font-size:15px;line-height:1.45;padding:18px 4px}
 .obtn{display:inline-block;margin-top:12px;border:1.5px solid var(--red);border-radius:20px;padding:9px 18px;font-size:15px;text-transform:uppercase;letter-spacing:.1em}
+#plS{display:flex;align-items:center;gap:8px;margin:0 0 4px;border:1px solid #3a3a3c;border-radius:10px;padding:0 4px 0 11px}
+#plS input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--w);font-size:16px;padding:10px 0;text-transform:uppercase}
+#plS input::placeholder{color:#5d6168}
+#plS svg{width:18px;height:18px;fill:none;stroke:var(--g);stroke-width:2;stroke-linecap:round}
+#plS button{width:38px;height:38px;display:flex;align-items:center;justify-content:center}
 #trBack{display:flex;align-items:center;gap:6px;font-size:13px;letter-spacing:.14em;color:var(--g);text-transform:uppercase;padding:6px 0}
 /* weather */
 #srch{display:flex;align-items:center;gap:8px;margin-top:8px;border:1px solid #3a3a3c;border-radius:10px;padding:0 4px 0 11px}
@@ -106,7 +118,14 @@ input{font:inherit;letter-spacing:inherit}
 #wDet{color:var(--g);font-size:14px;margin-top:5px;line-height:1.5}
 #wRain{font-size:15px;color:#9fc4e8;margin-top:10px;text-transform:uppercase;min-height:18px}
 #wWind{display:flex;align-items:center;gap:16px;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
-#wWind svg{flex:none;width:92px;height:92px}
+#wWind>svg{flex:none;width:92px;height:92px}#wRot,#wNd{transition:transform .6s ease}
+#wNd{--d:2.2s}#wNd .wc{animation:wv var(--d) linear infinite}#wNd .wc:nth-child(2){animation-delay:calc(var(--d)*.2)}#wNd .wc:nth-child(3){animation-delay:calc(var(--d)*.4)}#wNd.calm{opacity:0}
+@keyframes wv{0%,55%,100%{opacity:.18}20%{opacity:1}}
+@media (prefers-reduced-motion:reduce){#wNd .wc{animation:none}}
+#wSun{margin-left:auto;margin-right:30px;position:relative;top:4px;display:flex;flex-direction:column;gap:10px;padding-left:12px;border-left:1px solid var(--line)}
+#wSun div{display:grid;grid-template-columns:22px auto;column-gap:8px;align-items:center}
+#wSun svg{width:22px;height:22px;fill:none;stroke:#f2f2f2;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;grid-row:1/3}
+#wSun span{font-size:18px;line-height:1.1}#wSun i{font-style:normal;font-size:11px;letter-spacing:.14em;color:var(--g);text-transform:uppercase}
 #wsN{font-size:30px;line-height:1.1;margin-top:4px}
 .dy{display:grid;grid-template-columns:58px 26px 32px minmax(0,1fr) 32px 34px;align-items:center;gap:6px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:16px}
 .dy svg{width:22px;height:22px}
@@ -128,10 +147,14 @@ input{font:inherit;letter-spacing:inherit}
 .mapc{position:relative;border-radius:12px;overflow:hidden;background:#101214;margin-top:10px;touch-action:none}
 .mapc canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .mapc .base.dark{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.5)}
-.mapc .attr{position:absolute;right:6px;bottom:4px;font-size:10px;color:#6b6f76;pointer-events:none;font-family:-apple-system,sans-serif;letter-spacing:0}
+.mapc .attr{position:absolute;right:6px;bottom:4px;font-size:10px;color:#333;background:rgba(255,255,255,.7);padding:0 4px;border-radius:3px;pointer-events:none;font-family:-apple-system,sans-serif;letter-spacing:0}
 .mb{position:absolute;width:42px;height:42px;border-radius:50%;border:1px solid var(--btn);background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center}
 .mb svg{width:21px;height:21px;fill:none;stroke:var(--w);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .mb.on{border-color:var(--red);border-width:2px}
+.mb.zb{font-size:26px;line-height:1;color:var(--w);font-family:-apple-system,sans-serif}
+#layM{position:absolute;left:60px;top:10px;display:none;background:rgba(0,0,0,.85);border:1px solid var(--btn);border-radius:12px;overflow:hidden}
+#layM button{display:block;width:100%;padding:10px 16px;font-size:14px;text-transform:uppercase;letter-spacing:.08em;text-align:left;border-bottom:1px solid #2c2c2e}
+#layM button.on{color:var(--red)}
 .mtag{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:rgba(0,0,0,.75);border:1px solid var(--btn);border-radius:14px;padding:5px 12px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;display:none}
 #bigMap.full{position:fixed;inset:0;margin:0;border-radius:0;z-index:50;height:auto!important}
 #pinCard{position:absolute;left:10px;right:62px;bottom:10px;background:rgba(0,0,0,.88);border:1px solid var(--btn);border-radius:12px;padding:10px 12px;display:none}
@@ -153,7 +176,7 @@ input{font:inherit;letter-spacing:inherit}
 <div class="scr on" id="sNow">
 <div id="band"><div id="spdW"><span id="spd">--</span><span id="mph">mph</span></div>
 <div id="lim" class="none"><span>Limit</span><span id="limN">--</span></div></div>
-<svg id="dial" viewBox="0 0 268 268">
+<div id="dialW"><svg id="dial" viewBox="0 0 268 268">
 <defs><clipPath id="artC"><circle cx="134" cy="134" r="62"/></clipPath></defs>
 <circle cx="134" cy="134" r="130" fill="#0a0a0a" stroke="#9ba0a6" stroke-width="2.5"/>
 <circle cx="134" cy="134" r="124" fill="none" stroke="#2c2c2e" stroke-width="1"/>
@@ -161,14 +184,13 @@ input{font:inherit;letter-spacing:inherit}
 <path id="arcBg" fill="none" stroke="#1f1f21" stroke-width="5"/>
 <path id="arcOn" fill="none" stroke="#d5001c" stroke-width="5"/>
 <circle cx="134" cy="134" r="62" fill="#141416"/>
-<image id="art" x="72" y="72" width="124" height="124" clip-path="url(#artC)" preserveAspectRatio="xMidYMid slice"/>
 <text id="artTx" x="134" y="139" text-anchor="middle" font-size="15" fill="#8b9098" letter-spacing="2" font-family="DIN Alternate,Barlow Semi Condensed,sans-serif">SPOTIFY</text>
 <circle cx="134" cy="134" r="62" fill="none" stroke="#9ba0a6" stroke-width="1.5"/>
 <line id="needle" x1="134" y1="30" x2="134" y2="12" stroke="#d5001c" stroke-width="3.5" stroke-linecap="round"/>
 <circle id="knob" r="7" fill="#d5001c" opacity="0"/>
 <text x="134" y="246" text-anchor="middle" font-size="16" fill="#f2f2f2" font-family="DIN Alternate,Barlow Semi Condensed,sans-serif"><tspan id="tCur">0:00</tspan> <tspan id="tDur" fill="#8b9098">/ 0:00</tspan></text>
-</svg>
-<div id="trk"><div id="tT">Spotify</div><div id="tA">&nbsp;</div><div id="tC"></div></div>
+</svg><img id="art" alt=""></div>
+<div id="trk"><span class="tsp"></span><div style="min-width:0"><div id="tT">Spotify</div><div id="tA">&nbsp;</div><div id="tC"></div></div><button class="rb" id="bList" aria-label="Song list"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></button></div>
 <div id="ctl">
 <button class="rb" id="bPrev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 5v14M19 5L9 12l10 7z"/></svg></button>
 <button class="rb" id="bBack" aria-label="Back 15 seconds"><svg viewBox="0 0 24 24" style="width:34px;height:34px;stroke:#8b9098;stroke-width:1.3"><path d="M4.5 12a7.5 7.5 0 1 0 2.6-5.7M4.5 4v4h4"/></svg><span class="n">15</span></button>
@@ -184,11 +206,11 @@ input{font:inherit;letter-spacing:inherit}
 </div>
 
 <div class="scr" id="sList">
-<div id="mini"><svg class="md" viewBox="0 0 76 76"><defs><clipPath id="artC2"><circle cx="38" cy="38" r="24"/></clipPath></defs><circle cx="38" cy="38" r="36" fill="#0a0a0a" stroke="#9ba0a6" stroke-width="1.5"/><circle cx="38" cy="38" r="30" fill="none" stroke="#1f1f21" stroke-width="3.5"/><circle id="miniArc" cx="38" cy="38" r="30" fill="none" stroke="#d5001c" stroke-width="3.5" stroke-dasharray="0 189" transform="rotate(-90 38 38)"/><circle cx="38" cy="38" r="24" fill="#141416"/><image id="miniArt" x="14" y="14" width="48" height="48" clip-path="url(#artC2)" preserveAspectRatio="xMidYMid slice"/></svg>
+<div id="mini"><span id="miniW"><svg class="md" viewBox="0 0 76 76"><defs><clipPath id="artC2"><circle cx="38" cy="38" r="24"/></clipPath></defs><circle cx="38" cy="38" r="36" fill="#0a0a0a" stroke="#9ba0a6" stroke-width="1.5"/><circle cx="38" cy="38" r="30" fill="none" stroke="#1f1f21" stroke-width="3.5"/><circle id="miniArc" cx="38" cy="38" r="30" fill="none" stroke="#d5001c" stroke-width="3.5" stroke-dasharray="0 189" transform="rotate(-90 38 38)"/><circle cx="38" cy="38" r="24" fill="#141416"/></svg><img id="miniArt" alt=""></span>
 <div style="flex:1;min-width:0"><div id="miniT">Spotify</div><div id="miniA">&nbsp;</div></div>
 <button class="rb" id="miniP" aria-label="Play"><svg viewBox="0 0 24 24" style="width:22px;height:22px"><path id="pIc2" d="M8 5v14l11-7z"/></svg></button></div>
 <div id="plV"><div class="lab"><span>Playlists</span><button id="plRef" class="mut" style="font-size:12px;letter-spacing:.14em">Refresh</button></div><div id="plL"><div class="note">Loading…</div></div></div>
-<div id="trV" style="display:none"><button id="trBack"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>Playlists</button>
+<div id="trV" style="display:none"><button id="trBack"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg><span id="trBackT">Playlists</span></button>
 <div class="lab"><span id="trN"></span></div><div id="trL"></div></div>
 </div>
 
@@ -200,21 +222,22 @@ input{font:inherit;letter-spacing:inherit}
 <button id="home" class="off"><svg viewBox="0 0 24 24" width="26" height="26" class="gIc"></svg><span>Current<br>location</span></button></div>
 <div id="wNow"><div id="wTemp">--°</div><div style="flex:1;min-width:0"><div id="wCond"></div><div id="wDet"></div></div></div>
 <div id="wRain"></div>
-<div id="wWind"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#0a0a0a" stroke="#9ba0a6" stroke-width="1.8"/><g id="wTk"></g>
-<text x="50" y="27" text-anchor="middle" font-size="11" fill="#f2f2f2" font-family="DIN Alternate,sans-serif">N</text><text x="77" y="54" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">E</text><text x="50" y="81" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">S</text><text x="23" y="54" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">W</text>
-<g id="wNd"><line x1="50" y1="33" x2="50" y2="6" stroke="#d5001c" stroke-width="3" stroke-linecap="round"/></g><circle cx="50" cy="50" r="2.5" fill="#5d6168"/></svg>
-<div><div class="lab" style="margin:0;border:0;padding:0">Wind</div><div id="wsN">-- <span class="mut cap" style="font-size:13px;letter-spacing:.14em">mph</span></div><div id="wsD" class="cap" style="font-size:15px;margin-top:2px"></div><div id="wsG" class="mut cap" style="font-size:12px;margin-top:3px"></div></div></div>
+<div id="wWind"><svg id="wDial" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#0a0a0a" stroke="#9ba0a6" stroke-width="1.8"/><g id="wRot"><g id="wTk"></g>
+<text x="50" y="27" text-anchor="middle" font-size="11" fill="#f2f2f2" font-family="DIN Alternate,sans-serif">N</text><text x="77" y="54" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">E</text><text x="50" y="81" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">S</text><text x="23" y="54" text-anchor="middle" font-size="11" fill="#8b9098" font-family="DIN Alternate,sans-serif">W</text></g>
+<g id="wNd"><g fill="none" stroke="#d5001c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path class="wc" d="M40 34L50 44L60 34" opacity=".25"/><path class="wc" d="M40 45L50 55L60 45" opacity=".55"/><path class="wc" d="M40 56L50 66L60 56"/></g></g></svg>
+<div><div class="lab" style="margin:0;border:0;padding:0">Wind</div><div id="wsN">-- <span class="mut cap" style="font-size:13px;letter-spacing:.14em">mph</span></div><div id="wsD" class="cap" style="font-size:15px;margin-top:2px"></div><div id="wsG" class="mut cap" style="font-size:12px;margin-top:3px"></div></div>
+<div id="wSun"><div><svg viewBox="0 0 24 24"><path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 8V5M9.5 10.5 8 9M14.5 10.5 16 9M12 3l-1.5 1.5M12 3l1.5 1.5"/></svg><span id="sRise">--</span><i>Sunrise</i></div><div><svg viewBox="0 0 24 24"><path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 5v3M9.5 10.5 8 9M14.5 10.5 16 9M12 9l-1.5-1.5M12 9l1.5-1.5"/></svg><span id="sSet">--</span><i>Sunset</i></div></div></div>
 <div class="lab"><span>7-day forecast · tap a day</span></div>
 <div id="fc"></div>
 <div class="lab"><span id="cmT">Commute · Jackson to Fremont</span></div>
-<div id="cmB"><div class="cmRow"><button class="chip on" data-d="w">To work</button><button class="chip" data-d="h">To home</button><span style="flex:1"></span><button class="chip on" data-l="0">Now</button><button class="chip" data-l="30">+30</button><button class="chip" data-l="60">+60</button></div><div id="cmL"><div class="note">Loading…</div></div></div>
+<div id="cmB"><div class="cmRow"><button class="chip on" data-d="w">To work</button><button class="chip" data-d="h">To home</button><span style="flex:1"></span><button class="chip on" data-l="0">Now</button><button class="chip" data-l="30">+30</button><button class="chip" data-l="60">+60</button></div><div class="mapc" id="cmMap" style="height:260px"><canvas class="base"></canvas><canvas class="ov"></canvas><div class="attr">© OpenStreetMap · RainViewer</div><div class="mtag" id="cmTag"></div><button class="mb zb" id="cIn" style="right:10px;top:10px" aria-label="Zoom in">+</button><button class="mb zb" id="cOut" style="right:10px;top:60px" aria-label="Zoom out">−</button><button class="mb" id="cFit" style="right:10px;bottom:10px" aria-label="Whole route"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div><div id="cmL"><div class="note">Loading…</div></div></div>
 <div class="lab"><span>Radar · last hour</span><span id="rTime" style="color:var(--w);letter-spacing:.1em"></span></div>
-<div class="mapc" id="radMap" style="height:220px"><canvas class="base dark"></canvas><canvas class="ov"></canvas><div class="attr">© OpenStreetMap · RainViewer</div>
-<button class="mb" id="rPlay" style="left:10px;bottom:10px" aria-label="Pause radar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button></div>
+<div class="mapc" id="radMap" style="height:220px"><canvas class="base"></canvas><canvas class="ov"></canvas><div class="attr">© OpenStreetMap · RainViewer</div>
+<button class="mb" id="rPlay" style="left:10px;bottom:10px" aria-label="Pause radar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button><button class="mb zb" id="rIn" style="right:10px;top:10px" aria-label="Zoom in">+</button><button class="mb zb" id="rOut" style="right:10px;top:60px" aria-label="Zoom out">−</button></div>
 <div class="lab"><span>Map</span><span id="mInfo" style="color:var(--w);letter-spacing:.1em"></span></div>
-<div class="mapc" id="bigMap" style="height:260px"><canvas class="base dark"></canvas><canvas class="ov"></canvas><div class="attr" id="mAttr">© OpenStreetMap</div>
+<div class="mapc" id="bigMap" style="height:300px"><canvas class="base"></canvas><canvas class="ov"></canvas><div class="attr" id="mAttr">© OpenStreetMap</div>
 <div class="mtag" id="mTag"></div>
-<button class="mb" id="mSat" style="left:10px;top:10px" aria-label="Satellite"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
+<button class="mb" id="mSat" style="left:10px;top:10px" aria-label="Map layers"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></button><div id="layM"><button data-l="0">Street</button><button data-l="1">Satellite</button><button data-l="2">Topo</button></div><button class="mb zb" id="mIn" style="left:10px;top:110px" aria-label="Zoom in">+</button><button class="mb zb" id="mOut" style="left:10px;top:160px" aria-label="Zoom out">−</button>
 <button class="mb" id="mFull" style="left:10px;top:60px" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
 <button class="mb" id="mRad" style="right:10px;top:10px" aria-label="Radar"><svg viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 1-7.9A5 5 0 0 1 18 9a3.5 3.5 0 0 1-.5 7H7"/><path d="M9 19l-1 2M13 19l-1 2M17 19l-1 2"/></svg></button>
 <button class="mb" id="mMeas" style="right:10px;top:60px" aria-label="Measure"><svg viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg></button>
@@ -481,12 +504,12 @@ function up() {
 svg.addEventListener("pointerup", up); svg.addEventListener("pointercancel", up);
 
 /* ---- now playing ---- */
-var PLAY = "M8 5v14l11-7z", PAUSE = "M8 5v14M16 5v14";
+var artNow = null, PLAY = "M8 5v14l11-7z", PAUSE = "M8 5v14M16 5v14";
 function paint() {
   $("tT").textContent = S.name; $("tA").textContent = S.artist || " "; $("tC").textContent = S.ctxName || "";
   $("miniT").textContent = S.name; $("miniA").textContent = S.artist || " ";
   $("pIc").setAttribute("d", S.playing ? PAUSE : PLAY); $("pIc2").setAttribute("d", S.playing ? PAUSE : PLAY);
-  if ($("art").getAttribute("href") !== S.art) { $("art").setAttribute("href", S.art || ""); $("miniArt").setAttribute("href", S.art || ""); }
+  if (artNow !== S.art) { artNow = S.art; ["art", "miniArt"].forEach(function (i) { var e = $(i); if (S.art) e.src = S.art; else e.removeAttribute("src"); e.style.display = S.art ? "block" : "none"; }); }
   $("artTx").style.display = S.art ? "none" : "";
   $("artTx").textContent = tok ? "SPOTIFY" : "CONNECT";
   draw();
@@ -505,7 +528,7 @@ function poll() {
     return r.json().then(function (j) {
       var it = j.item;
       if (!it) return idle();
-      S.playing = !!j.is_playing; S.prog = j.progress_ms || 0; S.dur = it.duration_ms || 0; S.at = Date.now();
+      S.playing = !!j.is_playing; S.shuffle = !!j.shuffle_state; S.prog = j.progress_ms || 0; S.dur = it.duration_ms || 0; S.at = Date.now();
       S.uri = it.uri; S.ctx = j.context ? j.context.uri : "";
       S.name = it.name; S.artist = it.artists ? it.artists.map(function (x) { return x.name; }).join(", ") : (it.show ? it.show.name : "");
       var im = (it.album && it.album.images) || it.images || [];
@@ -529,7 +552,9 @@ function playPause() {
   if (S.playing) { S.playing = false; S.prog = cur(); S.at = Date.now(); paint(); act("PUT", "/me/player/pause"); }
   else go(null);
 }
-$("bPlay").onclick = playPause; $("miniP").onclick = playPause;
+$("bPlay").onclick = playPause; $("miniP").onclick = function (e) { e.stopPropagation(); playPause(); };
+$("mini").addEventListener("click", function (e) { if (!e.target.closest("#miniP")) MD.show("sNow"); });
+$("bList").onclick = function () { if (MD.openCurrent) MD.openCurrent(); };
 $("bPrev").onclick = function () { act("POST", "/me/player/previous"); };
 $("bNext").onclick = function () { act("POST", "/me/player/next"); };
 $("bBack").onclick = function () { skip(-15000); };
@@ -584,8 +609,42 @@ function row(name, sub, uri, songsId, fixIdx) {
   return r;
 }
 function lab(t) { var l = D.createElement("div"); l.className = "lab"; l.innerHTML = "<span></span>"; l.firstChild.textContent = t; return l; }
+var showAll = false, q = "", sRes = null, sTimer = 0, sN = 0;
+function results(L) {
+  var ql = q.toLowerCase(), hits = [];
+  FIXED.forEach(function (p) { var n = names[p[2]] || p[0] || ""; if (n.toLowerCase().indexOf(ql) >= 0) hits.push([n, p[1] === "playlist" ? "" : p[1], uriOf(p[1], p[2]), p[1] === "playlist" ? p[2] : null]); });
+  (mine && mine.pl || []).forEach(function (p) { if (p.n && p.n.toLowerCase().indexOf(ql) >= 0 && !FIXED.some(function (f) { return f[2] === p.id; })) hits.push([p.n, p.c != null ? p.c + " songs" : "", p.uri, p.id]); });
+  L.innerHTML = "";
+  L.appendChild(lab("Your playlists"));
+  if (!hits.length) { var n0 = D.createElement("div"); n0.className = "note"; n0.style.padding = "10px 4px"; n0.textContent = "No match in your playlists"; L.appendChild(n0); }
+  hits.forEach(function (h) { MD.ctxNames[h[2]] = h[0]; L.appendChild(row(h[0], h[1], h[2], h[3])); });
+  L.appendChild(lab("From Spotify"));
+  if (!sRes) { var n1 = D.createElement("div"); n1.className = "note"; n1.style.padding = "10px 4px"; n1.textContent = "Searching…"; L.appendChild(n1); }
+  else if (!sRes.length) { var n2 = D.createElement("div"); n2.className = "note"; n2.style.padding = "10px 4px"; n2.textContent = "Nothing found on Spotify"; L.appendChild(n2); }
+  else sRes.forEach(function (p) { MD.ctxNames[p.uri] = p.n; L.appendChild(row(p.n, p.o, p.uri, p.id)); });
+  hl();
+}
+function searchSpotify() {
+  var n = ++sN, term = q;
+  sRes = null; render();
+  api("GET", "/search?type=playlist&limit=12&q=" + encodeURIComponent(term)).then(function (r) { return r && r.ok ? r.json() : null; }).then(function (j) {
+    if (n !== sN) return;
+    sRes = ((j && j.playlists && j.playlists.items) || []).filter(function (p) { return p && p.id; }).map(function (p) { return { id: p.id, uri: p.uri, n: p.name, o: p.owner && p.owner.display_name ? "by " + p.owner.display_name : "" }; });
+    render();
+  });
+}
+(function () {
+  var b = D.createElement("div"); b.id = "plS";
+  b.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input placeholder="Search playlists" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+  $("plV").insertBefore(b, $("plV").firstChild);
+  var inp = b.querySelector("input");
+  inp.addEventListener("input", function () { q = inp.value.trim(); clearTimeout(sTimer); if (!q) { sRes = null; render(); return; } render(); sTimer = setTimeout(searchSpotify, 500); });
+  inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { inp.blur(); } });
+  b.querySelector("button").onclick = function () { inp.value = ""; q = ""; sRes = null; render(); };
+})();
 function render() {
   var L = $("plL"); L.innerHTML = "";
+  if (q && !editing && MD.lsGet("mdSp", null)) return results(L);
   FIXED.forEach(function (p, i) {
     var u = uriOf(p[1], p[2]), n = names[p[2]] || p[0] || "Playlist";
     MD.ctxNames[u] = n;
@@ -604,6 +663,11 @@ function render() {
     var n = D.createElement("div"); n.className = "note"; n.innerHTML = 'Log in to Spotify to play these and to see your own playlists.<br><button class="obtn">Connect Spotify</button>';
     n.querySelector("button").onclick = MD.spLogin; L.appendChild(n); hl(); return;
   }
+  if (q) return results(L);
+  var more = D.createElement("button"); more.className = "obtn"; more.style.cssText = "display:block;width:100%;margin:14px 0 4px";
+  more.textContent = showAll ? "Hide my other playlists" : "All playlists"; more.onclick = function () { showAll = !showAll; render(); };
+  L.appendChild(more);
+  if (!showAll) { hl(); return; }
   L.appendChild(lab("Your Spotify"));
   if (uid) { var cu = "spotify:user:" + uid + ":collection"; MD.ctxNames[cu] = "Liked songs"; L.appendChild(row("Liked songs", mine && mine.liked != null ? mine.liked + " songs" : "", cu, "liked")); }
   (mine && mine.pl || []).forEach(function (p) {
@@ -619,7 +683,8 @@ function hl(u) {
   Array.prototype.forEach.call(D.querySelectorAll("#plL .row"), function (r) { r.classList.toggle("on", !!c && r.dataset.u === c); });
   Array.prototype.forEach.call(D.querySelectorAll("#trL .trow"), function (r) { r.classList.toggle("on", !!MD.sp && r.dataset.u === MD.sp.uri); });
 }
-D.addEventListener("md:track", function () { hl(); });
+var lastUri = "";
+D.addEventListener("md:track", function () { hl(); if (openId && MD.sp && MD.sp.uri !== lastUri) { lastUri = MD.sp.uri; if (SC[openId]) fill(openId, SC[openId], openCtx); } });
 function load() {
   if (!MD.lsGet("mdSp", null)) return render();
   var jobs = [];
@@ -695,11 +760,19 @@ function fetchSongs(id) {
   }
   return step(0).then(function () { return out; });
 }
+var openCtx = "", fromMain = false, qU = [];
 function fill(id, list, ctx) {
   var L = $("trL"); L.innerHTML = "";
   if (!list.length) return msg("Spotify only lists the songs for playlists you own or follow. Tap the playlist name to play it.");
-  list.forEach(function (t, i) {
-    var e = D.createElement("div"); e.className = "trow"; e.dataset.u = t[2];
+  var cu = MD.sp && MD.sp.uri, ci = -1, idx = list.map(function (t, i) { if (t[2] === cu) ci = i; return i; }), later = [], labTxt = "";
+  if (ci >= 0) {
+    if (MD.sp.shuffle && qU.length) {
+      var first = [ci]; qU.forEach(function (u) { for (var k = 0; k < list.length; k++) if (list[k][2] === u && first.indexOf(k) < 0) { first.push(k); break; } });
+      later = idx.filter(function (k) { return first.indexOf(k) < 0; }); idx = first; labTxt = "Later in this playlist";
+    } else { later = idx.slice(0, ci); idx = idx.slice(ci); labTxt = "Earlier in this playlist"; }
+  }
+  function add(i) {
+    var t = list[i], e = D.createElement("div"); e.className = "trow"; e.dataset.u = t[2];
     e.innerHTML = "<div></div><div></div>"; e.firstChild.textContent = t[0]; e.lastChild.textContent = t[1];
     e.onclick = function () {
       MD.spGo({ context_uri: ctx, offset: { uri: t[2] } }).then(function (r) {
@@ -707,12 +780,19 @@ function fill(id, list, ctx) {
       });
     };
     L.appendChild(e);
-  });
+  }
+  idx.forEach(add);
+  if (later.length) { var l = lab(labTxt); l.style.margin = "14px 0 0"; L.appendChild(l); later.forEach(add); }
   hl();
-  var on = L.querySelector(".on"); if (on) on.scrollIntoView({ block: "center" });
+  $("sList").scrollTop = 0;
 }
-function openSongs(id, name, ctx) {
-  openId = id; $("trN").textContent = name; $("plV").style.display = "none"; $("trV").style.display = "";
+function getQueue() {
+  return api("GET", "/me/player/queue").then(function (r) { return r && r.ok ? r.json() : null; }).then(function (j) { qU = j && j.queue ? j.queue.map(function (x) { return x.uri; }) : []; }).catch(function () {});
+}
+function openSongs(id, name, ctx, main) {
+  fromMain = !!main; $("trBackT").textContent = fromMain ? "Now playing" : "Playlists";
+  openId = id; openCtx = ctx; lastUri = MD.sp ? MD.sp.uri : "";
+  if (MD.sp && MD.sp.shuffle) getQueue().then(function () { if (openId === id && SC[id]) fill(id, SC[id], ctx); }); $("trN").textContent = name; $("plV").style.display = "none"; $("trV").style.display = "";
   if (SC[id]) return fill(id, SC[id], ctx);
   msg("Loading songs…");
   fetchSongs(id).then(function (L) { SC[id] = L; if (openId === id) fill(id, L, ctx); }).catch(function (s) {
@@ -720,7 +800,14 @@ function openSongs(id, name, ctx) {
     msg(s === 401 || s === 403 ? "Spotify only lists the songs for playlists you own or follow. You can still tap the playlist name to play it." : "Couldn't load the songs (" + s + "). Try again in a moment.", s === 401);
   });
 }
-$("trBack").onclick = function () { openId = ""; $("trV").style.display = "none"; $("plV").style.display = ""; };
+$("trBack").onclick = function () { openId = ""; $("trV").style.display = "none"; $("plV").style.display = ""; if (fromMain) MD.show("sNow"); };
+MD.openCurrent = function () {
+  var c = (MD.sp && MD.sp.ctx) || "", m = c.match(/^spotify:playlist:(\w+)/);
+  MD.show("sList");
+  if (m) openSongs(m[1], MD.ctxNames[c] || names[m[1]] || "This playlist", c, true);
+  else if (/:collection$/.test(c)) openSongs("liked", "Liked songs", c, true);
+  else { openId = ""; $("trV").style.display = "none"; $("plV").style.display = ""; }
+};
 })();
 
 (function () {
@@ -863,10 +950,51 @@ function paint() {
   $("wsN").firstChild.textContent = Math.round(c.wind_speed_10m) + " ";
   $("wsD").textContent = "From " + DIRS[Math.round(c.wind_direction_10m / 22.5) % 16];
   $("wsG").textContent = c.wind_gusts_10m > c.wind_speed_10m + 2 ? "Gusts " + Math.round(c.wind_gusts_10m) : "";
-  $("wNd").setAttribute("transform", "rotate(" + c.wind_direction_10m + " 50 50)");
+  var ws = c.wind_speed_10m || 0; $("wNd").classList.toggle("calm", ws < 1); if (ws < 1) $("wsD").textContent = "Calm";
+  $("wNd").style.setProperty("--d", Math.max(0.8, Math.min(3, 3.2 - ws * 0.09)).toFixed(2) + "s");
+  windDir = c.wind_direction_10m; turn();
+  var sr = y.sunrise && y.sunrise[0], ss = y.sunset && y.sunset[0];
+  if (!sr && view == null && MD.pos) { var su = sunCalc(MD.pos.lat, MD.pos.lon); sr = su[0]; ss = su[1]; } else if (!sr && view) { var su2 = sunCalc(view.lat, view.lon); sr = su2[0]; ss = su2[1]; }
+  $("sRise").textContent = hm(sr); $("sSet").textContent = hm(ss);
   forecast(d);
   $("wUpd").textContent = "Updated " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + " · " + d.src;
 }
+function hm(t) {
+  if (!t) return "--";
+  if (typeof t === "number") { var d0 = new Date(t); return d0.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
+  var h = +t.slice(11, 13), m = t.slice(14, 16); return (h % 12 || 12) + ":" + m + (h < 12 ? " AM" : " PM");
+}
+/* sunrise and sunset worked out on the phone when the backup weather source has none */
+function sunCalc(lat, lon) {
+  var now = new Date(), n = Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(now.getFullYear(), 0, 0)) / 864e5), R = Math.PI / 180, g = 2 * Math.PI / 365 * (n - 1);
+  var eq = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+  var dc = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+  var c = (Math.cos(90.833 * R) - Math.sin(lat * R) * Math.sin(dc)) / (Math.cos(lat * R) * Math.cos(dc));
+  if (c > 1 || c < -1) return [null, null];
+  var ha = Math.acos(c) / R, mid = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  return [mid + (720 - 4 * (lon + ha) - eq) * 60000, mid + (720 - 4 * (lon - ha) - eq) * 60000];
+}
+/* wind dial turns with the car (GPS direction while moving, or the phone's compass once allowed) */
+var windDir = 0, head = 0.001, compass = null;
+function turn() {
+  var h = compass != null ? compass : (MD.heading != null && MD.mph > 3 ? MD.heading : head);
+  if (Math.abs(((h || 0) - head + 540) % 360 - 180) < 2 && turned === windDir) return;
+  head = h || 0; turned = windDir;
+  rA = un(rA, -head); nA = un(nA, windDir - head);
+  $("wRot").style.transform = "rotate(" + rA + "deg)"; $("wRot").style.transformOrigin = "50px 50px";
+  $("wNd").style.transform = "rotate(" + nA + "deg)"; $("wNd").style.transformOrigin = "50px 50px";
+}
+var rA = 0, nA = 0, turned = null;
+function un(prev, target) { var d = ((target - prev) % 360 + 540) % 360 - 180; return prev + d; }
+MD.onPos(function () { if (compass == null) turn(); });
+function onOri(e) { if (e.webkitCompassHeading != null) { compass = e.webkitCompassHeading; } else if (e.absolute && e.alpha != null) compass = 360 - e.alpha; turn(); }
+function startCompass() {
+  var DO = window.DeviceOrientationEvent;
+  if (DO && typeof DO.requestPermission === "function") DO.requestPermission().then(function (r) { if (r === "granted") { window.addEventListener("deviceorientation", onOri); MD.lsSet("mdCmp", 1); } }).catch(function () {});
+  else window.addEventListener("deviceorientationabsolute", onOri);
+}
+$("wDial").addEventListener("click", startCompass);
+if (MD.lsGet("mdCmp", 0)) { try { window.addEventListener("deviceorientation", onOri); } catch (e) {} }
 function rainLine(d) {
   var m = d.minutely_15;
   if (!m || !m.time || !m.precipitation) return "";
@@ -907,7 +1035,7 @@ function hours(d, idx) {
   return box;
 }
 /* wind gauge ticks */
-(function () { var g = $("wTk"); for (var i = 0; i < 36; i++) { var a = i * 10 * Math.PI / 180, m = i % 9 === 0, r2 = m ? 38 : 41, l = D.createElementNS(MD.NS, "line"); l.setAttribute("x1", 50 + 44 * Math.sin(a)); l.setAttribute("y1", 50 - 44 * Math.cos(a)); l.setAttribute("x2", 50 + r2 * Math.sin(a)); l.setAttribute("y2", 50 - r2 * Math.cos(a)); l.setAttribute("stroke", m ? "#f2f2f2" : "#5d6168"); l.setAttribute("stroke-width", m ? 1.6 : 0.8); g.appendChild(l); } })();
+(function () { var g = $("wTk"); for (var i = 0; i < 12; i++) { var a = i * 30 * Math.PI / 180, m = i % 3 === 0, r2 = m ? 38 : 41, l = D.createElementNS(MD.NS, "line"); l.setAttribute("x1", 50 + 44 * Math.sin(a)); l.setAttribute("y1", 50 - 44 * Math.cos(a)); l.setAttribute("x2", 50 + r2 * Math.sin(a)); l.setAttribute("y2", 50 - r2 * Math.cos(a)); l.setAttribute("stroke", m ? "#f2f2f2" : "#5d6168"); l.setAttribute("stroke-width", m ? 1.6 : 0.8); g.appendChild(l); } })();
 
 /* ---- search and favorites ---- */
 var sT = 0, sN = 0;
@@ -957,7 +1085,7 @@ function img(u, cb) {
 }
 function TMap(box, o) {
   var me = this, base = box.querySelector(".base"), ov = box.querySelector(".ov"), bx = base.getContext("2d"), ox = ov.getContext("2d");
-  me.lat = o.lat || 38.35; me.lon = o.lon || -120.77; me.z = o.z || 10; me.sat = false; me.radar = null; me.W = 0; me.H = 0;
+  me.lat = o.lat || 38.35; me.lon = o.lon || -120.77; me.z = o.z || 10; me.lay = 0; me.radar = null; me.W = 0; me.H = 0;
   var dpr = Math.min(2, window.devicePixelRatio || 1), q = 0;
   me.redraw = function () { if (!q) { q = 1; requestAnimationFrame(function () { q = 0; draw(); }); } };
   function size() { var r = box.getBoundingClientRect(); me.W = r.width; me.H = r.height; [base, ov].forEach(function (c) { c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr); }); me.redraw(); }
@@ -978,13 +1106,16 @@ function TMap(box, o) {
   }
   function draw() {
     bx.setTransform(dpr, 0, 0, dpr, 0, 0); ox.setTransform(dpr, 0, 0, dpr, 0, 0);
-    bx.fillStyle = me.sat ? "#000" : "#e8e8e8"; bx.fillRect(0, 0, me.W, me.H); ox.clearRect(0, 0, me.W, me.H);
-    var lv = Math.max(2, Math.min(me.sat ? 18 : 19, Math.round(me.z)));
-    layer(bx, lv, me.sat ? function (z, x, y) { return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + z + "/" + y + "/" + x; } : function (z, x, y) { return "https://tile.openstreetmap.org/" + z + "/" + x + "/" + y + ".png"; });
+    bx.fillStyle = me.lay === 1 ? "#000" : "#e8e8e8"; bx.fillRect(0, 0, me.W, me.H); ox.clearRect(0, 0, me.W, me.H);
+    var lv = Math.max(2, Math.min(me.lay ? 18 : 19, Math.round(me.z)));
+    layer(bx, lv, me.lay === 1 ? function (z, x, y) { return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + z + "/" + y + "/" + x; }
+      : me.lay === 2 ? function (z, x, y) { return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/" + z + "/" + y + "/" + x; }
+      : function (z, x, y) { return "https://tile.openstreetmap.org/" + z + "/" + x + "/" + y + ".png"; });
     if (me.radar) { var rp = me.radar; layer(ox, Math.min(lv, 7), function (z, x, y) { return rp.host + rp.path + "/256/" + z + "/" + x + "/" + y + "/2/1_1.png"; }, 0.7); }
     if (o.overlay) o.overlay(ox, me);
   }
-  me.setSat = function (v) { me.sat = v; base.classList.toggle("dark", !v); me.redraw(); };
+  me.setLay = function (v) { me.lay = v; me.redraw(); };
+  me.zoom = function (d) { me.z = Math.max(3, Math.min(19, Math.round(me.z) + d)); if (o.onMove) o.onMove(); me.redraw(); };
   me.center = function (lat, lon, z) { me.lat = lat; me.lon = lon; if (z) me.z = z; me.redraw(); };
   /* touch: one finger pans, two fingers zoom */
   var P = {}, st = null, tap = null;
@@ -996,7 +1127,7 @@ function TMap(box, o) {
     st = { cx: cx, cy: cy, d: a.length > 1 ? Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) : 0, z: me.z, ll: me.ll(cx, cy) };
   }
   box.addEventListener("pointerdown", function (e) {
-    if (e.target.closest("button,a,#pinCard")) return;
+    if (e.target.closest("button,a,#pinCard,#layM")) return;
     P[e.pointerId] = lxy(e); box.setPointerCapture(e.pointerId); begin();
     tap = pts().length === 1 ? { x: P[e.pointerId].x, y: P[e.pointerId].y, t: Date.now() } : null;
   });
@@ -1027,6 +1158,7 @@ function dot(ctx, m, pos) {
   ctx.beginPath(); ctx.arc(p[0], p[1], 8, 0, 7); ctx.fillStyle = "#d5001c"; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = "#fff"; ctx.stroke();
 }
 
+MD.TMap = TMap; MD.mapDot = dot;
 /* ---- radar frames from RainViewer ---- */
 var RF = { host: "", frames: [], at: 0 };
 function frames() {
@@ -1048,6 +1180,7 @@ function rStep() {
   var f = RF.frames[rIdx]; rm.radar = { host: RF.host, path: f.path }; rm.redraw();
   var ago = Math.round((Date.now() / 1000 - f.time) / 60);
   $("rTime").textContent = rIdx === RF.frames.length - 1 ? "Now" : "-" + ago + " min";
+  MD.radFrame = { r: rm.radar, t: $("rTime").textContent }; D.dispatchEvent(new CustomEvent("md:radar"));
 }
 function wxOn() { return $("sWx").classList.contains("on") && !D.hidden; }
 setInterval(function () {
@@ -1121,10 +1254,16 @@ $("pcDel").onclick = function () { pins = pins.filter(function (p) { return p !=
 $("pcRen").onclick = function () { if (!selPin) return; var n = prompt("Rename pin:", selPin.n); if (n) { selPin.n = n; savePins(); openPin(selPin); } };
 $("mMeas").onclick = function () { setMode("meas"); };
 $("mPin").onclick = function () { setMode("pin"); };
-var sat = MD.lsGet("mdSat", false);
-function applySat() { bm.setSat(sat); $("mSat").classList.toggle("on", sat); $("mAttr").textContent = sat ? "Esri, Maxar" : "© OpenStreetMap"; }
-$("mSat").onclick = function () { sat = !sat; MD.lsSet("mdSat", sat); applySat(); };
-applySat();
+var lay = MD.lsGet("mdLay", 0);
+function applyLay() {
+  bm.setLay(lay); $("mSat").classList.toggle("on", lay !== 0); $("mAttr").textContent = lay === 1 ? "Esri, Maxar" : lay === 2 ? "Esri" : "© OpenStreetMap";
+  Array.prototype.forEach.call(D.querySelectorAll("#layM button"), function (b) { b.classList.toggle("on", +b.dataset.l === lay); });
+}
+$("mSat").onclick = function () { var m = $("layM"); m.style.display = m.style.display === "block" ? "none" : "block"; };
+Array.prototype.forEach.call(D.querySelectorAll("#layM button"), function (b) { b.onclick = function () { lay = +b.dataset.l; MD.lsSet("mdLay", lay); applyLay(); $("layM").style.display = "none"; }; });
+applyLay();
+$("mIn").onclick = function () { bm.zoom(1); }; $("mOut").onclick = function () { bm.zoom(-1); };
+$("rIn").onclick = function () { rm.zoom(1); }; $("rOut").onclick = function () { rm.zoom(-1); };
 var radOn = false;
 $("mRad").onclick = function () {
   radOn = !radOn; this.classList.toggle("on", radOn);
@@ -1195,7 +1334,33 @@ var ROUTE = [
   ["Tracy", 37.7397, -121.4252, 70], ["Altamont", 37.7350, -121.6560, 80], ["Livermore", 37.6819, -121.7680, 88],
   ["Sunol", 37.5949, -121.8885, 98], ["Fremont", 37.5485, -121.9886, 110]
 ];
-var dir = "w", lead = 0, data = null, at = 0;
+/* road path for the map: SR-88, I-5, I-205, I-580, I-680 */
+var PATH = [[38.3488,-120.7741],[38.3600,-120.8050],[38.3330,-120.8700],[38.2900,-120.9300],[38.2400,-121.0000],[38.1910,-121.0880],[38.1590,-121.1630],[38.1150,-121.2200],[38.0300,-121.2600],[37.9577,-121.2908],
+  [37.9000,-121.3100],[37.8300,-121.2900],[37.7700,-121.3400],[37.7397,-121.4252],[37.7350,-121.5300],[37.7400,-121.6500],[37.7000,-121.7700],[37.7000,-121.9250],[37.6600,-121.9000],[37.5949,-121.8885],[37.5600,-121.9300],[37.5485,-121.9886]];
+var dir = "w", lead = 0, data = null, at = 0, bad = {}, fitted = false;
+var cm = new MD.TMap($("cmMap"), { lat: 37.95, lon: -121.38, z: 8.3, overlay: cmDraw });
+function fit() {
+  if (!cm.W) return;
+  function wp(la, lo) { var s = Math.sin(la * Math.PI / 180); return [(lo + 180) / 360 * 256, (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * 256]; }
+  var a = wp(38.40, -122.02), b = wp(37.50, -120.74);
+  cm.z = Math.log(Math.min((cm.W - 130) / (b[0] - a[0]), (cm.H - 50) / (b[1] - a[1]))) / Math.LN2;
+  cm.lat = 37.95; cm.lon = -121.38; var q = cm.ll(cm.W / 2 + 26, cm.H / 2); cm.lat = q[0]; cm.lon = q[1]; fitted = true; cm.redraw();
+}
+function lbl(c, t, x, y, col, al) { c.font = "600 11px 'DIN Alternate','Barlow Semi Condensed',sans-serif"; c.textAlign = al || "left"; c.lineWidth = 3.5; c.strokeStyle = "rgba(0,0,0,.85)"; c.strokeText(t, x, y); c.fillStyle = col; c.fillText(t, x, y); }
+function cmDraw(c, m) {
+  if (!fitted && m.W) { fit(); return; }
+  c.lineJoin = c.lineCap = "round";
+  [[7, "rgba(0,0,0,.55)"], [3.5, "#d5001c"]].forEach(function (s) { c.beginPath(); PATH.forEach(function (p, i) { var q = m.xy(p[0], p[1]); if (i) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); }); c.lineWidth = s[0]; c.strokeStyle = s[1]; c.stroke(); });
+  ROUTE.forEach(function (p, i) {
+    var q = m.xy(p[1], p[2]), hot = bad[p[0]], end = i === 0 || i === ROUTE.length - 1;
+    c.beginPath(); c.arc(q[0], q[1], hot ? 7 : end ? 6 : 4, 0, 7); c.fillStyle = hot ? "#d5001c" : "#fff"; c.fill(); c.lineWidth = 2; c.strokeStyle = hot ? "#fff" : "#000"; c.stroke();
+    if (hot || end) lbl(c, (p[0] + (hot ? " · " + hot : "")).toUpperCase(), i === 0 ? q[0] - 11 : q[0] + 10, q[1] + (i === ROUTE.length - 1 ? 14 : 4), hot ? "#ff5a6e" : "#fff", i === 0 ? "right" : "left");
+  });
+  MD.mapDot(c, m, MD.pos);
+}
+D.addEventListener("md:radar", function () { var f = MD.radFrame; cm.radar = f.r; var t = $("cmTag"); t.textContent = "Radar " + (f.t === "Now" ? "now" : f.t); t.style.display = "block"; cm.redraw(); });
+MD.onPos(function () { cm.redraw(); });
+$("cIn").onclick = function () { cm.zoom(1); }; $("cOut").onclick = function () { cm.zoom(-1); }; $("cFit").onclick = fit;
 function load() {
   if (data && Date.now() - at < 900000) return Promise.resolve(data);
   var u = "https://api.open-meteo.com/v1/forecast?latitude=" + ROUTE.map(function (p) { return p[1]; }).join(",") + "&longitude=" + ROUTE.map(function (p) { return p[2]; }).join(",") +
@@ -1223,17 +1388,17 @@ function paint() {
   load().then(function (d) {
     var start = Date.now() + lead * 60000, tot = ROUTE[ROUTE.length - 1][3], pts = ROUTE.map(function (p, i) { return { p: p, d: d[i], m: dir === "w" ? p[3] : tot - p[3] }; });
     if (dir === "h") pts.reverse();
-    L.innerHTML = ""; var flags = [];
+    L.innerHTML = ""; var flags = []; bad = {};
     pts.forEach(function (x) {
       var t = start + x.m * 60000, w = hourAt(x.d, t), wet = w.pp >= 40 || (w.c >= 51 && w.c < 100), fog = w.c === 45 || w.c === 48 || (w.vis != null && w.vis < 1000), windy = w.wg >= 30, snow = (w.c >= 71 && w.c <= 77) || w.c === 85 || w.c === 86;
-      if (wet || fog || windy || snow) flags.push(x.p[0] + ": " + (snow ? "snow" : fog ? "fog" : wet ? "rain " + w.pp + "%" : "gusts " + Math.round(w.wg)));
+      if (wet || fog || windy || snow) { var why = snow ? "snow" : fog ? "fog" : wet ? "rain " + w.pp + "%" : "gusts " + Math.round(w.wg); flags.push(x.p[0] + ": " + why); bad[x.p[0]] = why; }
       var r = D.createElement("div"); r.className = "cm";
       r.innerHTML = '<span class="t">' + new Date(t).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).replace(/\s?([AP])M/i, function (a, b) { return b.toLowerCase(); }) + '</span><span class="p' + (fog || snow ? " bad" : "") + '"></span>' + MD.wxIcon(w.c) +
         "<span>" + Math.round(w.tp) + '°</span><span class="r' + (wet ? " bad" : "") + '">' + (w.pp >= 10 ? w.pp + "%" : "") + '</span><span class="w' + (windy ? " bad" : "") + '">' + Math.round(w.ws) + (w.wg >= 25 ? "/" + Math.round(w.wg) : "") + "</span>";
       r.querySelector(".p").textContent = x.p[0];
       L.appendChild(r);
     });
-    MD.cmFlags = flags; warn();
+    MD.cmFlags = flags; warn(); cm.redraw();
     var s = D.createElement("div"); s.id = "cmS";
     s.innerHTML = flags.length ? '<span style="color:#d5001c">Heads up:</span> ' + MD.esc(flags.join(" · ")) : '<span class="mut">Clear drive, nothing to watch for</span>';
     L.appendChild(s);
