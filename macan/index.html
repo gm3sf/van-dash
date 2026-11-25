@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Macan Dash rev 5 -->
+<!-- Macan Dash rev 6 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -203,6 +203,10 @@ input{font:inherit;letter-spacing:inherit}
 .shB > button:first-child{font-size:14px;letter-spacing:.12em;color:var(--g);text-transform:uppercase;padding:10px 4px}
 .shB .obtn{margin-top:0;color:var(--w);text-decoration:none}
 #trk .tap{cursor:pointer}
+.strow{display:flex;justify-content:space-between;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);font-size:15px}
+.strow span{color:var(--g);text-transform:uppercase;font-size:12px;letter-spacing:.12em;flex:none}
+.strow b{font-weight:400;text-align:right}
+.stlog{font-size:12px;color:var(--g);padding:6px 2px;border-bottom:1px solid var(--line);font-family:Menlo,monospace;letter-spacing:0;word-break:break-word}
 #toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);width:84%;max-width:360px;background:#111113;border:1px solid var(--line2);border-radius:12px;padding:12px 14px;font-size:14px;text-align:center;z-index:99;display:none;line-height:1.35}
 </style>
 </head>
@@ -272,7 +276,7 @@ input{font:inherit;letter-spacing:inherit}
 <div id="wUpd"></div>
 </div>
 
-<div id="tabs"><button class="on" data-s="sNow">Now playing</button><button data-s="sList">Playlists</button><button data-s="sWx">Weather</button></div>
+<div id="tabs"><button class="on" data-s="sNow">Home</button><button data-s="sList">Playlists</button><button data-s="sWx">Weather</button></div>
 </div>
 <div id="ph"><div class="bar2"><span id="phD"></span><button id="phX">Close</button></div><img id="phI" alt=""><div class="bar2"><button id="phS">Share</button><button id="phDel">Delete</button></div></div>
 <div class="pg" id="mapPg"><div class="pgH"><button class="pgB" id="mapX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><div class="seg" id="mSeg"><button data-m="radar">Radar</button><button data-m="route">Route</button><button data-m="map">Map</button></div><span></span></div>
@@ -295,6 +299,7 @@ input{font:inherit;letter-spacing:inherit}
 <div id="sRes"></div><div class="lab"><span>Saved places</span></div><div id="favs"></div></div></div>
 <div class="pg" id="sunPg"><div class="pgH"><button class="pgB" id="sunX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Sunrise · Sunset</span><span></span></div><div class="pgC"><div id="sunName"></div><div id="sunTop"></div><div class="sr sh"><span></span><span>Sunrise</span><span>Sunset</span><span>Daylight</span></div><div id="sunL"></div></div></div>
 <div class="sheet" id="capS"><div class="shC"><img id="capI" alt=""><div class="lab" style="margin-top:12px"><span>Description</span></div><div id="capChips"></div><input id="capT" placeholder="Type a description" autocomplete="off" enterkeyhint="done" maxlength="40"><div class="shB"><button id="capX">Cancel</button><button id="capOk" class="obtn">Save photo</button></div></div></div>
+<div class="pg" id="stPg"><div class="pgH"><button class="pgB" id="stX"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="pgT">Spotify status</span><span></span></div><div class="pgC"><div id="stB"></div><div style="display:flex;gap:10px;margin-top:16px"><button class="obtn" id="stRe" style="font-size:13px">Check again</button><button class="obtn" id="stOut" style="font-size:13px;border-color:#5d6168">Switch account</button></div></div></div>
 <div id="toast"></div>
 <script>
 (function () {
@@ -465,7 +470,18 @@ function fresh() {
 function api(m, path, body) {
   return fresh().then(function () {
     return fetch(API + path, { method: m, headers: { Authorization: "Bearer " + tok.a, "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
-  }).then(function (r) { if (r.status === 401) { tok.x = 0; MD.lsSet("mdSp", tok); } return r; }).catch(function () { return null; });
+  }).then(function (r) {
+    if (r.status === 401) { tok.x = 0; MD.lsSet("mdSp", tok); }
+    if (!/^\/me\/player\?/.test(path) || r.status !== 200) note(m, path, r.status, r.status >= 400 ? r.clone().text() : null);
+    return r;
+  }).catch(function () { note(m, path, "no answer"); return null; });
+}
+/* keep the last answers from Spotify for the status page */
+var LOG = []; MD.spLog = LOG;
+function note(m, p, s, txt) {
+  var e = { t: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" }), w: m + " " + p.split("?")[0].replace(/\/(playlists)\/\w+/, "/$1/…"), s: s, why: "" };
+  LOG.unshift(e); if (LOG.length > 30) LOG.pop();
+  if (txt) txt.then(function (x) { try { var j = JSON.parse(x); e.why = (j.error && (j.error.reason || j.error.message)) || ""; } catch (z) { e.why = String(x).slice(0, 80); } }).catch(function () {});
 }
 MD.spApi = api;
 function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
@@ -481,6 +497,7 @@ function pick(d) {
 /* Same order as Van Dash: just play; if Spotify says no player, hand it to her phone
    (or the last phone that played); if Spotify is fully asleep, open the playlist in Spotify */
 function openIn(body) {
+  if (!body) { MD.toast("Spotify isn't playing on this phone right now. Start any song in Spotify once, then use the app.", 6000); return; }
   var u = body && (body.context_uri || (body.uris && body.uris[0]));
   var m = u && u.match(/^spotify:(\w+):(\w+)/);
   location.href = m ? "https://open.spotify.com/" + m[1] + "/" + m[2] : "spotify:";
@@ -762,6 +779,27 @@ function load() {
   Promise.all(jobs).then(function () { mine = out; MD.lsSet("mdMine", out); MD.lsSet("mdPlNames", names); render(); });
 }
 $("plRef").onclick = load;
+(function () { var b = D.createElement("button"); b.className = "mut"; b.style.cssText = "font-size:12px;letter-spacing:.14em;margin-right:18px"; b.textContent = "Status"; $("plRef").before(b); b.onclick = status; })();
+/* Spotify status page: what Spotify is actually answering */
+function status() {
+  var B = $("stB"); $("stPg").classList.add("on"); B.innerHTML = '<div class="note">Asking Spotify…</div>';
+  function j(p) { return api("GET", p).then(function (r) { return r && r.ok && r.status !== 204 ? r.json() : { _s: r ? r.status : "no answer" }; }); }
+  Promise.all([j("/me"), j("/me/player/devices"), j("/me/player")]).then(function (a) {
+    var me = a[0], dv = a[1].devices, pl = a[2], h = "";
+    function row(k, v) { h += '<div class="strow"><span>' + k + "</span><b></b></div>"; return v; }
+    var vals = [];
+    vals.push(row("Signed in as", me.id ? (me.display_name || me.id) + (me.product ? " · " + me.product : "") : "unknown (" + me._s + ")"));
+    vals.push(row("Spotify sees", dv ? (dv.length ? dv.map(function (d) { return d.name + (d.is_active ? " (active)" : ""); }).join(", ") : "no players") : "error " + a[1]._s));
+    vals.push(row("Playing on", pl.device ? pl.device.name + (pl.is_playing ? " · playing" : " · paused") : pl.item ? "a song, player hidden" : "nothing playing" + (pl._s && pl._s !== 204 ? " (" + pl._s + ")" : "")));
+    h += '<div class="lab"><span>Last answers from Spotify</span></div>';
+    B.innerHTML = h;
+    Array.prototype.forEach.call(B.querySelectorAll(".strow b"), function (e, i) { e.textContent = vals[i]; });
+    MD.spLog.slice(0, 20).forEach(function (e) { var d = D.createElement("div"); d.className = "stlog"; d.textContent = e.t + "  " + e.w + "  →  " + e.s + (e.why ? "  " + e.why : ""); B.appendChild(d); });
+  });
+}
+$("stX").onclick = function () { $("stPg").classList.remove("on"); };
+$("stRe").onclick = status;
+$("stOut").onclick = function () { if (!confirm("Sign out of Spotify and sign in again?")) return; localStorage.removeItem("mdSp"); MD.spLogin(); };
 (function () { var b = D.createElement("button"); b.id = "plEd"; b.className = "mut"; b.style.cssText = "font-size:12px;letter-spacing:.14em;margin-left:auto;margin-right:18px"; b.textContent = "Edit"; $("plRef").before(b); b.onclick = function () { editing = !editing; render(); }; })();
 function addLink() {
   var v = prompt("Paste a Spotify playlist, album or artist link:");
@@ -846,14 +884,14 @@ function getQueue() {
   return api("GET", "/me/player/queue").then(function (r) { return r && r.ok ? r.json() : null; }).then(function (j) { qU = j && j.queue ? j.queue.map(function (x) { return x.uri; }) : []; }).catch(function () {});
 }
 function openSongs(id, name, ctx, main) {
-  fromMain = !!main; $("trBackT").textContent = fromMain ? "Now playing" : "Playlists";
+  fromMain = !!main; $("trBackT").textContent = fromMain ? "Home" : "Playlists";
   openId = id; openCtx = ctx; lastUri = MD.sp ? MD.sp.uri : "";
   if (MD.sp && MD.sp.shuffle) getQueue().then(function () { if (openId === id && SC[id]) fill(id, SC[id], ctx); }); $("trN").textContent = name; $("plV").style.display = "none"; $("trV").style.display = "";
   if (SC[id]) return fill(id, SC[id], ctx);
   msg("Loading songs…");
   fetchSongs(id).then(function (L) { SC[id] = L; if (openId === id) fill(id, L, ctx); }).catch(function (s) {
     if (openId !== id) return;
-    msg(s === 401 ? "Spotify needs you to log in again." : s === 403 || s === 404 ? "Spotify only shows the songs in playlists she owns or is a collaborator on. Tap the playlist name to play it." : "Couldn't load the songs right now. Try again in a moment.", s === 401);
+    msg(s === 401 ? "Spotify needs you to log in again." : s === 403 || s === 404 ? "Spotify only shows the songs in playlists she owns or is a collaborator on. Tap the playlist name to play it. (Spotify code " + s + ")" : "Couldn't load the songs right now. Try again in a moment. (Spotify code " + s + ")", s === 401);
   });
 }
 $("trBack").onclick = function () { openId = ""; $("trV").style.display = "none"; $("plV").style.display = ""; if (fromMain) MD.show("sNow"); };
